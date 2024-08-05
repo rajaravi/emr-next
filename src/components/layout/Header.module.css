@@ -1,0 +1,36 @@
+/* src/components/layout/Header.module.css */
+
+/* Customize Navbar */
+.navbar {
+    background-color: #3366cc; /* Change this to match your desired color */
+  }
+  
+  .navbar-brand {
+    font-weight: bold;
+    font-size: 1.5rem;
+  }
+  
+  .navbar-nav .nav-link {
+    color: white !important; /* Force the text color to be white */
+    font-size: 1rem;
+    padding-right: 1rem;
+  }
+  
+  .navbar-nav .nav-link:hover {
+    background-color: #285199; /* Change this to match your desired hover color */
+    border-radius: 5px;
+  }
+  
+  .navbar-text {
+    color: white;
+    font-weight: bold;
+  }
+  
+  .navbar-toggler {
+    border-color: rgba(255, 255, 255, 0.5);
+  }
+  
+  .navbar-toggler-icon {
+    background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba%28255, 255, 255, 0.5%29' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+  }
+  
