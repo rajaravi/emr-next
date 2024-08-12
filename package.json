@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "nodemon --watch public/locales -e json --exec \"touch next.config.js\" --exec \"next dev\"",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
@@ -14,18 +14,27 @@
     "@fortawesome/react-fontawesome": "^0.2.2",
     "axios": "^1.7.3",
     "bootstrap": "^5.3.3",
+    "crypto-js": "^4.2.0",
+    "i18next": "^23.12.2",
     "next": "^14.2.5",
+    "next-i18next": "^15.3.1",
     "react": "^18.3.1",
     "react-bootstrap": "^2.10.4",
     "react-bootstrap-pagination-control": "^1.0.5",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "react-i18next": "^15.0.1",
+    "uuid": "^10.0.0"
   },
   "devDependencies": {
+    "@types/crypto-js": "^4.2.2",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@types/react-i18next": "^8.1.0",
+    "@types/uuid": "^10.0.0",
     "eslint": "^8",
     "eslint-config-next": "14.2.5",
+    "nodemon": "^3.1.4",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"

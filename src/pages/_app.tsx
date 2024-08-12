@@ -1,25 +1,19 @@
-import '../styles/global.css';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import { appWithTranslation } from 'next-i18next';
 import { AppProps } from 'next/app';
-import Layout from '../components/layout/Layout';
-import { useRouter } from 'next/router';
-import PatientLayout from '@/components/layout/PatientLayout';
-import { Suspense } from 'react';
+import Header from '@/components/layout/Header';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import '../styles/global.css';
 
-const MyApp = ({ Component, pageProps }: AppProps) => {
-  const router = useRouter();
-  const isPatientPage = router.pathname.startsWith('/patient/[id]');
+const EMRApp = ({ Component, pageProps }: AppProps) => {
+  console.log('API URL:', process.env.NEXT_PUBLIC_API_URL);
+  
+  return (
+    <>
+      <Header />
+      <Component {...pageProps} />
+    </>
+  );
 
-  // if (isPatientPage) {
-  //   const patientId = router.query.id as string;
-  //   return (
-  //     <PatientLayout patientId={patientId}>
-  //       <Component {...pageProps} />
-  //     </PatientLayout>
-  //   );
-  // }
-
-  return <Component {...pageProps} />;
 };
 
-export default MyApp;
+export default appWithTranslation(EMRApp);

@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import { Alert } from 'react-bootstrap';
 
 // components
-import LoginForm from '@/components/forms/LoginForm';
+import LoginForm from './components/LoginForm';
 // service
 import { login } from '@/services/authService';
 
@@ -17,10 +17,8 @@ const LoginPage = () => {
       const response = await login(email, password);
       if (response.success) {
         // Redirect to a protected page or home
-        // window.location.href = '/patient'; // Change as needed
         router.push('/patient'); 
       } else {
-        // alert('Login failed. Please check your credentials.');
         setError(response.error || 'Login failed');
       }
     } catch (error) {
