@@ -1,40 +1,32 @@
 import React, { ReactNode, Suspense } from 'react';
-import PatientSidebar from './PatientSidebar';
 import { Container, Row, Col } from 'react-bootstrap';
-import Header from './Header';
 import Loader from '../common/Loader';
 import { useRouter } from 'next/router';
+import AccountSidebar from './AccountSidebar';
 
-interface PatientLayoutProps {
+interface AccountLayoutProps {
   children: ReactNode;
-  patientId: string;
 }
 
-const PatientLayout: React.FC<PatientLayoutProps> = ({ children, patientId }) => {
+const AccountLayout: React.FC<AccountLayoutProps> = ({ children}) => {
   const router = useRouter();
   const { pathname } = router;
-  console.log("🚀 ~ router:2223", router, pathname)
   const { id } = router.query;
-
-  // Define restricted paths
-  const restrictedPathCommonHeader = ['/patient/[id]', '/patient/[id]/patient-details'];
-  const isHeaderAllowed = !restrictedPathCommonHeader.includes(pathname);
   
   return (
     <Container fluid>
         <Row>
             <Col xs={10} id="page-content-wrapper">
               <Suspense fallback={<Loader />}>
-                {isHeaderAllowed ? <div>I am common header to all side bar...</div> : ''}
                 {children}
               </Suspense>
             </Col>
             <Col xs={2} id="sidebar-wrapper">
-            <PatientSidebar patientId={patientId} />
+              <AccountSidebar/>
             </Col>
         </Row>
     </Container>
   );
 };
 
-export default PatientLayout;
+export default AccountLayout;

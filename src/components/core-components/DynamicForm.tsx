@@ -13,9 +13,10 @@ interface DynamicFormProps {
   onSubmit: (values: { [key: string]: any }) => void;
   isEditMode?: boolean;
   initialValues?: { [key: string]: any }; 
+  colClass?: string
 }
 
-const DynamicForm: React.FC<DynamicFormProps> = ({ initialValues = {}, formData, onSubmit, isEditMode = false }) => {
+const DynamicForm: React.FC<DynamicFormProps> = ({ initialValues = {}, formData, onSubmit, isEditMode = false, colClass = 'col-md-6' }) => {
   const [formValues, setFormValues] = useState<{ [key: string]: any }>({});
   const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
   const router = useRouter();
@@ -91,15 +92,15 @@ const DynamicForm: React.FC<DynamicFormProps> = ({ initialValues = {}, formData,
 
           switch (field.type) {
             case 'text':
-              return <TextInput key={index} {...commonProps} placeholder={field.placeholder} validation={field.validation} />;
+              return <TextInput key={index} {...commonProps} placeholder={field.placeholder} validation={field.validation} colClassName={colClass} />;
             case 'dropdown':
-              return <Dropdown key={index} {...commonProps} options={field.options!} />;
+              return <Dropdown key={index} {...commonProps} options={field.options!} colClassName={colClass}/>;
             case 'date':
-              return <DatePicker key={index} {...commonProps} />;
+              return <DatePicker key={index} {...commonProps} colClassName={colClass}/>;
             case 'radio':
-              return <RadioButton key={index} {...commonProps} options={field.options!} />;
+              return <RadioButton key={index} {...commonProps} options={field.options!} colClassName={colClass}/>;
             case 'checkbox':
-              return <Checkbox key={index} {...commonProps} options={field.options!} />;
+              return <Checkbox key={index} {...commonProps} options={field.options!} colClassName={colClass}/>;
             case 'submit':
               return (
                 <div key={index} className="col-12">

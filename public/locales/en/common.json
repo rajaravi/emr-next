@@ -17,5 +17,14 @@
       "EXAMINATION": "Examination",
       "APPOINTMENT": "Appointment"
     }
+  },
+  "ACCOUNT": {
+    "PATIENT_DASHBOARD": "Account Dashboard",
+    "SIDE_MENU": {
+      "INVOICE": "Invoice",
+      "RECEIPT": "Receipt",
+      "EXPENSES": "Expenses",
+      "CLAIM": "Claim"
+    }
   }
 }

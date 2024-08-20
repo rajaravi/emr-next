@@ -14,9 +14,10 @@ interface CheckboxProps {
   required?: boolean;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   error?: string;
+  colClassName: string
 }
 
-const Checkbox: React.FC<CheckboxProps> = ({ label, name, options, required, value, onChange, error, ...rest }) => {
+const Checkbox: React.FC<CheckboxProps> = ({ label, name, options, required, value, onChange, error, colClassName, ...rest }) => {
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value: checkboxValue, checked } = e.target;
     let updatedValues = [...value];
@@ -40,7 +41,7 @@ const Checkbox: React.FC<CheckboxProps> = ({ label, name, options, required, val
   };
 
   return (
-  <div className="col-md-6 mb-3">
+    <div className={`${colClassName} mb-3`}>
     <label>
         {required && <span className="text-danger">*</span>}
         {label}

@@ -7,10 +7,11 @@ interface DatePickerProps {
   value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   error?: string;
+  colClassName: string
 }
 
-const DatePicker: React.FC<DatePickerProps> = ({ label, name, required, value, onChange, error }) => (
-  <div className="col-md-6 mb-3">
+const DatePicker: React.FC<DatePickerProps> = ({ label, name, required, value, onChange, error, colClassName }) => (
+  <div className={`${colClassName} mb-3`}>
     <label className="form-label">
       {required && <span className="text-danger">*</span>}
       {label}

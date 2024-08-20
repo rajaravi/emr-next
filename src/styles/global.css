@@ -18,3 +18,8 @@ body {
   #page-content-wrapper {
     padding: 20px;
   }
+
+  .custom-modal-width {
+    max-width: 98%;
+  }
+  

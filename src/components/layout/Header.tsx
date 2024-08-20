@@ -28,7 +28,7 @@ const Header: React.FC = () => {
               </Link>
             </li>
             <li className="nav-item">
-              <Link href="/accounts" className={`nav-link ${styles.navLink}`}>
+              <Link href="/accounts/invoice" className={`nav-link ${styles.navLink}`}>
                 <FontAwesomeIcon icon={faWallet} /> {t('MENU.MENU_ACCOUNT')}
               </Link>
             </li>

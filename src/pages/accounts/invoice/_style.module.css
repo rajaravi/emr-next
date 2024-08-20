@@ -1,0 +1,28 @@
+.textColor {
+    color: red;
+}
+
+.buttonGroup .btn {
+    margin-right: 10px;
+}
+
+.title {
+    color: #767070c4;
+}
+
+.customtable thead {
+    background-color: #007bff;
+    /* Bootstrap primary color */
+    color: white;
+}
+
+.customtable,
+.customtable th,
+.customtable td {
+    border: none;
+}
+
+.customtable tbody tr {
+    border-bottom: 1px solid #dee2e6;
+    /* Light grey color for row separation */
+}
