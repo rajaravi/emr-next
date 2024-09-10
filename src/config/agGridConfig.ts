@@ -1,7 +1,7 @@
 import { ColDef, GridOptions } from 'ag-grid-community';
 
 export const defaultColumnDefs: ColDef[] = [
-  { sortable: true, filter: true, resizable: true },
+  { sortable: true, filter: true, resizable: false },
 ];
 
 export const defaultGridOptions: GridOptions = {
@@ -11,7 +11,7 @@ export const defaultGridOptions: GridOptions = {
   defaultColDef: {
     sortable: true,
     filter: false, // show/hide column filter
-    resizable: true,
+    resizable: false,
   },
   rowSelection: 'single'
 };

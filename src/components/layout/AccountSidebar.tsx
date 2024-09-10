@@ -23,30 +23,28 @@ const AccountSidebar: React.FC = () => {
       <ul className="nav nav-pills flex-column mb-auto">
         <li className="nav-item">
           <Link href={`/accounts/invoice`}
-            className={`nav-link ${activeLink === `/accounts/invoice` ? 'active' : 'link-dark'}`} aria-current="page">
+            className={`nav-link ${activeLink === `/accounts/invoice` ? 'active' : ''}`} aria-current="page">
             {t('ACCOUNT.SIDE_MENU.INVOICE')}
           </Link>
         </li>
-        <hr />
         <li>
           <Link href={`/accounts/receipt`}
-            className={`nav-link ${activeLink === `/accounts/receipt` ? 'active' : 'link-dark'}`}>
+            className={`nav-link ${activeLink === `/accounts/receipt` ? 'active' : ''}`}>
             {t('ACCOUNT.SIDE_MENU.RECEIPT')}
           </Link>
         </li>
         <li>
           <Link href={`/accounts/expenses`}
-            className={`nav-link ${activeLink === `/accounts/expenses` ? 'active' : 'link-dark'}`}>
+            className={`nav-link ${activeLink === `/accounts/expenses` ? 'active' : ''}`}>
             {t('ACCOUNT.SIDE_MENU.EXPENSES')}
           </Link>
         </li>
         <li>
           <Link href={`/accounts/claim`}
-            className={`nav-link ${activeLink === `/accounts/claim` ? 'active' : 'link-dark'}`}>
+            className={`nav-link ${activeLink === `/accounts/claim` ? 'active' : ''}`}>
             {t('ACCOUNT.SIDE_MENU.CLAIM')}
           </Link>
         </li>
-        <hr />
       </ul>
   </div>
   );

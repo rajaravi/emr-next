@@ -21,15 +21,15 @@ const PatientLayout: React.FC<PatientLayoutProps> = ({ children, patientId }) =>
   const isHeaderAllowed = !restrictedPathCommonHeader.includes(pathname);
   
   return (
-    <Container fluid>
+    <Container fluid className='m-0'>
         <Row>
-            <Col xs={10} id="page-content-wrapper">
+            <Col id="page-content-wrapper">
               <Suspense fallback={<Loader />}>
                 {isHeaderAllowed ? <div>I am common header to all side bar...</div> : ''}
                 {children}
               </Suspense>
             </Col>
-            <Col xs={2} id="sidebar-wrapper">
+            <Col id="sidebar-wrapper">
             <PatientSidebar patientId={patientId} />
             </Col>
         </Row>
