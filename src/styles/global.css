@@ -38,7 +38,7 @@ h6 {
 }
 .sidebar {
   background-color: #ffffff;
-  height: calc(100vh - 90px);
+  height: calc(100vh - 60px);
   border: 1px solid #eaf1fb;
   box-shadow: 0 0 5px rgb(221 230 243);
 }
@@ -46,7 +46,7 @@ h6 {
   color: #333;
   font-size: .9rem;
   font-weight: 500;
-  border-bottom: 1px dotted #bbc9de;
+  /* border-bottom: 1px dotted #bbc9de; */
   border-radius: 0;
 }
 #page-content-wrapper {
@@ -59,8 +59,8 @@ h6 {
   width: 230px;
   height: 100%;
   position: fixed;
-  left: 15px;
-  top: 75px;
+  left: 0;
+  top: 60px;
   padding: 0;
 }
 .nav-pills .nav-link.active, .nav-pills .show>.nav-link {  
