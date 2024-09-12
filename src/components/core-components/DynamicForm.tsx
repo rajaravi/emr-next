@@ -1,22 +1,37 @@
-import React, { useEffect, useState } from 'react';
+import React, { forwardRef, useEffect, useState, Ref } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import TextInput from './TextInput';
-import Dropdown from './Dropdown';
-import DatePicker from './DatePicker';
-import RadioButton from './RadioButton';
-import Checkbox from './Checkbox';
+import TextInput from './formElements/TextInput';
+import Dropdown from './formElements/Dropdown';
+import DatePicker from './formElements/DatePicker';
+import RadioButton from './formElements/RadioButton';
+import Checkbox from './formElements/Checkbox';
 import { useRouter } from 'next/router';
 import { FormField } from '@/types/form';
 
-interface DynamicFormProps {
-  formData: FormField[];
-  onSubmit: (values: { [key: string]: any }) => void;
-  isEditMode?: boolean;
-  initialValues?: { [key: string]: any }; 
-  colClass?: string
+
+export interface DynamicFormHandle {
+  validateModelForm: any;
 }
 
-const DynamicForm: React.FC<DynamicFormProps> = ({ initialValues = {}, formData, onSubmit, isEditMode = false, colClass = 'col-md-6' }) => {
+interface DynamicFormProps {
+  formData: FormField[];
+  onSubmit?: (values: { [key: string]: any }) => void;
+  isEditMode?: boolean;
+  initialValues?: { [key: string]: any }; 
+  colClass?: string;
+  modelFormInputs?: React.ChangeEventHandler<HTMLInputElement | HTMLSelectElement>;
+}
+
+const DynamicForm = forwardRef<DynamicFormHandle, DynamicFormProps> (({
+    initialValues = {},
+    formData,
+    onSubmit,
+    isEditMode = false,
+    colClass = 'col-md-6',
+    modelFormInputs
+  },
+    ref: Ref<DynamicFormHandle>
+  ) => {
   const [formValues, setFormValues] = useState<{ [key: string]: any }>({});
   const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
   const router = useRouter();
@@ -34,14 +49,38 @@ const DynamicForm: React.FC<DynamicFormProps> = ({ initialValues = {}, formData,
     }
   }, [formData, initialValues, isEditMode]);
 
+  // Set initial invoice date
+  useEffect(() => {
+    setFormValues((prevFormData) => ({
+      ...prevFormData,
+      invDate: new Date().toISOString().split('T')[0],  // Set initial value to current date
+    }));
+  }, []);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
+  React.useImperativeHandle(ref, () => ({
+    validateModelForm
+  }));
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = event.target;
+    console.log("🚀 ~ DynamicForm handleChange ~ name, value:", name, value, typeof event)
     setFormValues({
       ...formValues,
       [name]: value,
     });
+
+    if (modelFormInputs) {
+      modelFormInputs?.(event);
+      if (value) {
+        formErrors[name] = '';
+        setFormErrors(formErrors);
+      }
+    }
   };
+
+  const validateModelForm = () => {
+    validate();
+  }
 
   const validate = () => {
     const errors: { [key: string]: string } = {};
@@ -63,11 +102,11 @@ const DynamicForm: React.FC<DynamicFormProps> = ({ initialValues = {}, formData,
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
     console.log("🚀 ~ handleSubmit ~ formValues:", formValues)
+    e.preventDefault();
 
     if (validate()) {
-        onSubmit(formValues);
+        onSubmit?.(formValues);
     }
   };
 
@@ -76,6 +115,7 @@ const DynamicForm: React.FC<DynamicFormProps> = ({ initialValues = {}, formData,
   };
 
   const sortedFormData = [...formData].sort((a, b) => a.order - b.order);
+  // console.log("🚀 ~ sortedFormData:", sortedFormData)
 
   return (
     <form onSubmit={handleSubmit} className="container">
@@ -96,7 +136,14 @@ const DynamicForm: React.FC<DynamicFormProps> = ({ initialValues = {}, formData,
             case 'dropdown':
               return <Dropdown key={index} {...commonProps} options={field.options!} colClassName={colClass}/>;
             case 'date':
-              return <DatePicker key={index} {...commonProps} colClassName={colClass}/>;
+              return (
+              <DatePicker 
+                key={index} 
+                {...commonProps} 
+                disablePrevDate={field.disablePrevDate} 
+                disableFutureDate={field.disableFutureDate} 
+                colClassName={colClass}
+              />);
             case 'radio':
               return <RadioButton key={index} {...commonProps} options={field.options!} colClassName={colClass}/>;
             case 'checkbox':
@@ -111,7 +158,7 @@ const DynamicForm: React.FC<DynamicFormProps> = ({ initialValues = {}, formData,
                     <button type="submit" className="btn btn-primary">
                     {isEditMode ? 'Update Patient' : 'Save Patient'}
                     </button>
-                </div>
+                  </div>
                 </div>
               );
             default:
@@ -121,6 +168,6 @@ const DynamicForm: React.FC<DynamicFormProps> = ({ initialValues = {}, formData,
       </div>
     </form>
   );
-};
+});
 
 export default DynamicForm;

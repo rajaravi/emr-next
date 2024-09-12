@@ -3,10 +3,11 @@ import { FormField } from "@/types/form";
  export const InvoiceFormElements: FormField[] = [
   {
     "type": "date",
-    "name": "date",
+    "name": "invDate",
     "label": "Date",
     "required": true,
     "defaultValue": "",
+    "disablePrevDate": true,
     "order": 1
   },
   {
@@ -24,7 +25,7 @@ import { FormField } from "@/types/form";
   },
   {
     "type": "dropdown",
-    "name": "income_category",
+    "name": "incomeCategory",
     "label": "Income Category",
     "options": [
       { "label": "Category 1", "value": "cat1" },
@@ -37,7 +38,7 @@ import { FormField } from "@/types/form";
   },
   {
     "type": "dropdown",
-    "name": "bill_to",
+    "name": "billTo",
     "label": "Bill To",
     "options": [
       { "label": "Client A", "value": "client_a" },
@@ -50,7 +51,7 @@ import { FormField } from "@/types/form";
   },
   {
     "type": "dropdown",
-    "name": "patient_name",
+    "name": "patientName",
     "label": "Patient Name",
     "options": [
       { "label": "Patient 1", "value": "patient1" },

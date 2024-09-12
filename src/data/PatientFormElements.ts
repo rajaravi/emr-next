@@ -43,6 +43,8 @@ import { FormField } from "@/types/form";
       "name": "dob",
       "label": "Date of Birth",
       "required": true,
+      "disablePrevDate": false,
+      "disableFutureDate": true,
       "order": 4
     },
     {

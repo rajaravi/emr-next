@@ -7,10 +7,16 @@ interface DatePickerProps {
   value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   error?: string;
-  colClassName: string
+  disablePrevDate?: boolean;
+  disableFutureDate?: boolean;
+  colClassName: string;
 }
 
-const DatePicker: React.FC<DatePickerProps> = ({ label, name, required, value, onChange, error, colClassName }) => (
+const todayDate = new Date().toISOString().split('T')[0];
+
+const DatePicker: React.FC<DatePickerProps> = ({ 
+  label, name, required, value, onChange, error, disablePrevDate = true, disableFutureDate = true, colClassName 
+}) => (
   <div className={`${colClassName} mb-3`}>
     <label className="form-label">
       {required && <span className="text-danger">*</span>}
@@ -21,7 +27,9 @@ const DatePicker: React.FC<DatePickerProps> = ({ label, name, required, value, o
       name={name}
       className={`form-control ${error ? 'is-invalid' : ''}`}
       required={required}
-      value={value}
+      value={value || todayDate}
+      min={disablePrevDate ? todayDate: undefined}
+      max={disableFutureDate ? todayDate: undefined}
       onChange={onChange}
     />
     {error && <div className="text-danger">{error}</div>}

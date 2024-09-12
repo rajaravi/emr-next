@@ -28,7 +28,7 @@ const ModalPopUp: React.FC<ModalPopUpProps> = ({ show, handleClose, title, child
                 aria-hidden={!show}
                 onClick={handleBackdropClick}
             >
-                <div className={`modal-dialog ${sizeElement}`}>
+                <div className={`modal-dialog modal-dialog-scrollable ${sizeElement}`}>
                     <div className="modal-content">
                         <div className="modal-header">
                             <h5 className="modal-title" style={{ flex: 1 }}>{title}</h5>
