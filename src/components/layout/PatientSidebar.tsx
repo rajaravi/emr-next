@@ -23,30 +23,28 @@ const PatientSidebar: React.FC<PatientSidebarProps> = ({ patientId }) => {
       <ul className="nav nav-pills flex-column mb-auto">
         <li className="nav-item">
           <Link href={`/patient/${patientId}/patient-details`}
-            className={`nav-link ${activeLink === `/patient/${patientId}/patient-details` ? 'active' : 'link-dark'}`} aria-current="page">
+            className={`nav-link ${activeLink === `/patient/${patientId}/patient-details` ? 'active' : ''}`} aria-current="page">
             {t('PATIENT.SIDE_MENU.PATIENT_DETAILS')}
           </Link>
         </li>
-        <hr />
         <li>
           <Link href={`/patient/${patientId}/patient-history`}
-            className={`nav-link ${activeLink === `/patient/${patientId}/patient-history` ? 'active' : 'link-dark'}`}>
+            className={`nav-link ${activeLink === `/patient/${patientId}/patient-history` ? 'active' : ''}`}>
             {t('PATIENT.SIDE_MENU.PATIENT_HISTORY')}
           </Link>
         </li>
         <li>
           <Link href={`/patient/${patientId}/examination`}
-            className={`nav-link ${activeLink === `/patient/${patientId}/examination` ? 'active' : 'link-dark'}`}>
+            className={`nav-link ${activeLink === `/patient/${patientId}/examination` ? 'active' : ''}`}>
             {t('PATIENT.SIDE_MENU.EXAMINATION')}
           </Link>
         </li>
         <li>
           <Link href={`/patient/${patientId}/appointment`}
-            className={`nav-link ${activeLink === `/patient/${patientId}/appointment` ? 'active' : 'link-dark'}`}>
+            className={`nav-link ${activeLink === `/patient/${patientId}/appointment` ? 'active' : ''}`}>
             {t('PATIENT.SIDE_MENU.APPOINTMENT')}
           </Link>
         </li>
-        <hr />
       </ul>
   </div>
   );

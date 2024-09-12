@@ -6,7 +6,10 @@
     "MENU_PATIENT": "Patient",
     "MENU_CALENDAR": "Calendar",
     "MENU_ACCOUNT": "Accounts",
-    "MENU_TRAY": "Tray"
+    "MENU_TRAY": "Tray",
+    "MENU_SETTING": "Settings",
+    "MENU_REPORT": "Reports"
+    
   },
   "PATIENT": {
     "PATIENT_DASHBOARD": "Patient Dashboard",
@@ -25,6 +28,20 @@
       "RECEIPT": "Receipt",
       "EXPENSES": "Expenses",
       "CLAIM": "Claim"
+    }
+  },
+  "SETTING": {
+    "PATIENT_DASHBOARD": "Patient Dashboard",
+    "EDIT_HEADER": "Edit Patient",
+    "SIDE_MENU": {
+      "DOCTOR": "Doctor",
+      "SPECIALITY": "Speciality",
+      "REFERENCE": "Reference",
+      "LOCATION": "Location",
+      "PURCHASER": "Purchaser",
+      "PURCHASER_TYPE": "Purchaser Type",
+      "PATIENT_TYPE": "Patient Type",
+      "USER": "User"
     }
   }
 }

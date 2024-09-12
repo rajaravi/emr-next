@@ -1,25 +1,86 @@
+@import url('https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
+
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-
-  html, body, #__next {
+  /* font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; */
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Rubik", sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  font-style: normal;
+  background-color: #EEF5FF;
+}
+h1 {
+  font-size: 2rem;
+  font-weight: 400;
+}
+h2 {
+  font-size: 1.85rem;
+}
+h3 {
+  font-size: 1.5rem;
+}
+h4 {
+  font-size: 1.35rem;
+}
+h5 {
+  font-size: 1.15rem;
+}
+h6 {
+  font-size: 1rem;
+}
+.navbar .nav-link {
+  color: #fff;
+  font-size: 1.1rem;
+  margin: 0 5px;
+}
+.sidebar {
+  background-color: #ffffff;
+  height: calc(100vh - 60px);
+  border: 1px solid #eaf1fb;
+  box-shadow: 0 0 5px rgb(221 230 243);
+}
+.sidebar .nav-link {
+  color: #333;
+  font-size: .9rem;
+  font-weight: 500;
+  /* border-bottom: 1px dotted #bbc9de; */
+  border-radius: 0;
+}
+#page-content-wrapper {
+  width: calc(100% - 230px);
+  position: absolute;
+  right: 0;
+  top: 60px;
+}
+#sidebar-wrapper {
+  width: 230px;
+  height: 100%;
+  position: fixed;
+  left: 0;
+  top: 60px;
+  padding: 0;
+}
+.nav-pills .nav-link.active, .nav-pills .show>.nav-link {  
+  color: #fd960d;
+  border-left: 3px solid;
+  background-color: #fff;
+}
+html, body, #__next {
     height: 100%;
-  }
-  
-  .sidebar {
-    background: #f8f9fa;
-    height: 100vh;
-    padding-top: 20px;
-  }
-  
-  #page-content-wrapper {
-    padding: 20px;
-  }
+}
+#page-content-wrapper {
+  padding: 20px;
+}
+.custom-modal-width {
+  max-width: 98%;
+}
 
-  .custom-modal-width {
-    max-width: 98%;
-  }
+.ag-root-wrapper {
+  font-family: "Open Sans", sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+}
   

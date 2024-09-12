@@ -85,13 +85,13 @@ const PatientIndex: React.FC = () => {
   
 
   return (
-    <div className="container-fluid mt-2">
+    <div className="container-fluid">
       <div className="d-flex justify-content-between align-items-center">
-        <h1 className={`${styles.title} mb-3`}>Patient</h1>
+        <h1 className={`${styles.title} my-3`}>Patient</h1>
         <div className={styles.buttonGroup}>
-          <button className={`${styles.btn} btn btn-success`} onClick={addNewPatinet}>
+          <button className={`${styles.btn} btn btn-sm btn-success rounded-0`} onClick={addNewPatinet}>
             <FontAwesomeIcon icon={faPlus} /> Add New</button>
-          <button className="btn btn-primary" onClick={editPatinet}>
+          <button className="btn btn-sm btn-primary rounded-0" onClick={editPatinet}>
             <FontAwesomeIcon icon={faEdit} /> Edit</button>
         </div>
       </div>

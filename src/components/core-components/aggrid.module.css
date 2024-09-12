@@ -1,11 +1,15 @@
 .agthemequartz {
     /* --ag-foreground-color: rgb(126, 46, 132);
     --ag-background-color: rgb(249, 245, 227); */
-    --ag-header-foreground-color: rgb(255, 255, 255);
-    --ag-header-background-color: rgb(105, 191, 227);
+    --ag-header-foreground-color: #000;
+    --ag-header-background-color: #F8FAFC;
+    /* border-bottom: 1px solid #D9D9D9; */
     /* --ag-odd-row-background-color: rgb(0, 0, 0, 0.03);
     --ag-header-column-resize-handle-color: rgb(126, 46, 132);
 
     --ag-font-size: 17px;
     --ag-font-family: monospace; */
+}
+.ag-header-cell-sortable .ag-header-cell-label {
+    font-weight: 600 !important;
 }
