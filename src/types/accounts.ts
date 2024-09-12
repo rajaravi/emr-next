@@ -15,7 +15,30 @@ export interface TableRow {
     quantity: number;
     cost: number;
     total: number;
-  }
+}
+
+interface Procedure {
+  date: string;
+  code: number;
+  procedure: string;
+  quantity: number;
+  cost: number;
+  total: number;
+}
+
+export interface InvoiceModel {
+  invDate: string;
+  doctor: string;
+  incomeCategory: string;
+  billTo: string;
+  patientName: string;
+  tax: string;
+  procedures: Procedure[];
+  subTotal: number;
+  discount: number;
+  taxAmount: number;
+  netTotal: number;
+}
 
 export const sampleAccountRecords: AccountTable[] = [
     {

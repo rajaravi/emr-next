@@ -27,7 +27,9 @@
       "INVOICE": "Invoice",
       "RECEIPT": "Receipt",
       "EXPENSES": "Expenses",
-      "CLAIM": "Claim"
+      "CLAIM": "Claim",
+      "EDITOR": "Document Editor",
+      "DOCUMENTS": "CK Editor"
     }
   },
   "SETTING": {

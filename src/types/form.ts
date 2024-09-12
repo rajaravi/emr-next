@@ -19,6 +19,8 @@ export interface FormField {
     order: number;
     value?: string;
     multiple?: boolean;
+    disablePrevDate?: boolean;
+    disableFutureDate?: boolean;
     defaultValue?: string | number | undefined | string[]; 
 }
   
