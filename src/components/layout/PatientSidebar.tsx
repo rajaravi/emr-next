@@ -27,19 +27,19 @@ const PatientSidebar: React.FC<PatientSidebarProps> = ({ patientId }) => {
             {t('PATIENT.SIDE_MENU.PATIENT_DETAILS')}
           </Link>
         </li>
-        <li>
+        <li className="nav-item">
           <Link href={`/patient/${patientId}/patient-history`}
             className={`nav-link ${activeLink === `/patient/${patientId}/patient-history` ? 'active' : ''}`}>
             {t('PATIENT.SIDE_MENU.PATIENT_HISTORY')}
           </Link>
         </li>
-        <li>
+        <li className="nav-item">
           <Link href={`/patient/${patientId}/examination`}
             className={`nav-link ${activeLink === `/patient/${patientId}/examination` ? 'active' : ''}`}>
             {t('PATIENT.SIDE_MENU.EXAMINATION')}
           </Link>
         </li>
-        <li>
+        <li className="nav-item">
           <Link href={`/patient/${patientId}/appointment`}
             className={`nav-link ${activeLink === `/patient/${patientId}/appointment` ? 'active' : ''}`}>
             {t('PATIENT.SIDE_MENU.APPOINTMENT')}

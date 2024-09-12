@@ -22,32 +22,46 @@ const SettingSidebar : React.FC = () => {
             className={`nav-link ${activeLink === `/settings/doctor` ? 'active' : ''}`} aria-current="page">
             {t('SETTING.SIDE_MENU.DOCTOR')}
           </Link>
+        </li>
+        <li className="nav-item">
           <Link href={`/settings/speciality`}
-            className={`nav-link ${activeLink === `/settings/speciality` ? 'active' : ''}`} aria-current="page">
+            className={`nav-link ${activeLink === `/settings/speciality` ? 'active' : ''}`}>
             {t('SETTING.SIDE_MENU.SPECIALITY')}
           </Link>
+        </li>
+        <li className="nav-item">
           <Link href={`/settings/reference`}
-            className={`nav-link ${activeLink === `/settings/reference` ? 'active' : ''}`} aria-current="page">
+            className={`nav-link ${activeLink === `/settings/reference` ? 'active' : ''}`}>
             {t('SETTING.SIDE_MENU.REFERENCE')}
           </Link>
+        </li>
+        <li className="nav-item">
           <Link href={`/settings/location`}
-            className={`nav-link ${activeLink === `/settings/location` ? 'active' : ''}`} aria-current="page">
+            className={`nav-link ${activeLink === `/settings/location` ? 'active' : ''}`}>
             {t('SETTING.SIDE_MENU.LOCATION')}
           </Link>
+        </li>
+        <li className="nav-item">
           <Link href={`/settings/purchaser`}
-            className={`nav-link ${activeLink === `/settings/purchaser` ? 'active' : ''}`} aria-current="page">
+            className={`nav-link ${activeLink === `/settings/purchaser` ? 'active' : ''}`}>
             {t('SETTING.SIDE_MENU.PURCHASER')}
           </Link>
+        </li>
+        <li className="nav-item">
           <Link href={`/settings/purchaser-type`}
-            className={`nav-link ${activeLink === `/settings/purchaser-type` ? 'active' : ''}`} aria-current="page">
+            className={`nav-link ${activeLink === `/settings/purchaser-type` ? 'active' : ''}`}>
             {t('SETTING.SIDE_MENU.PURCHASER_TYPE')}
           </Link>
+        </li>
+        <li className="nav-item">
           <Link href={`/settings/patient-type`}
-            className={`nav-link ${activeLink === `/settings/patient-type` ? 'active' : ''}`} aria-current="page">
+            className={`nav-link ${activeLink === `/settings/patient-type` ? 'active' : ''}`}>
             {t('SETTING.SIDE_MENU.PATIENT_TYPE')}
           </Link>
+        </li>
+        <li className="nav-item">
           <Link href={`/settings/user`}
-            className={`nav-link ${activeLink === `/settings/user` ? 'active' : ''}`} aria-current="page">
+            className={`nav-link ${activeLink === `/settings/user` ? 'active' : ''}`}>
             {t('SETTING.SIDE_MENU.USER')}
           </Link>
         </li>        

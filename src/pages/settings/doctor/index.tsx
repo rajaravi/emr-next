@@ -66,7 +66,7 @@ const Doctor: React.FC = () => {
 
   return (
     <SettingLayout>
-        <div className="d-flex justify-content-between align-items-center ms-3">
+        <div className="d-flex justify-content-between align-items-center">
           <h1 className={`${styles.title} mb-3`}>{t('SETTING.SIDE_MENU.DOCTOR')}</h1>
           <div className={styles.buttonGroup}>
             <a className={`${styles.btn} text-dark mx-3 text-decoration-none btn btn-sm border-0`}>
@@ -78,7 +78,7 @@ const Doctor: React.FC = () => {
             
           </div>
         </div>
-        <div className='ms-3'>
+        <div>
           <AgGridComponent<DoctorTable>
             rowData={rowData}
             columnDefs={columnDefs}
