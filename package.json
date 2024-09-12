@@ -10,9 +10,12 @@
   },
   "dependencies": {
     "@flaticon/flaticon-uicons": "^3.3.1",
+    "@ckeditor/ckeditor5-build-classic": "^43.1.0",
+    "@ckeditor/ckeditor5-react": "^9.1.0",
     "@fortawesome/fontawesome-svg-core": "^6.6.0",
     "@fortawesome/free-solid-svg-icons": "^6.6.0",
     "@fortawesome/react-fontawesome": "^0.2.2",
+    "@syncfusion/ej2-react-documenteditor": "^26.2.11",
     "ag-grid-community": "^32.1.0",
     "ag-grid-react": "^32.1.0",
     "axios": "^1.7.3",
@@ -36,10 +39,12 @@
     "@types/react-dom": "^18",
     "@types/react-i18next": "^8.1.0",
     "@types/uuid": "^10.0.0",
+    "css-loader": "^7.1.2",
     "eslint": "^8",
     "eslint-config-next": "14.2.5",
     "nodemon": "^3.1.4",
     "postcss": "^8",
+    "style-loader": "^4.0.0",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
   }

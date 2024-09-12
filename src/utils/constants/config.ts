@@ -1,0 +1,6 @@
+export const EMR_CONFIG = {
+    INVOICE_DISCOUNT_PERCENTAGE: 10,
+    INVOICE_TAX_PERCENTAGE: 5,
+}
+
+export default EMR_CONFIG;

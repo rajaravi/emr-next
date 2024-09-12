@@ -21,6 +21,11 @@
       "@/*": ["./src/*"]
     }
   },
+  "jsx": "react",
+  "esModuleInterop": true,
+  "moduleResolution": "node",
+  "allowSyntheticDefaultImports": true,
+  // "types": ["@ckeditor/ckeditor5-build-classic", "@types/react"],
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
   "exclude": ["node_modules"]
 }

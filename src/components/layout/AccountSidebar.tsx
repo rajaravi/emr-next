@@ -45,6 +45,18 @@ const AccountSidebar: React.FC = () => {
             {t('ACCOUNT.SIDE_MENU.CLAIM')}
           </Link>
         </li>
+        <li>
+          <Link href={`/accounts/editor`}
+            className={`nav-link ${activeLink === `/accounts/editor` ? 'active' : 'link-dark'}`}>
+            {t('ACCOUNT.SIDE_MENU.EDITOR')}
+          </Link>
+        </li>
+        <li>
+          <Link href={`/accounts/documents`}
+            className={`nav-link ${activeLink === `/accounts/documents` ? 'active' : 'link-dark'}`}>
+            {t('ACCOUNT.SIDE_MENU.DOCUMENTS')}
+          </Link>
+        </li>
       </ul>
   </div>
   );
