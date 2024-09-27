@@ -1,24 +1,30 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { Table, Button } from 'react-bootstrap';
 import { useRouter } from 'next/router';
 import styles from './_style.module.css';
+import { execute_axios_get } from '@/utils/services/httpService';
+import { ColDef, RowClickedEvent, RowDoubleClickedEvent } from 'ag-grid-community';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlus, faEdit, faPrint, faSave, faClose, faSearch, faCheck } from '@fortawesome/free-solid-svg-icons';
+
+import AccountLayout from '@/components/layout/AccountLayout';
+import ModalPopUp from '@/components/core-components/ModalPopUp';
+import AgGridComponent from '@/components/core-components/AgGridComponent';
+import DynamicForm, { DynamicFormHandle } from '@/components/core-components/DynamicForm';
+
+import { InvoiceFormElements } from '@/data/InvoiceFormElements';
+import { ProcedureTable, sampleProcedureTable } from '@/types/procedure';
+import { AccountTable, sampleAccountRecords, InvoiceModel } from '@/types/accounts';
+
+import { Patient, initialInvoiceValues } from '@/types/patient';
+import { idToUuid } from '@/utils/helpers/uuid';
+import { EMR_CONFIG } from '@/utils/constants/config'
+
 // Translation logic - start
 import { GetStaticPaths, GetStaticProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { getI18nStaticProps } from '@/utils/services/getI18nStaticProps';
-import AccountLayout from '@/components/layout/AccountLayout';
-import AgGridComponent from '@/components/core-components/AgGridComponent';
-import { faPlus, faEdit, faPrint, faSave, faClose, faSearch, faCheck } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { AccountTable, sampleAccountRecords, InvoiceModel } from '@/types/accounts';
-import { ColDef, RowClickedEvent, RowDoubleClickedEvent } from 'ag-grid-community';
-import { Patient } from '@/types/patient';
-import { idToUuid } from '@/utils/helpers/uuid';
-import ModalPopUp from '@/components/core-components/ModalPopUp';
-import DynamicForm, { DynamicFormHandle } from '@/components/core-components/DynamicForm';
-import { InvoiceFormElements } from '@/data/InvoiceFormElements';
-import { Table, Button } from 'react-bootstrap';
-import { ProcedureTable, sampleProcedureTable } from '@/types/procedure';
-import { EMR_CONFIG } from '@/utils/constants/config'
+
 
 export const getStaticProps: GetStaticProps = getI18nStaticProps();
 // Translation logic - end
@@ -36,7 +42,9 @@ const Invoice: React.FC = () => {
     patientName: '',
     tax: '',
     procedures: [
-      { date: '', code: 0, procedure: '', quantity: 1, cost: 0, total: 0 },
+      { 
+        date: new Date().toISOString().split("T")[0],
+        code: 0, procedure: '', quantity: 1, cost: 0, total: 0 },
     ],
     subTotal: 0,
     discount: 0,
@@ -44,7 +52,7 @@ const Invoice: React.FC = () => {
     netTotal: 0,
   };
   const dynamicFormRef = useRef<DynamicFormHandle>(null);
-
+  const [loading, setLoading] = useState<boolean>(false);
   const [selectedInvoice, setSelectedInvoice] = useState<AccountTable | null>(null);
   const [selectedProcedure, setSelectedProcedure] = useState<ProcedureTable | null>(null);
   const [rowData, setRowData] = useState<AccountTable[]>([]);
@@ -52,13 +60,37 @@ const Invoice: React.FC = () => {
   const [columnDefs, setColumnDefs] = useState<ColDef[]>([]);
   const [columnProcedureDefs, setProcedureColumnDefs] = useState<ColDef[]>([]);
   const [showModal, setShowModal] = useState(false);
+  const [formReset, setFormReset] = useState(false);
   const [showProcedureModal, setShowProcedureModal] = useState(false);
   const [procedureIndex, setProcedureIndex] = useState<number | null>(null);
   const [formData, setFormData] = useState<InvoiceModel>(initialFormData);
+  const [invoiceFormConfig, setInvoiceFormConfig] = useState<any>(InvoiceFormElements);
+
+  const [patientList, setPatientList] = useState<{ [key: number]: any }>({});
+  const [error, setError] = useState<string | null>(null);
+
+  type Option = {
+    label: string;
+    value: string;
+  };
 
   useEffect(() => {
-    // console.log('----samplePatients--->', sampleAccountRecords)
-    const fetchCarsData = async () => {
+    const fetchPatientList = async () => {
+      try {
+        const response = await execute_axios_get('/mock/getPatientList'); // Replace with your actual API endpoint
+        updateTypeaheadOptions(response.data);
+      } catch (err) {
+        setError('Failed to load patient data.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPatientList();
+  }, []);
+
+  useEffect(() => {
+    const fetchAccountData = async () => {
       const rowDataFromApi: AccountTable[] = sampleAccountRecords;
       const columnDefsFromApi: ColDef[] = [
         { headerName: 'Inv.No', field: 'inv_no', sortable: true, filter: true, resizable: true, width: 250  },
@@ -74,12 +106,11 @@ const Invoice: React.FC = () => {
       setColumnDefs(columnDefsFromApi);
     };
 
-    fetchCarsData();
+    fetchAccountData();
   }, []);
 
   useEffect(() => {
-    // console.log('----sampleProcedure--->', sampleProcedureTable)
-    const fetchCarsData = async () => {
+    const fetchProcedureData = async () => {
       const rowDataFromApi: ProcedureTable[] = sampleProcedureTable;
       const columnDefsFromApi: ColDef[] = [
         { headerName: 'S.No', field: 's_no', sortable: true, filter: false, resizable: false, width: 80  },
@@ -92,16 +123,33 @@ const Invoice: React.FC = () => {
       setProcedureColumnDefs(columnDefsFromApi);
     };
 
-    fetchCarsData();
+    fetchProcedureData();
   }, []);
 
-   // Set initial invoice date
-  // useEffect(() => {
-  //   setFormValues((prevFormData) => ({
-  //     ...prevFormData,
-  //     invDate: new Date().toISOString().split('T')[0],  // Set initial value to current date
-  //   }));
-  // }, []);
+  // Function to update options in form config
+  const updateTypeaheadOptions = (apiData: Option[]) => {
+    const updatedConfig = invoiceFormConfig.map((field: { type: string; }) => {
+        if (field.type === "typeahead") {
+            return {
+                ...field,
+                options: apiData,
+            };
+        }
+        return field;
+    });
+    setInvoiceFormConfig(updatedConfig);
+  };
+
+  const handleShow = () => {
+    setShowModal(true);
+    setFormReset(true);
+    setFormData(initialFormData);
+  };
+  const handleClose = () => {
+    setShowModal(false);
+    setFormReset(false);
+    setFormData(initialFormData);
+  };
 
   const onInvoiceDoubleClicked = (event: RowDoubleClickedEvent<AccountTable>): void => {
     if (event.data) {
@@ -131,16 +179,6 @@ const Invoice: React.FC = () => {
     console.log("🚀 ~ handleProcedureSelect---> 2:", event.data);
   }
 
-
-  const handleShow = () => {
-    setShowModal(true);
-    setFormData(initialFormData);
-  };
-  const handleClose = () => {
-    setShowModal(false);
-    setFormData(initialFormData);
-  };
-
   const handleShowProcedure = (index: React.SetStateAction<number | null>) => {
     setProcedureIndex(index);
     setShowProcedureModal(true);
@@ -167,25 +205,6 @@ const Invoice: React.FC = () => {
     console.log("🚀 ~ handleOkProcedure--updatedProcedures---> 3:", procedureIndex, updatedProcedures, selectedProcedure, formData);
     setSelectedProcedure(null)
   }
-  
-  const handleSave = async (action: string) => {
-    // Save or Save & Pay based on action
-    console.log('Form Action & Data: ', action, formData);
-
-    if (dynamicFormRef.current?.validateModelForm()) {
-      console.log('Form is valid', dynamicFormRef);
-    } else {
-      console.log('Form is invalid', dynamicFormRef);
-    }
-    // Call API to save the data
-    // await api.saveInvoice(formData);
-
-    if (action === 'savePay') {
-      // Logic for Save & Pay
-    }
-    // setShowModal(false)
-  }
-
   // Function to add a new procedure row
   const handleAddProcedure = () => {
     const newProcedure = { date: '', code: 0, procedure: '', quantity: 1,
@@ -209,11 +228,11 @@ const Invoice: React.FC = () => {
     calculateInvoice(updatedFormData)
   };
 
-
+  
   // Function to handle form field changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>, index?: number) => {
+    setFormReset(false); // block form reset
     const { name, value } = e.target;
-    console.log("🚀 ~ Parent: handleInputChange ~ name, value:", name, value)
 
     if (index !== undefined) {
       const updatedProcedures = [...formData.procedures];
@@ -230,6 +249,11 @@ const Invoice: React.FC = () => {
     }
   };
 
+  const handleTypeaheadInputChange = (name: string, selected: any) => {
+    setFormReset(false); // block form reset
+    setFormData({ ...formData, [name]: selected });
+  };
+  // Function to calculate invoice
   const calculateInvoice = (invoice: InvoiceModel) => {
     // Case 1: Calculate total for each procedure
     invoice.procedures = invoice.procedures.map((procedure) => {
@@ -253,6 +277,25 @@ const Invoice: React.FC = () => {
   
     return invoice;
   };
+
+  // Function to handle post form data
+  const handleSave = async (action: string) => {
+    // Save or Save & Pay based on action
+    console.log('Form Action & Data: ', action, formData);
+
+    if (dynamicFormRef.current?.validateModelForm()) {
+      console.log('Form is valid', dynamicFormRef);
+      handleClose()
+    } else {
+      console.log('Form is invalid', dynamicFormRef);
+    }
+    // Call API to save the data
+    // await api.saveInvoice(formData);
+
+    if (action === 'savePay') {
+      // Logic for Save & Pay
+    }
+  }
 
   return (
     <>
@@ -299,11 +342,13 @@ const Invoice: React.FC = () => {
         }
       >
         {/* Form content goes here */}
-        {/* <div>Modal body text goes here.</div> */}
         <div className="container mt-4">
           <DynamicForm ref={dynamicFormRef}
-            formData={InvoiceFormElements}
+            formData={invoiceFormConfig}
+            formReset={formReset}
+            initialValues={initialFormData}
             modelFormInputs={handleInputChange}
+            modelFormTypeahead={handleTypeaheadInputChange}
             colClass="col-md-4"
           />
           <div className="container">

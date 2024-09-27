@@ -45,4 +45,7 @@
 .editor {
     display: block; 
 }
-  
+.paddingUnset {
+ padding: unset;
+ border: unset;
+}
