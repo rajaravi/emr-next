@@ -50,16 +50,11 @@ import { FormField } from "@/types/form";
     "order": 4
   },
   {
-    "type": "dropdown",
-    "name": "patientName",
-    "label": "Patient Name",
-    "options": [
-      { "label": "Patient 1", "value": "patient1" },
-      { "label": "Patient 2", "value": "patient2" }
-    ],
+    "type": 'typeahead',
+    "name": 'patientName',
+    "label": 'Patient Name',
+    "options": [],
     "required": true,
-    "defaultValue": "practice1",
-    "multiple": false,
     "order": 5
   },
   {
