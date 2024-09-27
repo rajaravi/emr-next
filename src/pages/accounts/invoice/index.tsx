@@ -16,7 +16,7 @@ import { InvoiceFormElements } from '@/data/InvoiceFormElements';
 import { ProcedureTable, sampleProcedureTable } from '@/types/procedure';
 import { AccountTable, sampleAccountRecords, InvoiceModel } from '@/types/accounts';
 
-import { Patient, initialInvoiceValues } from '@/types/patient';
+import { Patient } from '@/types/patient';
 import { idToUuid } from '@/utils/helpers/uuid';
 import { EMR_CONFIG } from '@/utils/constants/config'
 

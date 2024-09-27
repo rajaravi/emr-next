@@ -8,27 +8,54 @@ import { uuidToId } from '@/utils/helpers/uuid';
 import { GetStaticPaths, GetStaticProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { getI18nStaticProps } from '@/utils/services/getI18nStaticProps';
+import { ParsedUrlQuery } from 'querystring';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+interface PatientProps {
+  id: string;
+}
+interface Params extends ParsedUrlQuery {
+  id: string; // Define that id will always be a string
+}
 
-export const getStaticProps: GetStaticProps = getI18nStaticProps();
+const validIds = ['1', '2', '3', '4', '5', '6'];
+
+// export const getStaticProps: GetStaticProps = getI18nStaticProps();
 export const getStaticPaths: GetStaticPaths = async () => {
-  // Hardcode some IDs
-  const paths = [
-    { params: { id: '1' } },
-    { params: { id: '2' } },
-    { params: { id: '3' } },
-  ];
+  const paths = validIds.map((id) => ({
+    params: { id },
+  }));
 
   return {
     paths,
-    fallback: true, // or 'blocking'
+    fallback: 'blocking',
   };
 };
 // Translation logic - end
 
+export const getStaticProps: GetStaticProps = async (context) => {
+  const { id } = context.params as Params;
+  const patientId = uuidToId(id);
 
-interface PatientProps {
-  id: string;
-}
+  // Check for valid ID
+  if (!validIds.includes(patientId+'')) {
+    // return {
+    //   notFound: true, // Return a 404 if the ID is invalid
+    // };
+    return {
+      redirect: {
+        destination: '/_error', // Replace with your specific page path
+        permanent: false, // Set to true if you want a permanent redirect (301)
+      },
+    };
+  }
+
+  return {
+    props: {
+      ...(await serverSideTranslations(context.locale || 'en', ['common'])), // Load translations for 'common'
+      id,
+    },
+  };
+};
 
 const PatientIndex: React.FC<PatientProps> = () => {
   const router = useRouter();
