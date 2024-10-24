@@ -15,7 +15,6 @@ interface CKEditorComponentProps {
   onChange: (values: any) => void;
 }
 
-// const CKEditorComponent3: React.FC<CKEditorComponentProps> = ({ onChange, initialData }) => {
 const CKEditorComponent3: React.FC<CKEditorComponentProps> = React.memo(({ onChange, initialData }) => {
   const editorRef = useRef<any>(null);
   const editorInitialized = useRef(false);

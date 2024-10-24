@@ -26,12 +26,15 @@ const AgGridComponent = <T,>({
   const gridOptions = { ...defaultGridOptions, ...customGridOptions };
 
   return (
-    <div className={`${styles.agthemequartz} ag-theme-quartz`} style={{ height: 400, }}>
+    <div className={`${styles.agthemequartz} ag-theme-quartz`} style={{ height: 700, }}>
       <AgGridReact<T>
         rowData={rowData}
         columnDefs={getColumnDefs(columnDefs)}
         onRowDoubleClicked={onRowDoubleClicked}
         onRowClicked={onRowClicked}
+        pagination={true}
+        paginationPageSize={10}
+        paginationPageSizeSelector={[10, 20, 50, 100]}
         {...gridOptions}
       />
     </div>

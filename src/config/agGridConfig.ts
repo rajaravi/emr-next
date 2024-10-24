@@ -5,8 +5,6 @@ export const defaultColumnDefs: ColDef[] = [
 ];
 
 export const defaultGridOptions: GridOptions = {
-  pagination: true,
-  paginationPageSize: 10,
   domLayout: 'autoHeight',
   defaultColDef: {
     sortable: true,

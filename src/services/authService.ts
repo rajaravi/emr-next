@@ -24,5 +24,4 @@ export interface LoginResponse {
       console.error('Login error:', error);
       return { success: false, error: 'Login failed' };
     }
-  };
-  
+};
