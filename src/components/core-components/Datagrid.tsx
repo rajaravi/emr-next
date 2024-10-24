@@ -1,10 +1,6 @@
 import React, { useEffect, useState, FC } from 'react';
 import { PaginationControl } from 'react-bootstrap-pagination-control';
-import { faSearch, faDeleteLeft } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-
 let id: number = 0;
-let pageLimit: number = 11;
 
 interface Column {
     class: string;
@@ -12,69 +8,25 @@ interface Column {
     field: string;
 }
 
-interface Filter {
-    field: string;
-    name: string;
-}
-
 interface DatalistProps {
-    url: string;
-    refresh: boolean;
     columns: Column[];
-    filter: Filter[];
+    list: [];
+    onRowClick: (event: any) => void;
+    onRowDblClick: (event: any) => void;
     page: number;
-    onRowClick: () => void;
-    onRowDblClick: () => void;
-    archiveRecord: () => void;
+    total: number;
+    pageLimit: number;
+    refresh: boolean;
+    refreshData: (event: any) => void;
+    showPagination: boolean;
 }
 
-const Datalist: FC<DatalistProps> = (props) => {
-    const [page, setPage] = useState<number>(1);
-    const [list, setList] = useState<any[]>([]);
-    const [total, setTotal] = useState<number>(0);
-    const [clear, setClear] = useState<boolean>(false);
-    const [overlay, setOverlay] = useState<boolean>(false);
-
-    useEffect(() => { getData(page); }, [props.refresh]);
-
-    const getData = async (page: number, sFilter?: { field: string; text: string }) => {
-        setOverlay(true);
-        try {
-            let passData: string = JSON.stringify({ page: page, limit: pageLimit, sort: null, search: sFilter });
-            const res = await postData(props.url, passData);
-            if (res.success) {
-                setList(res.data.list);
-                setTotal(res.data.total);
-            }
-        } catch (error) {
-            console.error('Error posting data:', error);
-        }
-        setOverlay(false);
-    }
-
-    const handleSearch = () => {
-        const searchTextElement = document.getElementById('searchText') as HTMLInputElement;
-        if (searchTextElement.value) {
-            const sFilter = {
-                field: (document.getElementById('searchType') as HTMLSelectElement).value,
-                text: searchTextElement.value
-            }
-            getData(1, sFilter);
-            setClear(true);
-        }
-    }
-
-    const clearSearch = () => {
-        (document.getElementById('searchText') as HTMLInputElement).value = '';
-        getData(1);
-        setClear(false);
-    }
-
+const Datalist: FC<DatalistProps> = ({columns, list, page, total, pageLimit, onRowClick, onRowDblClick, refresh, refreshData, showPagination }) => {
     return (
-        <>
+        <>            
             <div className="row listHead">
                 {
-                    props.columns.map((cols, index) => {
+                    columns.map((cols, index) => {
                         return (
                             <div key={index} className={cols.class}>{cols.name}</div>
                         );
@@ -85,16 +37,20 @@ const Datalist: FC<DatalistProps> = (props) => {
                 {
                     list.map((data, i) => {
                         return (
-                            <div className="row" key={i} onClickCapture={props.onRowClick} onDoubleClickCapture={props.onRowDblClick}>
+                            <div className="row" key={i} onClickCapture={onRowClick} onDoubleClickCapture={onRowDblClick}>
                                 {
-                                    props.columns.map((cols, j) => {
+                                    columns.map((cols, j) => {
                                         let f: string = cols.field; 
                                         let colKey: string = i + '' + j;      
                                         if (f === 'id') {
-                                            if (props.page < 2) {
+                                            data[f] = Number(i + 1);
+                                        }
+                                        if(f === 'id') {
+                                            if(page < 2) {
                                                 data[f] = (i + 1);
-                                            } else {
-                                                data[f] = ((page - 1) * pageLimit) + (i + 1);
+                                            }
+                                            else {
+                                                data[f] = ((page-1) * pageLimit) + (i + 1);
                                             }
                                             id = data[f];
                                         }
@@ -107,46 +63,27 @@ const Datalist: FC<DatalistProps> = (props) => {
                         );
                     })
                 }
-            </div>
-            <div className='row'>
-                <div className='col-sm-6'>
-                    <div className="pt-3 row">
-                        <div className="col-sm-5 pe-0">
-                            <input type="text" className="form-control rounded-0" id="searchText" autoComplete='off' />
-                        </div>
-                        <div className="col-sm-3 px-0">
-                            <select className="form-control rounded-0" id="searchType">
-                                {
-                                    props.filter.map((fil, k) => {
-                                        return (
-                                            <option key={k} value={fil.field}>{fil.name}</option>
-                                        );
-                                    })
-                                }
-                            </select>
-                        </div>
-                        <div className="col-sm-4 ps-0">
-                            <button type='button' className="btn btn-secondary rounded-0" onClick={() => handleSearch()}><FontAwesomeIcon icon={faSearch} /> Search</button>
-                            {clear ? <button type='button' className="btn btn-default rounded-0 ms-2" onClick={() => clearSearch()}><FontAwesomeIcon icon={faDeleteLeft} /> Clear</button> : null}
-                        </div>
+            </div>   
+            { showPagination ? 
+                <div className='row'>
+                    <div className='col-sm-6 text-start pt-3'>
+                    {/* <label className="text-secondary">Showing records { ((page * pageLimit) - (pageLimit - 1))} -  {count} of {total}</label> */}
+                    <label className="text-secondary">Total records {total}</label>
                     </div>
-                </div>
-                <div className='col-sm-6 text-end pt-3'>
+                    <div className='col-sm-6 text-end pt-3'>
                     <PaginationControl
                         page={page}
                         between={2}
                         total={total}
                         limit={pageLimit}
                         changePage={(page: number) => {
-                            setPage(page); getData(page);
-                            let x = document.getElementsByClassName("selected");
-                            if (x.length > 0) { x[0].classList.remove("selected"); }
+                            refreshData(page);                        
                         }}
                         ellipsis={1}
-                    />
-                </div>
-            </div>
-            {overlay ? <div className="overlay"></div> : null}
+                    />                
+                    </div>
+                </div> : ''
+            }                                 
         </>
     );
 }

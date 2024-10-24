@@ -2,18 +2,23 @@
 
 /* Customize Navbar */
 .navbar {
-  background-color: #0066FF;
-  border-bottom: 2px solid #0058DB;
+  background-color: #fff;
+  box-shadow: 0 0 10px #E9EDF3;
   height: 60px;
 }
-.navbar-text {
-  color: white;
-  font-weight: bold;
+ul.navbar-nav li.nav-item a.nav-link {
+  color: #000 !important;
+  font-size: 16px !important;
+  margin: 0 5px;
+  font-weight: 600;
 }
-.navbar-toggler {
-    border-color: rgba(255, 255, 255, 0.5);
+.navbar .nav-link i {
+  position: relative;
+  top: 2px;
+  right: 2px;
 }
-.navbar-toggler-icon {
-  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba%28255, 255, 255, 0.5%29' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+.navbar-brand {
+  width: 230px;
+  margin-left: -10px;
+  text-align: center;
 }
-  

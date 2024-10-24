@@ -24,25 +24,25 @@ const PatientSidebar: React.FC<PatientSidebarProps> = ({ patientId }) => {
         <li className="nav-item">
           <Link href={`/patient/${patientId}/patient-details`}
             className={`nav-link ${activeLink === `/patient/${patientId}/patient-details` ? 'active' : ''}`} aria-current="page">
-            {t('PATIENT.SIDE_MENU.PATIENT_DETAILS')}
+            <i className="fi fi-rr-member-list"></i> {t('PATIENT.SIDE_MENU.PATIENT_DETAILS')}
           </Link>
         </li>
         <li className="nav-item">
           <Link href={`/patient/${patientId}/patient-history`}
             className={`nav-link ${activeLink === `/patient/${patientId}/patient-history` ? 'active' : ''}`}>
-            {t('PATIENT.SIDE_MENU.PATIENT_HISTORY')}
+            <i className="fi fi-rs-user-time"></i> {t('PATIENT.SIDE_MENU.PATIENT_HISTORY')}
           </Link>
         </li>
         <li className="nav-item">
           <Link href={`/patient/${patientId}/examination`}
             className={`nav-link ${activeLink === `/patient/${patientId}/examination` ? 'active' : ''}`}>
-            {t('PATIENT.SIDE_MENU.EXAMINATION')}
+            <i className="fi fi-ts-file-invoice"></i> {t('PATIENT.SIDE_MENU.EXAMINATION')}
           </Link>
         </li>
         <li className="nav-item">
           <Link href={`/patient/${patientId}/appointment`}
             className={`nav-link ${activeLink === `/patient/${patientId}/appointment` ? 'active' : ''}`}>
-            {t('PATIENT.SIDE_MENU.APPOINTMENT')}
+            <i className="fi fi-rs-time-watch-calendar"></i> {t('PATIENT.SIDE_MENU.APPOINTMENT')}
           </Link>
         </li>
       </ul>

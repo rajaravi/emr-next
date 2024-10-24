@@ -27,7 +27,7 @@ const DynamicForm = forwardRef<DynamicFormHandle, DynamicFormProps> (({
     formData,
     onSubmit,
     isEditMode = false,
-    colClass = 'col-md-6',
+    colClass = 'col-md-4',
     modelFormInputs
   },
     ref: Ref<DynamicFormHandle>
@@ -100,7 +100,7 @@ const DynamicForm = forwardRef<DynamicFormHandle, DynamicFormProps> (({
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
-
+ 
   const handleSubmit = async (e: React.FormEvent) => {
     console.log("🚀 ~ handleSubmit ~ formValues:", formValues)
     e.preventDefault();
@@ -118,7 +118,7 @@ const DynamicForm = forwardRef<DynamicFormHandle, DynamicFormProps> (({
   // console.log("🚀 ~ sortedFormData:", sortedFormData)
 
   return (
-    <form onSubmit={handleSubmit} className="container">
+    <form onSubmit={handleSubmit} className="container-fluid">
       <div className="row">
         {sortedFormData.map((field, index) => {
           const commonProps = {
@@ -152,11 +152,11 @@ const DynamicForm = forwardRef<DynamicFormHandle, DynamicFormProps> (({
               return (
                 <div key={index} className="col-12">
                   <div className="d-flex justify-content-end mt-4">
-                    <button type="button" className="btn btn-secondary me-2" onClick={handleCancel}>
+                    <button type="button" className="btn btn-sm btn-secondary rounded-0 me-2" onClick={handleCancel}>
                     Cancel
                     </button>
-                    <button type="submit" className="btn btn-primary">
-                    {isEditMode ? 'Update Patient' : 'Save Patient'}
+                    <button type="submit" className="btn btn-sm btn-primary rounded-0">
+                    {isEditMode ? 'Update' : 'Save'}
                     </button>
                   </div>
                 </div>

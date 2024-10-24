@@ -29,7 +29,12 @@ const CreatePatient = () => {
         // Logic to create a new patient
         console.log('Creating patient with values:', values);
         try {
-            const response = await execute_axios_post(ENDPOINTS.POST_CREATE_PATIENT, values);
+            const response = await execute_axios_post(ENDPOINTS.POST_CREATE_PATIENT, values, {
+                headers: {
+                  "content-type": "application/json",
+                  'Authorization': 'Bearer '+localStorage.getItem('authKey')+'',
+                }
+            });
             // const response = await axios.post('/api/createPatient', values);
             console.log('GET data:', response);
 
@@ -48,8 +53,7 @@ const CreatePatient = () => {
               initialValues={initialPatientValues} // Pass the initial values
               onSubmit={handleCreate}
           /> */}
-            <div className="container">
-                <h6>{'Dynamic Form'}</h6>
+            <div className="container-fluid">
                 <h1>Add Patient </h1>
                 <DynamicForm
                     formData={PatientFormElements}

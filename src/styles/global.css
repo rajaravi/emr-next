@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,100..900;1,100..900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
 @import '../../node_modules/@syncfusion/ej2-base/styles/material.css';
 @import '../../node_modules/@syncfusion/ej2-buttons/styles/material.css';
@@ -9,21 +9,23 @@
 @import '../../node_modules/@syncfusion/ej2-splitbuttons/styles/material.css';
 @import '../../node_modules/@syncfusion/ej2-dropdowns/styles/material.css';
 @import "../../node_modules/@syncfusion/ej2-documenteditor/styles/material.css";
+@import "~@flaticon/flaticon-uicons/css/all/all";
 
 body {
   /* font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; */
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: "Rubik", sans-serif;
-  font-size: 13px;
-  font-weight: 400;
+  font-family: "Public Sans", sans-serif;
+  font-size: 14px;
+  font-weight: 500;
   font-style: normal;
-  background-color: #EEF5FF;
+  background-color: #F4F7FA;
+  color: #000;
 }
 h1 {
   font-size: 2rem;
-  font-weight: 400;
+  font-weight: 500;
 }
 h2 {
   font-size: 1.85rem;
@@ -41,43 +43,62 @@ h6 {
   font-size: 1rem;
 }
 .navbar .nav-link {
-  color: #fff;
-  font-size: 1.1rem;
+  color: #000;
+  font-size: 16px;
   margin: 0 5px;
+  font-weight: 600;
+}
+.navbar .nav-link i {
+  position: relative;
+  top: 2px;
+  right: 2px;
+}
+.navbar-brand {
+  width: 230px;
+  margin-left: -10px;
+  text-align: center;
 }
 .sidebar {
-  background-color: #001B27;
-  height: calc(100vh - 60px);
+  background-color: #fff;
+  height: calc(100vh - 90px);
+  box-shadow: 0 0 10px #E9EDF3;
 }
 .sidebar .nav-item {
-  padding: 10px;
+  
 }
+.sidebar .nav-item > .nav-link.active{
+  background-color: #E5FFFF;
+}
+
 .sidebar .nav-link {
-  color: #fff;
+  color: #333;
   font-size: .92rem;
-  font-weight: 400;
+  font-weight: 600;
   /* border-bottom: 1px dotted #bbc9de; */
   border-radius: 0;
-  padding: 2px 0 0 10px;  
+  padding: 12px 10px;
+}
+.sidebar .nav-link i {
+  position: relative;
+  top: 2px;
+  right: 2px;
 }
 #page-content-wrapper {
-  width: calc(100% - 230px);
+  width: calc(100% - 225px);
   position: absolute;
   right: 0;
   top: 60px;
 }
 #sidebar-wrapper {
-  width: 230px;
+  width: 215px;
   height: 100%;
   position: fixed;
-  left: 0;
-  top: 60px;
+  left: 15px;
+  top: 75px;
   padding: 0;
 }
 .nav-pills .nav-link.active, .nav-pills .show>.nav-link {  
-  color: #62A1FF;
-  border-left: 3px solid;
-  background-color: #001B27;
+  color: #004EFF;
 }
 html, body, #__next {
     height: 100%;
@@ -103,4 +124,223 @@ html, body, #__next {
   min-height: 500px;
   max-height: 600px;
   min-width: 700px;
+}
+
+.form-control {
+  border-radius: 0;
+  appearance: auto;
+  -webkit-appearance: auto;
+  height: 40px;
+}
+
+
+.listHead {
+  font-weight: 600;
+  margin: 0px 0 0 0;
+  /* padding: 10px 0; */
+  height: 46px;
+  line-height: 46px;
+  border-bottom: 1px dashed #BAC6D6;
+  text-transform: uppercase;
+  color: #5C6672;
+  box-shadow: inset 0 7px 9px -7px #97a9c485;
+}
+.listBody{
+  margin: 0;
+  border-left: 1px solid #ddd;
+  border-right: 1px solid #ddd;
+}
+.listBody .row {
+  padding: 0;
+  height: 46px;
+  line-height: 46px;
+  margin: 0;  
+  background-color: #fff;
+  border-bottom: 1px dashed #BAC6D6;
+  
+}
+.listBody .row:nth-child(even) {
+  background-color: #fcfcfc;
+}
+.listBody .row.selected {
+  background-color: #e5ffff;
+}
+
+ul.pagination {
+  float: right;
+}
+.white-bg {
+  background-color: #fff;
+}
+.btn-theme {
+  background-color: #004EFF;
+  color: #fff;
+}
+.btn-theme:hover, .btn-theme:focus {
+  background-color: #0046e9;
+  color: #fff;
+}
+.btn-theme-light {
+  background-color: #E1EDFF;
+  color: #000;
+  border: 1px solid #BAC6D6;
+}
+.search-text { 
+  border:1px solid #004EFF;
+}
+
+.btn i {
+  top: 2px;
+  right: 2px;
+  position: relative;
+}
+
+.sidebar .nav-item > .nav-link.active::after {
+  content:'';
+  height: 10px;
+  width: 3px;
+  position: absolute;
+  right: 0;
+  top: 2px;
+}
+.action {
+  text-align: left;
+  display: flex;
+}
+.action .btn {
+  height: 37.5px;
+}
+
+.pagination li:first-child .page-link, .pagination li:last-child .page-link {
+  border-radius: 0;
+}
+.active>.page-link, .page-link.active {
+  background-color: #0046e9;
+  border-color: #0046e9;
+}
+
+#menu {
+  background: #E1EDFF;
+  display: block;
+  float: left;
+  margin-left: 10px;
+  border: 1px solid #BAC6D6;
+  padding: 0;
+  color: #000;
+}
+
+#menu ul,
+#menu li {
+  margin: 0 0;
+  padding: 0 0;
+  list-style: none
+}
+
+#menu ul {
+  height: 40px
+}
+
+#menu li {
+  float: left;
+  display: inline;
+  position: relative;    
+}
+
+#menu a {
+  display: block;
+  line-height: 36px;
+  padding: 0px 20px;
+  text-decoration: none;
+  color: #000;
+  font-size: 16px;
+}
+
+#menu a.prett i {
+  top: 2px;
+  position: relative;
+}
+
+#menu li:hover > a,
+#menu li a:hover {
+  background: #fff
+}
+
+#menu ul.menus {
+  height: auto;
+  width: 180px;
+  background: #fff;
+  position: absolute;
+  z-index: 99;
+  display: none;
+  border: 0;
+}
+
+#menu ul.menus li {
+  display: block;
+  width: 100%;
+  text-transform: none;
+}
+
+#menu li:hover ul.menus {
+  display: block;
+  box-shadow: 0 0 10px rgb(222 228 237);
+}
+
+#menu ul.menus li a i {
+  top: 2px;
+  position: relative;
+  padding-right: 5px;
+}
+
+#menu ul.menus a:hover {
+  background: #E5FFFF;
+}
+
+#menu ul.menus .submenu {
+  display: none;
+  position: absolute;
+  left: 180px;
+  background: #fff;
+  top: 0;
+  width: auto;
+}
+
+#menu ul.menus .submenu li {
+  background: #fff;
+}
+
+#menu ul.menus .has-submenu:hover .submenu {
+  display: block;
+}
+
+.offcanvas-body {
+  background-color: #F4F7FA;
+}
+
+.search-button {
+  position: absolute;
+  right: 13px;
+  z-index: 1;
+  top: 1px;
+  margin: 1px;
+  height: 35px;
+  width: 36px;
+  padding: 0;
+  text-align: center;
+}
+.btn-search-clear {
+  position: absolute;
+  right: 70px;
+  z-index: 1;
+  top: 95px;
+}
+.position-relative {
+  position: relative;
+}
+
+.modal-lg {
+  width: 840px !important;
+}
+.modal-md {
+  width: 640px;
 }

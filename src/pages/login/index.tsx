@@ -12,10 +12,12 @@ const LoginPage = () => {
   const [error, setError] = useState('');
   const router = useRouter();
 
-  const handleLogin = async (email: string, password: string) => {
+  const handleLogin = async (practice: string, email: string, password: string) => {
     try {
-      const response = await login(email, password);
+      const response = await login(practice, email, password);
       if (response.success) {
+        localStorage.setItem("authKey", response.data.token);
+        localStorage.setItem("user", response.data.name);
         // Redirect to a protected page or home
         router.push('/patient'); 
       } else {

@@ -3,14 +3,14 @@ import { useRouter } from 'next/router';
 import { execute_axios_post } from '@/utils/services/httpService';
 import ENDPOINTS from '@/utils/constants/endpoints';
 import styles from './_style.module.css';
-import { PaginationControl } from 'react-bootstrap-pagination-control';
+
 // Translation logic - start
 import { GetStaticPaths, GetStaticProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { getI18nStaticProps } from '@/utils/services/getI18nStaticProps';
 import SettingLayout from '@/components/layout/SettingLayout';
 import Datalist from '@/components/core-components/Datagrid';
-import CreateDoctor from '../doctor/create';
+import CreateSpeciality from '../speciality/create';
 
 
 let pageLimit: number = 8;
@@ -20,16 +20,14 @@ export const getStaticProps: GetStaticProps = getI18nStaticProps();
 
 const columns: { name: string; class: string; field: string; }[] = [
   { name: "S.No", class: "col-sm-1", field: "id" },
-  { name: "Name", class: "col-sm-7", field: "name" },
-  { name: "Degree", class: "col-sm-4", field: "degree" }   
+  { name: "Name", class: "col-sm-11", field: "name" } 
 ];
 
 const filter: { name: string; field: string; }[] = [
-  { name: "Name", field: 'name' },
-  { name: "Degree", field: 'degree' }
+  { name: "Name", field: 'name' }
 ];
 
-const Doctor: React.FC = () => {
+const Speciality: React.FC = () => {
   const { t } = useTranslation('common');
   const router = useRouter();
   const { id } = router.query;
@@ -39,13 +37,15 @@ const Doctor: React.FC = () => {
   const [total, setTotal] = useState<number>(0);
   const [count, setCount] = useState<number>(0);
   const [clear, setClear] = useState<boolean>(false);
+ 
   
-  useEffect(() => { getData(page); }, []);
+  useEffect(() => { getData(page); }, [refreshList]);
+  
 
   const getData = async (page: number, sFilter?: { field: string; text: string }) => {
     try {
         let passData: string = JSON.stringify({ page: page, limit: pageLimit, sort: null, search: sFilter });
-        const response = await execute_axios_post(ENDPOINTS.GET_DOCTOR, passData, {
+        const response = await execute_axios_post(ENDPOINTS.GET_SPECIALITY, passData, {
           headers: {
             "content-type": "application/json",
             'Authorization': 'Bearer '+localStorage.getItem('authKey')+'',
@@ -76,7 +76,6 @@ const Doctor: React.FC = () => {
 
   const clearSearch = () => {
     (document.getElementById('searchText') as HTMLInputElement).value = '';
-    setPage(1);
     getData(1);
     setClear(false);
   }
@@ -93,19 +92,20 @@ const Doctor: React.FC = () => {
     if(event.target.getAttribute('custom-attribute')) {
         eid = event.target.getAttribute('custom-attribute');
         event.target.parentElement.setAttribute('class', 'row selected');        
-    }    
+    }
   }
-  const handlePaginationChange = (page: any) => {
-    console.log("sdfsdf");
-    setPage(page);
-    getData(page);
-  };
-  
+
+  const refreshData = (currentPage: number) => {
+    getData(currentPage);
+  }
+  const refreshForm = () => {
+    getData(1);
+  }
 
   return (
     <SettingLayout>
       <div className="d-flex justify-content-between align-items-center">
-        <h1 className={`${styles.title} mb-3`}>{t('SETTING.SIDE_MENU.DOCTOR')}</h1>                
+        <h1 className={`${styles.title} mb-3`}>{t('SETTING.SIDE_MENU.SPECIALITY')}</h1>                
       </div>
       <div className="row white-bg p-1 m-0 top-bottom-shadow">
         <div className="col-sm-7 mt-3 action">    
@@ -151,31 +151,14 @@ const Doctor: React.FC = () => {
           total={total}
           pageLimit={pageLimit}
           refresh={refreshList}
+          refreshData={refreshData}
+          showPagination={true}
         />
       </div>      
-      <div className='row'>
-        <div className='col-sm-6 text-start pt-3'>
-        {/* <label className="text-secondary">Showing records { ((page * pageLimit) - (pageLimit - 1))} -  {count} of {total}</label> */}
-        <label className="text-secondary">Total records {total}</label>
-        </div>
-        <div className='col-sm-6 text-end pt-3'>
-        <PaginationControl
-            page={page}
-            between={2}
-            total={total}
-            limit={pageLimit}
-            changePage={(page: number) => {
-                setPage(page);                 
-                getData(page);                        
-            }}
-            ellipsis={1}
-        />                
-        </div>
-      </div>  
-      <CreateDoctor id={eid} />
-      
+      <CreateSpeciality id={eid} refreshForm={refreshForm} />      
     </SettingLayout>
   );
 };
 
-export default Doctor;
+export default Speciality;
+

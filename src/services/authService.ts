@@ -4,14 +4,14 @@ export interface LoginResponse {
     error?: string;
   }
   
-  export const login = async (email: string, password: string): Promise<LoginResponse> => {
+  export const login = async (practice: string, username: string, password: string): Promise<LoginResponse> => {
     try {
-      const response = await fetch('/api/login', { // Adjust URL as needed
+      const response = await fetch('http://localhost/emr-backend/public/api/app/login/'+practice, { // Adjust URL as needed
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ username, password }),
       });
   
       if (!response.ok) {
