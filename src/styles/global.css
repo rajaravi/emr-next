@@ -330,9 +330,9 @@ ul.pagination {
 }
 .btn-search-clear {
   position: absolute;
-  right: 70px;
+  right: 50px;
   z-index: 1;
-  top: 95px;
+  top: 1px;
 }
 .position-relative {
   position: relative;
@@ -344,3 +344,25 @@ ul.pagination {
 .modal-md {
   width: 640px;
 }
+.top-40 {
+  position: fixed;
+  top: 40px;
+}
+
+/* Custom Offcanvas sizes */
+.canvas-sm {
+  width: 25% !important /* Adjust width as needed for medium screens */
+}
+
+.canvas-md {
+  width: 50% !important /* Adjust width as needed for medium screens */
+}
+
+.canvas-lg {
+  width: 75% !important /* Adjust width as needed for large screens */
+}
+
+.canvas-xl {
+  width: 100% !important /* Full width or adjust as needed for extra-large screens */
+}
+

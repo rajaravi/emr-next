@@ -5,6 +5,7 @@ import Dropdown from './formElements/Dropdown';
 import DatePicker from './formElements/DatePicker';
 import RadioButton from './formElements/RadioButton';
 import Checkbox from './formElements/Checkbox';
+import Switch from './formElements/Switch';
 import TypeaheadInput from './formElements/TypeaheadInput';
 import { useRouter } from 'next/router';
 import { FormField } from '@/types/form';
@@ -16,6 +17,7 @@ interface Option {
 
 export interface DynamicFormHandle {
   validateModelForm: any;
+  customModelSubmit: any;
 }
 
 interface DynamicFormProps {
@@ -55,12 +57,13 @@ const DynamicForm = forwardRef<DynamicFormHandle, DynamicFormProps> (({
   useEffect(() => {
     setFormValues((prevFormData) => ({
       ...prevFormData,
-      invDate: new Date().toISOString().split('T')[0],  // Set initial value to current date
+      // invDate: new Date().toISOString().split('T')[0],  // Set initial value to current date
     }));
   }, []);
 
   React.useImperativeHandle(ref, () => ({
-    validateModelForm
+    validateModelForm,
+    customModelSubmit,
   }));
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -98,6 +101,15 @@ const DynamicForm = forwardRef<DynamicFormHandle, DynamicFormProps> (({
   const validateModelForm = () => {
     return validate();
   }
+  
+  const customModelSubmit = (field: String, values: any) => {
+    if(field && values) {
+      console.log("Values", values);
+      formValues[field] = values;
+      setFormValues(formValues)
+    }
+    return handleSubmitCustom();
+  }
 
   const validate = () => {
     const errors: { [key: string]: string } = {};
@@ -123,6 +135,14 @@ const DynamicForm = forwardRef<DynamicFormHandle, DynamicFormProps> (({
   const handleSubmit = async (e: React.FormEvent) => {
     console.log("🚀 ~ handleSubmit ~ formValues:", formValues)
     e.preventDefault();
+
+    onSubmit?.(formValues);
+    if (validate()) {
+    }
+  };
+
+  const handleSubmitCustom = async  (e: React.FormEvent) => {
+    console.log("🚀 ~ handleSubmitCustom ~ formValues:", formValues)
 
     if (validate()) {
         onSubmit?.(formValues);
@@ -152,23 +172,26 @@ const DynamicForm = forwardRef<DynamicFormHandle, DynamicFormProps> (({
           switch (field.type) {
             case 'text':
               return <TextInput key={index} {...commonProps} placeholder={field.placeholder}
-                onChange={handleChange} validation={field.validation} colClassName={colClass} />;
+                onChange={handleChange} validation={field.validation} colClassName={field.colClass} />;
             case 'dropdown':
               return <Dropdown key={index} {...commonProps} options={field.options!}
-                onChange={handleChange} colClassName={colClass} />;
+                onChange={handleChange} colClassName={field.colClass} />;
             case 'date':
               return <DatePicker key={index} {...commonProps} disablePrevDate={field.disablePrevDate}
                 disableFutureDate={field.disableFutureDate} 
-                onChange={handleChange} colClassName={colClass} />;
+                onChange={handleChange} colClassName={field.colClass} />;
             case 'radio':
               return <RadioButton key={index} {...commonProps} options={field.options!}
-                onChange={handleChange} colClassName={colClass} />;
+                onChange={handleChange} colClassName={field.colClass} />;
             case 'checkbox':
               return <Checkbox key={index} {...commonProps} options={field.options!}
-                onChange={handleChange} colClassName={colClass} />;
+                onChange={handleChange} colClassName={field.colClass} />;
+            case 'switch':
+              return <Switch key={index} {...commonProps} options={field.options!}
+                onChange={handleChange} colClassName={field.colClass} />;
             case 'typeahead': 
               return <TypeaheadInput key={index} {...commonProps}
-                onChange={handleTypeaheadChange} options={field.options!} colClassName={colClass} />;
+                onChange={handleTypeaheadChange} options={field.options!} colClassName={field.colClass} />;
             case 'submit':
               return (
                 <div key={index} className="col-12">

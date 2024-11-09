@@ -3,12 +3,16 @@ import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 
 // Base URL for your API
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
-
+let token = null;
+if (typeof window !== 'undefined') {
+  token = localStorage.getItem('authKey');
+}
 // Create an instance of Axios
 const axiosInstance = axios.create({
   baseURL: BASE_URL,
   headers: {
     'Content-Type': 'application/json',
+    'Authorization': (token) ? 'Bearer '+token+'' : '',
   },
 });
 

@@ -6,16 +6,17 @@ import { FormField } from "@/types/form";
       "name": "designation_id",
       "label": "Destination",
       "options": [
-        { "label": "Mr", "value": "mr" },
-        { "label": "Dr", "value": "dr" },
-        { "label": "Fr", "value": "fr" },
-        { "label": "Master", "value": "master" },
-        { "label": "Messrs", "value": "messrs" },
-        { "label": "Miss", "value": "miss" },
+        { "label": "Mr", "value": "1" },
+        { "label": "Dr", "value": "2" },
+        { "label": "Fr", "value": "3" },
+        { "label": "Master", "value": "4" },
+        { "label": "Messrs", "value": "5" },
+        { "label": "Miss", "value": "6" },
       ],
       "required": true,
       "defaultValue": "mrs",
       "multiple": false, 
+      "colClass": "col-sm-6",
       "order": 1
     },
     {
@@ -25,6 +26,7 @@ import { FormField } from "@/types/form";
       "placeholder": "",
       "required": true,
       "validation": { "minLength": 2 },
+      "colClass": "col-sm-6",
       "order": 2
     },
     {
@@ -34,6 +36,7 @@ import { FormField } from "@/types/form";
       "placeholder": "",
       "required": true,
       "validation": { "minLength": 2 },
+      "colClass": "col-sm-6",
       "order": 3
     },
     {
@@ -43,6 +46,7 @@ import { FormField } from "@/types/form";
       "placeholder": "",
       "required": true,
       "validation": { "minLength": 2 },
+      "colClass": "col-sm-6",
       "order": 4
     },
     {
@@ -56,6 +60,7 @@ import { FormField } from "@/types/form";
       "required": true,
       "defaultValue": "",
       "multiple": false, 
+      "colClass": "col-sm-6",
       "order": 5
     },
     {
@@ -65,6 +70,7 @@ import { FormField } from "@/types/form";
       "placeholder": "",
       "required": false,
       "validation": { "minLength": 2 },
+      "colClass": "col-sm-6",
       "order": 6
     },
     {
@@ -74,16 +80,18 @@ import { FormField } from "@/types/form";
       "placeholder": "",
       "required": false,
       "validation": { "minLength": 2 },
+      "colClass": "col-sm-6",
       "order": 7
     },
     {
-      "type": "checkbox",
+      "type": "switch",
       "name": "is_archive",
       "label": "Archive",
       "options": [
-        { "label": "Yes", "value": "1" }        
+        { "label": "", "value": 0 }        
       ],
-      "required": true,
+      "required": false,
+      "colClass": "col-sm-6",  
       "order": 8
     }
   ];
