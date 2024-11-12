@@ -1,13 +1,15 @@
 import React, { forwardRef, useEffect, useState, Ref } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import TextInput from './formElements/TextInput';
-import Dropdown from './formElements/Dropdown';
-import DatePicker from './formElements/DatePicker';
-import RadioButton from './formElements/RadioButton';
-import Checkbox from './formElements/Checkbox';
-import TypeaheadInput from './formElements/TypeaheadInput';
+import TextInput from '@/components/common/form-elements/TextInput';
+// import TextInput from './formElements/TextInput';
+import Dropdown from '@/components/common/form-elements/Dropdown';
+import DatePicker from '@/components/common/form-elements/DatePicker';
+import RadioButton from '@/components/common/form-elements/RadioButton';
+import Checkbox from '@/components/common/form-elements/Checkbox';
+import TypeaheadInput from '@/components/common/form-elements/TypeaheadInput';
 import { useRouter } from 'next/router';
 import { FormField } from '@/types/form';
+import TextArea from '@/components/common/form-elements/TextArea';
 
 interface Option {
   label: string;
@@ -25,7 +27,7 @@ interface DynamicFormProps {
   isEditMode?: boolean;
   initialValues?: { [key: string]: any }; 
   colClass?: string;
-  modelFormInputs?: React.ChangeEventHandler<HTMLInputElement | HTMLSelectElement>;
+  modelFormInputs?: React.ChangeEventHandler<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>;
   modelFormTypeahead?: any;
 }
 
@@ -63,7 +65,7 @@ const DynamicForm = forwardRef<DynamicFormHandle, DynamicFormProps> (({
     validateModelForm
   }));
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = event.target;
     setFormValues({
       ...formValues,
@@ -153,6 +155,9 @@ const DynamicForm = forwardRef<DynamicFormHandle, DynamicFormProps> (({
             case 'text':
               return <TextInput key={index} {...commonProps} placeholder={field.placeholder}
                 onChange={handleChange} validation={field.validation} colClassName={colClass} />;
+            case 'textarea':
+              return <TextArea key={index} {...commonProps} placeholder={field.placeholder}
+                onChange={handleChange} rows={field.rows} colClassName={colClass} />;
             case 'dropdown':
               return <Dropdown key={index} {...commonProps} options={field.options!}
                 onChange={handleChange} colClassName={colClass} />;
