@@ -2,7 +2,7 @@ import React, { Suspense } from 'react';
 import { useRouter } from 'next/router';
 import PatientLayout from '@/components/layout/PatientLayout';
 import styles from './_style.module.css';
-import Loader from '@/components/common/Loader';
+import Loader from '@/components/suspense/Loader';
 import { uuidToId } from '@/utils/helpers/uuid';
 
 const PatientHistoryComponent = React.lazy(() => import('./patient-history'));

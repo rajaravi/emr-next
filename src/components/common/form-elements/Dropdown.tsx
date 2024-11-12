@@ -15,11 +15,11 @@ interface DropdownProps {
   error?: string;
   multiple?: boolean;
   defaultValue?: string;
-  colClassName: string;
+  colClassName?: string;
 }
 
 const Dropdown: React.FC<DropdownProps> = ({ label, name, options, required, value,
-    onChange, error, defaultValue = '', multiple = false, colClassName, ...rest }) => {
+    onChange, error, defaultValue = '', multiple = false, colClassName = 'col-sm-12', ...rest }) => {
     
     return (
       <div className={`${colClassName} mb-3`}>

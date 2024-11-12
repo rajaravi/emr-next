@@ -13,10 +13,10 @@ interface RadioButtonProps {
   value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   error?: string;
-  colClassName: string;
+  colClassName?: string;
 }
 
-const RadioButton: React.FC<RadioButtonProps> = ({ label, name, options, required, value, onChange, error, colClassName }) => (
+const RadioButton: React.FC<RadioButtonProps> = ({ label, name, options, required, value, onChange, error, colClassName = 'col-sm-12' }) => (
   <div className={`${colClassName} mb-3`}>
     <label className="form-label">
       {required && <span className="text-danger">*</span>}

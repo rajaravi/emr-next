@@ -45,6 +45,12 @@ const PatientSidebar: React.FC<PatientSidebarProps> = ({ patientId }) => {
             <i className="fi fi-rs-time-watch-calendar"></i> {t('PATIENT.SIDE_MENU.APPOINTMENT')}
           </Link>
         </li>
+        <li>
+          <Link href={`/patient/${patientId}/notes`}
+            className={`nav-link ${activeLink === `/patient/${patientId}/notes` ? 'active' : ''}`}>
+            {t('PATIENT.SIDE_MENU.NOTES')}
+          </Link>
+        </li>
       </ul>
   </div>
   );

@@ -1,6 +1,6 @@
 import React, { ReactNode, Suspense } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
-import Loader from '../common/Loader';
+import Loader from '../suspense/Loader';
 import { useRouter } from 'next/router';
 import AccountSidebar from './AccountSidebar';
 

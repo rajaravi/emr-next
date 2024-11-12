@@ -1,14 +1,16 @@
 import React, { forwardRef, useEffect, useState, Ref } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import TextInput from './formElements/TextInput';
-import Dropdown from './formElements/Dropdown';
-import DatePicker from './formElements/DatePicker';
-import RadioButton from './formElements/RadioButton';
-import Checkbox from './formElements/Checkbox';
-import Switch from './formElements/Switch';
-import TypeaheadInput from './formElements/TypeaheadInput';
+import TextInput from '@/components/common/form-elements/TextInput';
+// import TextInput from './formElements/TextInput';
+import Dropdown from '@/components/common/form-elements/Dropdown';
+import DatePicker from '@/components/common/form-elements/DatePicker';
+import RadioButton from '@/components/common/form-elements/RadioButton';
+import Checkbox from '@/components/common/form-elements/Checkbox';
+import Switch from '@/components/common/form-elements/Switch';
+import TypeaheadInput from '@/components/common/form-elements/TypeaheadInput';
 import { useRouter } from 'next/router';
 import { FormField } from '@/types/form';
+import TextArea from '@/components/common/form-elements/TextArea';
 
 interface Option {
   label: string;
@@ -17,7 +19,7 @@ interface Option {
 
 export interface DynamicFormHandle {
   validateModelForm: any;
-  customModelSubmit: any;
+  // customModelSubmit: any;
 }
 
 interface DynamicFormProps {
@@ -27,7 +29,7 @@ interface DynamicFormProps {
   isEditMode?: boolean;
   initialValues?: { [key: string]: any }; 
   colClass?: string;
-  modelFormInputs?: React.ChangeEventHandler<HTMLInputElement | HTMLSelectElement>;
+  modelFormInputs?: React.ChangeEventHandler<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>;
   modelFormTypeahead?: any;
 }
 
@@ -63,10 +65,10 @@ const DynamicForm = forwardRef<DynamicFormHandle, DynamicFormProps> (({
 
   React.useImperativeHandle(ref, () => ({
     validateModelForm,
-    customModelSubmit,
+    // customModelSubmit,
   }));
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = event.target;
     setFormValues({
       ...formValues,
@@ -102,14 +104,14 @@ const DynamicForm = forwardRef<DynamicFormHandle, DynamicFormProps> (({
     return validate();
   }
   
-  const customModelSubmit = (field: String, values: any) => {
-    if(field && values) {
-      console.log("Values", values);
-      formValues[field] = values;
-      setFormValues(formValues)
-    }
-    return handleSubmitCustom();
-  }
+  // const customModelSubmit = (field: String, values: any) => {
+  //   if(field && values) {
+  //     console.log("Values", values);
+  //     formValues[field] = values;
+  //     setFormValues(formValues)
+  //   }
+  //   return handleSubmitCustom();
+  // }
 
   const validate = () => {
     const errors: { [key: string]: string } = {};
@@ -141,13 +143,13 @@ const DynamicForm = forwardRef<DynamicFormHandle, DynamicFormProps> (({
     }
   };
 
-  const handleSubmitCustom = async  (e: React.FormEvent) => {
-    console.log("🚀 ~ handleSubmitCustom ~ formValues:", formValues)
+  // const handleSubmitCustom = async  (e: React.FormEvent) => {
+  //   console.log("🚀 ~ handleSubmitCustom ~ formValues:", formValues)
 
-    if (validate()) {
-        onSubmit?.(formValues);
-    }
-  };
+  //   if (validate()) {
+  //       onSubmit?.(formValues);
+  //   }
+  // };
 
   const handleCancel = () => {
     router.push('/patient'); // Redirect to the desired page, e.g., the patient list or patient details page
@@ -173,6 +175,9 @@ const DynamicForm = forwardRef<DynamicFormHandle, DynamicFormProps> (({
             case 'text':
               return <TextInput key={index} {...commonProps} placeholder={field.placeholder}
                 onChange={handleChange} validation={field.validation} colClassName={field.colClass} />;
+            case 'textarea':
+              return <TextArea key={index} {...commonProps} placeholder={field.placeholder}
+                onChange={handleChange} rows={field.rows} colClassName={field.colClass} />;
             case 'dropdown':
               return <Dropdown key={index} {...commonProps} options={field.options!}
                 onChange={handleChange} colClassName={field.colClass} />;
@@ -188,7 +193,7 @@ const DynamicForm = forwardRef<DynamicFormHandle, DynamicFormProps> (({
                 onChange={handleChange} colClassName={field.colClass} />;
             case 'switch':
               return <Switch key={index} {...commonProps} options={field.options!}
-                onChange={handleChange} colClassName={field.colClass} />;
+                onChange={handleChange} colClassName={field.colClass} checked={true} />;
             case 'typeahead': 
               return <TypeaheadInput key={index} {...commonProps}
                 onChange={handleTypeaheadChange} options={field.options!} colClassName={field.colClass} />;

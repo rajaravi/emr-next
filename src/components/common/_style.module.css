@@ -1,0 +1,69 @@
+@import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
+/* @media print {
+	body {
+		margin: 0 !important;
+	}
+} */
+
+.main-container {
+	font-family: 'Lato';
+	width: fit-content;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.ck-content {
+	font-family: 'Lato';
+	line-height: 1.6;
+	word-break: break-word;
+}
+
+.editor-container_classic-editor .editor-container__editor {
+	min-width: 795px;
+	max-width: 795px;
+}
+
+
+.textColor {
+    color: red;
+}
+
+.buttonGroup .btn {
+    margin-right: 10px;
+}
+
+.title {
+    color: #767070c4;
+}
+.ckeditor__editable {
+    min-height: 500px;
+    max-height: 600px;
+    min-width: 700px;
+}
+
+.editor {
+    display: block; 
+}
+.paddingUnset {
+	padding: unset;
+	border: unset;
+}
+
+.calendarApp {
+	display: flex;
+	min-height: 100%;
+	font-family: Arial, Helvetica Neue, Helvetica, sans-serif;
+	font-size: 14px;
+}
+
+.calendarAppMain {
+	flex-grow: 1;
+	padding: 3em;
+}
+
+.fc {
+	/* the calendar root */
+	max-width: 1100px;
+	margin: 0 auto;
+}

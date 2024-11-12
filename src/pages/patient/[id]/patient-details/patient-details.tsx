@@ -11,6 +11,8 @@ import { FormField } from '@/types/form';
 import { PatientFormElements } from '@/data/PatientFormElements';
 import { PatientForm } from '@/data/PatientForm';
 import { useTranslation } from 'next-i18next';
+import Skeleton from '@/components/suspense/Skeleton';
+import FormSkeleton from '@/components/suspense/FormSkeleton';
 
 interface PatientDetailsProps {
   patientId: string,
@@ -45,6 +47,7 @@ const PatientDetails: React.FC<PatientDetailsProps> = ({ patientId }) => {
       try {
         const response = await execute_axios_get('/mock/getPatientData'); // Replace with your actual API endpoint
         console.log("🚀 ~ fetchInitialValues ~ response:", response.data)
+        // await new Promise((resolve) => setTimeout(resolve, 3000));
         setInitialValues(response.data);
       } catch (err) {
         setError('Failed to load form data.');
@@ -53,7 +56,12 @@ const PatientDetails: React.FC<PatientDetailsProps> = ({ patientId }) => {
       }
     };
 
-    fetchInitialValues();
+    const timer = setTimeout(() => {
+      fetchInitialValues();
+    }, 3000); // Delay to demonstrate Suspense
+
+    return () => clearTimeout(timer);
+
   }, []);
 
   // const handler = async (req: NextApiRequest, res: NextApiResponse) => {
@@ -79,7 +87,7 @@ const PatientDetails: React.FC<PatientDetailsProps> = ({ patientId }) => {
   };
 
 
-  if (loading) return <p>Loading form...</p>;
+  if (loading) return <p><FormSkeleton /></p>;
   if (error) return <p>{error}</p>;
 
   return (

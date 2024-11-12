@@ -28,9 +28,9 @@ const ErrorPage = ({ statusCode }: ErrorPageProps) => {
   );
 };
 
-ErrorPage.getInitialProps = ({ res, err }: NextPageContext) => {
-  const statusCode = res?.statusCode || err?.statusCode || 404;
-  return { statusCode };
-};
+// ErrorPage.getInitialProps = ({ res, err }: NextPageContext) => {
+//   const statusCode = res?.statusCode || err?.statusCode || 404;
+//   return { statusCode };
+// };
 
 export default ErrorPage;
