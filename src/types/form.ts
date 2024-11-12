@@ -10,7 +10,7 @@ export interface Option {
 }
 
 export interface FormField {
-    type: 'text' | 'dropdown' | 'date' | 'radio' | 'checkbox' | 'typeahead' | 'submit' | 'textarea';
+    type: 'text' | 'dropdown' | 'date' | 'radio' | 'checkbox' | 'typeahead' | 'submit' | 'textarea' | 'switch';
     name: string;
     label?: string;
     placeholder?: string;
@@ -24,5 +24,6 @@ export interface FormField {
     disablePrevDate?: boolean;
     disableFutureDate?: boolean;
     defaultValue?: string | number | undefined | string[]; 
+    colClass?: string;
 }
   

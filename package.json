@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@flaticon/flaticon-uicons": "^3.3.1",
     "@ckeditor/ckeditor5-build-classic": "^43.1.0",
     "@ckeditor/ckeditor5-react": "^9.1.0",
     "@fortawesome/fontawesome-free": "^6.6.0",

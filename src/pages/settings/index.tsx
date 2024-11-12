@@ -13,8 +13,7 @@ const Settings = () => {
   return (
     <SettingLayout>
       <div>
-        {/* <h1>{t('PATIENT.PATIENT_DASHBOARD')},</h1> */}
-        <p>This is the default content for the patient.</p>
+        <p>This is the default content for the settings.</p>
       </div>
     </SettingLayout>
   );

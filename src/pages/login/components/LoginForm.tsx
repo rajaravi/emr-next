@@ -6,17 +6,17 @@ import styles from './LoginForm.module.css'; // Adjust path as necessary
 
 interface LoginFormProps {
   errVal: string,
-  onSubmit: (email: string, password: string) => void;
+  onSubmit: (practice: string, username: string, password: string) => void;
 }
 
 const LoginForm: React.FC<LoginFormProps> = ({ onSubmit, errVal }) => {
-  const [username, setUsername] = useState('test@example.com');
-  const [password, setPassword] = useState('admin');
-  const [practiceName, setPractice] = useState('Richard');
+  const [username, setUsername] = useState();
+  const [password, setPassword] = useState();
+  const [practice, setPractice] = useState();
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(username, password);
+    onSubmit(practice, username, password);
   };
 
   return (
@@ -28,14 +28,14 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmit, errVal }) => {
         {errVal && <Alert variant="danger" className="mb-3">{errVal}</Alert>}
         <form className={styles.form} onSubmit={handleSubmit}>
           <div className="mb-3 mt-2">
-            <label htmlFor="practiceName" className="form-label">Practice</label>
+            <label htmlFor="practice" className="form-label">Practice</label>
             <div className="input-group">
               <input
-                id="practiceName"
-                type="practiceName"
+                id="practice"
+                type="practice"
                 className="form-control"
                 placeholder="Practice name"
-                value={practiceName}
+                value={practice}
                 onChange={(e) => setPractice(e.target.value)}
                 required
               />

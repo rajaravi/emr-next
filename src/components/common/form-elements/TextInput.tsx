@@ -12,7 +12,7 @@ interface TextInputProps {
   };
   onChange: React.ChangeEventHandler<HTMLInputElement>;
   error?: string;
-  colClassName: string;
+  colClassName?: string;
 }
 
 const TextInput: React.FC<TextInputProps> = ({
@@ -24,7 +24,7 @@ const TextInput: React.FC<TextInputProps> = ({
   validation,
   onChange,
   error,
-  colClassName
+  colClassName = 'col-sm-12' 
 }) => (
   <div className={`${colClassName} mb-3`}>
     <label htmlFor="name" className="form-label">

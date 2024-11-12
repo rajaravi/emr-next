@@ -14,7 +14,7 @@ interface TypeaheadInputProps {
   options: Option[]; // List of available options as objects with label and value
   onChange: (selected: any[], name: string, label: string) => void;
   error?: string;
-  colClassName: string;
+  colClassName?: string;
 }
 
 const TypeaheadInput: React.FC<TypeaheadInputProps> = ({
@@ -26,7 +26,7 @@ const TypeaheadInput: React.FC<TypeaheadInputProps> = ({
   options,
   onChange,
   error,
-  colClassName,
+  colClassName = 'col-sm-12',
 }) => (
   <div className={`${colClassName} mb-3`}>
     <label htmlFor={name} className="form-label">

@@ -44,7 +44,8 @@
       "PURCHASER": "Purchaser",
       "PURCHASER_TYPE": "Purchaser Type",
       "PATIENT_TYPE": "Patient Type",
-      "USER": "User"
+      "USER": "User",
+      "ULELEMENTS": "UI Elements"      
     }
   }
 }

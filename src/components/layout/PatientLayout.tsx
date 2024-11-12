@@ -25,8 +25,35 @@ const PatientLayout: React.FC<PatientLayoutProps> = ({ children, patientId }) =>
     <Container fluid className='m-0'>
         <Row>
             <Col id="page-content-wrapper">
-              <Suspense fallback={<Skeleton />}>
-                {isHeaderAllowed ? <div>I am common header to all side bar...</div> : ''}
+              <Suspense fallback={<Loader />}>
+                {isHeaderAllowed ? <div>
+                  <div className="card rounded-0 mb-3 border-0 border-bottom border-primary bg-transparent">
+                    <div className="card-body p-0 pb-3">
+                      <div className='row'>
+                        <div className='col-1'>
+                          <p className="card-text mb-0">ID</p>    
+                          <h6 className="card-title mb-0">14</h6>
+                        </div>
+                        <div className='col-3'>
+                          <p className="card-text mb-0">Name</p>    
+                          <h6 className="card-title mb-0">David Brown</h6>
+                        </div>
+                        <div className='col-2'>
+                          <p className="card-text mb-0">MRN</p>    
+                          <h6 className="card-title mb-0">820309</h6>
+                        </div>
+                        <div className='col-3'>
+                          <p className="card-text mb-0">Phone</p>    
+                          <h6 className="card-title mb-0">353 992 0291</h6>
+                        </div>
+                        <div className='col-3'>
+                          <p className="card-text mb-0">Email</p>    
+                          <h6 className="card-title mb-0">david.brown90@yopmail.com</h6>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div> : ''}
                 {children}
               </Suspense>
             </Col>

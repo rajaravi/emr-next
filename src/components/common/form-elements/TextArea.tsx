@@ -9,7 +9,7 @@ interface TextAreaProps {
   rows?: number;
   onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
   error?: string;
-  colClassName: string;
+  colClassName?: string;
 }
 
 const TextArea: React.FC<TextAreaProps> = ({
@@ -21,7 +21,7 @@ const TextArea: React.FC<TextAreaProps> = ({
   rows,
   onChange,
   error,
-  colClassName
+  colClassName = 'col-sm-12'
 }) => (
   <div className={`${colClassName} mb-3`}>
     <label htmlFor="name" className="form-label">
