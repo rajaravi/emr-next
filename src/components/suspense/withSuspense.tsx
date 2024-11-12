@@ -4,8 +4,8 @@ import Loader from './Loader'; // This line is optional if you're using CSS modu
 const withSuspense = (WrappedComponent: React.ComponentType) => {
   return (props: any) => (
     <Suspense fallback={<Loader />}>
-    <WrappedComponent {...props} />
-  </Suspense>
+      <WrappedComponent {...props} />
+    </Suspense>
   );
 };
 

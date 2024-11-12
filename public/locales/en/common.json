@@ -18,7 +18,8 @@
       "PATIENT_DETAILS": "Patient Details",
       "PATIENT_HISTORY": "Patient History",
       "EXAMINATION": "Examination",
-      "APPOINTMENT": "Appointment"
+      "APPOINTMENT": "Appointment",
+      "NOTES": "Notes"
     }
   },
   "ACCOUNT": {

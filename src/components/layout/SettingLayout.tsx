@@ -1,7 +1,7 @@
 import React, { ReactNode, Suspense } from 'react';
 import SettingSidebar from './SettingSidebar';
 import { Container, Row, Col } from 'react-bootstrap';
-import Loader from '../common/Loader';
+import Loader from '../suspense/Loader';
 import { useRouter } from 'next/router';
 
 interface SettingLayoutProps {
