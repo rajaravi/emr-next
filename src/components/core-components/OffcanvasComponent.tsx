@@ -3,16 +3,19 @@ import React from 'react';
 import { Offcanvas, Button } from 'react-bootstrap';
 
 interface OffcanvasComponentProps {
-  show: boolean;
-  title: string;
-  handleClose: () => void;
-  onSave: () => void;
-  children: React.ReactNode;
+    size?: string; // e.g., '30%', '50%', '400px', etc.
+    show: boolean;
+    title: string;
+    handleClose: () => void;
+    onSave: () => void;
+    children: React.ReactNode;
 }
 
-const OffcanvasComponent: React.FC<OffcanvasComponentProps> = ({ show, title, handleClose, onSave, children }) => {
+const OffcanvasComponent: React.FC<OffcanvasComponentProps> = ({ 
+    size = '30%',  // default size
+    show, title, handleClose, onSave, children }) => {
   return (
-    <Offcanvas show={show} onHide={handleClose} placement="end">
+    <Offcanvas show={show} onHide={handleClose} placement="end" backdrop="static"  style={{ width: size }}>
       <Offcanvas.Header closeButton>
         <Offcanvas.Title>{title}</Offcanvas.Title>
       </Offcanvas.Header>

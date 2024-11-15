@@ -18,6 +18,7 @@ import { FormField } from "@/types/form";
       "required": false,
       "defaultValue": "mrs",
       "multiple": false, 
+      "colClass": "col-sm-6",
       "order": 1
     },
     {
@@ -27,6 +28,7 @@ import { FormField } from "@/types/form";
       "placeholder": "Enter your first name",
       "required": true,
       "validation": { "minLength": 2 },
+      "colClass": "col-sm-6",
       "order": 2
     },
     {
@@ -36,6 +38,7 @@ import { FormField } from "@/types/form";
       "placeholder": "Enter your surname",
       "required": true,
       "validation": { "minLength": 2 },
+      "colClass": "col-sm-6",
       "order": 3
     },
     {
@@ -45,6 +48,7 @@ import { FormField } from "@/types/form";
       "required": true,
       "disablePrevDate": false,
       "disableFutureDate": true,
+      "colClass": "col-sm-6",
       "order": 4
     },
     {
@@ -59,6 +63,7 @@ import { FormField } from "@/types/form";
       "required": false,
       "defaultValue": "female",
       "multiple": false, 
+      "colClass": "col-sm-6",
       "order": 5
     },
     {
@@ -68,6 +73,7 @@ import { FormField } from "@/types/form";
       "placeholder": "Enter your address",
       "required": false,
       "validation": { "minLength": 2 },
+      "colClass": "col-sm-6",
       "order": 6
     },
     {
@@ -79,6 +85,7 @@ import { FormField } from "@/types/form";
         { "label": "No", "value": "0" }
       ],
       "required": false,
+      "colClass": "col-sm-6",
       "order": 7
     },
     // {

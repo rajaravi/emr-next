@@ -26,6 +26,7 @@ import { getI18nStaticProps } from '@/utils/services/getI18nStaticProps';
 import OffcanvasComponent from '@/components/core-components/OffcanvasComponent';
 import { NotesFormElements } from '@/data/NotesFormElements';
 import ToastNotification from '@/components/core-components/ToastNotification';
+import { useLoading } from '@/context/LoadingContext';
 
 
 export const getStaticProps: GetStaticProps = getI18nStaticProps();
@@ -57,6 +58,7 @@ const initialValues = {
 };
 
 const Invoice: React.FC = () => {
+  const { showLoading, hideLoading } = useLoading();
   const { t } = useTranslation('common');
   const router = useRouter();
   const { id } = router.query;
@@ -80,6 +82,7 @@ const Invoice: React.FC = () => {
   };
   // Save button handler
   const handleSave = async () => {
+    showLoading();
     // Implement your save logic here
     console.log('Form saved:', formData);
     handleShowToast('Notes saved successfully!', 'success');
@@ -89,6 +92,10 @@ const Invoice: React.FC = () => {
       console.log(response.data.message); // Display success message or handle success
     } catch (error) {
       console.error('Error updating notes:', error);
+    } finally {
+      setTimeout(() => {
+        hideLoading();
+      }, 2000);
     }
     handleClose(); // Close offcanvas after saving
   };
@@ -154,7 +161,7 @@ const Invoice: React.FC = () => {
             onRowClicked={onInvoiceClicked}
             customGridOptions={{ suppressCellSelection: true }}
           />
-          <OffcanvasComponent show={show} title={'Add Notes'} handleClose={handleClose} onSave={handleSave}>
+          <OffcanvasComponent show={show} title={'Add Notes'} handleClose={handleClose} onSave={handleSave} size="50%">
             <DynamicForm
               formData={NotesFormElements}
               initialValues={initialValues}

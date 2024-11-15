@@ -11,6 +11,7 @@ import { faCheck, faClose, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { GetStaticPaths, GetStaticProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { getI18nStaticProps } from '@/utils/services/getI18nStaticProps';
+import { useLoading } from '@/context/LoadingContext';
 
 export const getStaticProps: GetStaticProps = getI18nStaticProps();
 // Translation logic - end
@@ -18,6 +19,7 @@ export const getStaticProps: GetStaticProps = getI18nStaticProps();
 const CustomEditor3 = dynamic(() => import( '@/components/core-components/CKEditorComponent' ), { ssr: false } );
 
 const Documents: React.FC = () => {
+  const { showLoading, hideLoading } = useLoading();
 
   const { t } = useTranslation('common');
   const router = useRouter();
@@ -32,7 +34,11 @@ const Documents: React.FC = () => {
   }
 
   const handleShow = () => {
+    showLoading();
     setShowModal(true);
+    setTimeout(() => {
+      hideLoading();
+    }, 1000);
   };
 
   const handleCloseEditor = () => {

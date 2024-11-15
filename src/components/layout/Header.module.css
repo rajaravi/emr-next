@@ -22,3 +22,34 @@ ul.navbar-nav li.nav-item a.nav-link {
   margin-left: -10px;
   text-align: center;
 }
+
+.navbar {
+  /* Your navbar styles */
+}
+
+.nav-link {
+  text-decoration: none;
+  color: #000; /* Default color */
+  padding-bottom: 5px; /* To create space for the underline */
+  transition: all 0.3s ease; /* Smooth transition for color and underline */
+}
+
+.nav-link:hover {
+  color: #0056b3; /* Blue on hover */
+}
+
+.active {
+  color: #0056b3; /* Highlight active menu text */
+  position: relative; /* For positioning the underline */
+}
+
+.active::after {
+  content: '';
+  display: block;
+  width: 100%;
+  height: 3px; /* Thickness of the underline */
+  background-color: #0056b3; /* Blue underline */
+  position: absolute;
+  bottom: 0; /* Align the underline to the bottom */
+  left: 0; /* Start underline from the left */
+}

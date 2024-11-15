@@ -5,6 +5,8 @@ import Header from '@/components/layout/Header';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../styles/global.css';
 import '../styles/ckeditor-custom.css';
+import { LoadingProvider, useLoading } from '@/context/LoadingContext';
+import GlobalSpinner from '@/components/core-components/GlobalSpinner';
 
 const EMRApp = ({ Component, pageProps }: AppProps) => {
   const router = useRouter();
@@ -15,11 +17,19 @@ const EMRApp = ({ Component, pageProps }: AppProps) => {
   
   return (
     <>
-      {isHeaderAllowed ? <Header /> : ''}
-      <Component {...pageProps} />
+      <LoadingProvider>
+        {isHeaderAllowed ? <Header /> : ''}
+        <Component {...pageProps} />
+        <GlobalSpinnerWrapper />
+      </LoadingProvider>
     </>
   );
 
+};
+
+const GlobalSpinnerWrapper = () => {
+  const { loading } = useLoading();
+  return <GlobalSpinner show={loading} />;
 };
 
 export default appWithTranslation(EMRApp);

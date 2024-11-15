@@ -8,6 +8,7 @@ import { FormField } from "@/types/form";
     "required": true,
     "defaultValue": "",
     "disablePrevDate": true,
+    "colClass": "col-sm-6",
     "order": 1
   },
   {
@@ -21,6 +22,7 @@ import { FormField } from "@/types/form";
     "required": true,
     "defaultValue": "dr_smith",
     "multiple": false,
+    "colClass": "col-sm-6",
     "order": 2
   },
   {
@@ -33,6 +35,7 @@ import { FormField } from "@/types/form";
     ],
     "required": true,
     "defaultValue": "cat1",
+    "colClass": "col-sm-6",
     "multiple": false,
     "order": 3
   },
@@ -46,6 +49,7 @@ import { FormField } from "@/types/form";
     ],
     "required": true,
     "defaultValue": "client_a",
+    "colClass": "col-sm-6",
     "multiple": false,
     "order": 4
   },
@@ -55,6 +59,7 @@ import { FormField } from "@/types/form";
     "label": 'Patient Name',
     "options": [],
     "required": true,
+    "colClass": "col-sm-6",
     "order": 5
   },
   {
@@ -68,6 +73,7 @@ import { FormField } from "@/types/form";
     "required": true,
     "defaultValue": "tax1",
     "multiple": false,
+    "colClass": "col-sm-6",
     "order": 6
   }
 ];

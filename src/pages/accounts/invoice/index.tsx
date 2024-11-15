@@ -24,12 +24,14 @@ import { EMR_CONFIG } from '@/utils/constants/config'
 import { GetStaticPaths, GetStaticProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { getI18nStaticProps } from '@/utils/services/getI18nStaticProps';
+import { useLoading } from '@/context/LoadingContext';
 
 
 export const getStaticProps: GetStaticProps = getI18nStaticProps();
 // Translation logic - end
 
 const Invoice: React.FC = () => {
+  const { showLoading, hideLoading } = useLoading();
   const { t } = useTranslation('common');
   const router = useRouter();
   const { id } = router.query;
@@ -76,6 +78,7 @@ const Invoice: React.FC = () => {
 
   useEffect(() => {
     const fetchPatientList = async () => {
+      showLoading();
       try {
         const response = await execute_axios_get('/mock/getPatientList'); // Replace with your actual API endpoint
         updateTypeaheadOptions(response.data);
@@ -83,6 +86,9 @@ const Invoice: React.FC = () => {
         setError('Failed to load patient data.');
       } finally {
         setLoading(false);
+        setTimeout(() => {
+          hideLoading();
+        }, 1000);
       }
     };
 

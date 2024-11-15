@@ -8,8 +8,9 @@
     "MENU_ACCOUNT": "Accounts",
     "MENU_TRAY": "Tray",
     "MENU_SETTING": "Settings",
-    "MENU_REPORT": "Reports"
-    
+    "MENU_REPORT": "Reports",
+    "MENU_PROFILE": "Profile",
+    "MENU_LOGOUT": "Logout"
   },
   "PATIENT": {
     "PATIENT_DASHBOARD": "Patient Dashboard",
@@ -46,6 +47,10 @@
       "PATIENT_TYPE": "Patient Type",
       "USER": "User",
       "ULELEMENTS": "UI Elements"      
+    },
+    "DOCTOR": {
+      "CREATE_TITLE": "Create Doctor",
+      "EDIT_TITLE": "Edit Doctor"
     }
   }
 }
