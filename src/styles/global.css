@@ -62,14 +62,23 @@ h6 {
   background-color: #fff;
   height: calc(100vh - 90px);
   box-shadow: 0 0 10px #E9EDF3;
+  overflow: auto;
 }
-.sidebar .nav-item {
-  
+.sidebar::-webkit-scrollbar {
+  width: 5px;
+}
+.sidebar::-webkit-scrollbar-track {
+  background: #f1f1f1; 
+} 
+.sidebar::-webkit-scrollbar-thumb {
+  background: #888; 
+}
+.sidebar::-webkit-scrollbar-thumb:hover {
+  background: #555; 
 }
 .sidebar .nav-item > .nav-link.active{
   background-color: #E5FFFF;
 }
-
 .sidebar .nav-link {
   color: #333;
   font-size: .92rem;
@@ -83,11 +92,38 @@ h6 {
   top: 2px;
   right: 2px;
 }
+.sidebar-h {
+  background-color: #004eff;
+  height: 46px;
+  width: 100%;
+}
+.sidebar-h .nav-item > .nav-link.active{
+  background-color: #E5FFFF;
+}
+.sidebar-h .nav-link {
+  color: #fff;
+  font-size: .92rem;
+  font-weight: 600;
+  /* border-bottom: 1px dotted #bbc9de; */
+  border-radius: 0;
+  padding: 12px 10px;
+}
+.sidebar-h .nav-link i {
+  position: relative;
+  top: 2px;
+  right: 2px;
+}
 #page-content-wrapper {
   width: calc(100% - 225px);
   position: absolute;
   right: 0;
   top: 60px;
+}
+#page-content-wrapper1 {
+  width: 100%;
+  position: absolute;
+  right: 0;
+  top: 110px;
 }
 #sidebar-wrapper {
   width: 215px;
@@ -95,6 +131,14 @@ h6 {
   position: fixed;
   left: 15px;
   top: 75px;
+  padding: 0;
+}
+#sidebar-wrapper-h {
+  width: 100%;
+  height: 60px;
+  position: fixed;
+  left: 0;
+  top: 60px;
   padding: 0;
 }
 .nav-pills .nav-link.active, .nav-pills .show>.nav-link {  
@@ -130,10 +174,10 @@ html, body, #__next {
   border-radius: 0;
   appearance: auto;
   -webkit-appearance: auto;
+}
+input[type=text].form-control, select.form-control  {
   height: 40px;
 }
-
-
 .listHead {
   font-weight: 600;
   margin: 0px 0 0 0;
@@ -366,3 +410,119 @@ ul.pagination {
   width: 100% !important /* Full width or adjust as needed for extra-large screens */
 }
 
+.pt-12 {
+  padding-top: 12px;
+}
+.pt-60 {
+  padding-top: 60px;
+}
+.fc-v-event {
+	border: none !important; /* Remove borders */
+}
+a.fc-event, a.fc-event:hover {
+	font-weight: 600;
+}
+.fc-daygrid-day {
+  position: relative;
+}
+
+.fc-daygrid-day .task-count {
+  font-size: 0.8em;
+  color: blue;
+  margin-top: 4px;
+  text-align: center;
+}
+.fc-license-message {
+  display: none;
+}
+.fc-direction-ltr .fc-timegrid-col-events {
+  margin: 0 1px;
+}
+.fc-timegrid-cols tbody tr td:nth-child(2).fc-resource {
+  background-color: #e6f4ff;
+}
+.fc-timegrid-cols tbody tr td:nth-child(3).fc-resource {
+  background-color: #ffecf2;
+}
+.fc-timegrid-cols tbody tr td:nth-child(6).fc-resource {
+  background-color: #ebffe6;
+}
+.fc-timegrid-cols tbody tr td:nth-child(4).fc-resource {
+  background-color: #fff3e6;
+}
+.fc-today-button {
+  margin-left: 10px;
+}
+.fc-theme-standard td {
+  height: 120px;
+}
+.fc-daygrid-day {
+  height: 100px; /* Set a fixed height for each day slot */
+}
+.fc-event-background {
+  background: repeating-linear-gradient(
+    45deg,
+    #606dbc,
+    #606dbc 10px,
+    #465298 10px,
+    #465298 20px
+  ) !important;
+  opacity: 0.75; /* Make it semi-transparent */
+}
+.fc-scroller table thead tr th:nth-child(2).fc-resource {
+  background-color: #e6f4ff;
+  color: #1776c1;
+}
+.fc-scroller table thead tr th:nth-child(3).fc-resource {
+  background-color: #ffecf2;
+  color: #ba2655;
+}
+.fc-scroller table thead tr th:nth-child(6).fc-resource {
+  background-color: #ebffe6;
+  color: #44b129;
+}
+.fc-scroller table thead tr th:nth-child(4).fc-resource {
+  background-color: #fff3e6;
+  color: #d98f3f;
+}
+ul.weekdays {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+}
+ul.weekdays li {
+  padding: 6px 0;
+  border: 1px solid #45b100;
+  margin-right: 2px;
+  width: 30px;
+  text-align: center;
+  border-radius: 50%;
+  height: 30px;
+  font-size: 0.75rem;
+  background-color: #e0ffcc;
+  cursor: pointer;
+}
+.disabled ul.weekdays {
+  display: none;
+}
+ul.timeSlots {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+ul.timeSlots li {
+  display: block;
+  margin: 1%;
+  background: #baff97;
+  border: 1px solid #6bd933;
+  padding: 5px;
+  border-radius: 3px;
+  width: 30%;
+  text-align: center;
+  float: left;
+  font-size: .75rem;
+}
+.autoCompleteTable tbody tr:hover td {
+  background: #ffe1ea;
+}

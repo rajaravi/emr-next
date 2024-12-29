@@ -1,8 +1,11 @@
-
-
 interface References {
   reference_value: string;
   reference_id: number;
+}
+
+interface CustomField {
+  field: string;
+  value: string;
 }
 
 export interface DoctorModel {
@@ -16,11 +19,12 @@ export interface DoctorModel {
     contact_no?: string;
     is_archive: boolean;
     references: References[];
+    custom_fields: CustomField[];
 }
 export interface DoctorTable {
     name: string;
     doctor_id: number;
-    speciality: string;    
+    speciality: string;
     contact_name: string;
     contact_no: string;
 };

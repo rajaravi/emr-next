@@ -14,7 +14,7 @@ interface ToastNotificationProps {
 const ToastNotification: React.FC<ToastNotificationProps> = ({ show, message, position, onClose, color = 'primary' }) => {
   return (
     <ToastContainer position={position} className="p-3">
-      <Toast className="d-inline-block m-1" bg='success' onClose={onClose} show={show} delay={3000} autohide>
+      <Toast className="d-inline-block m-1" bg={color} onClose={onClose} show={show} delay={3000} autohide>
         <Toast.Header className={`bg-${color} text-white`}>
           <strong className="me-auto">Notification</strong>
           <small>Just now</small>

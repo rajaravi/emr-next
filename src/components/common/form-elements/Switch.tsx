@@ -33,12 +33,12 @@ const Switch: React.FC<CheckboxProps> = ({ label, name, options, required, value
 
   return (
     <div className={`${colClassName} mb-3`}>
-    <label>
+    <label className="form-label">
         {required && <span className="text-danger">*</span>}
         {label}
     </label>
     {options.map((option, index) => (
-      <div key={index} className="form-check form-switch mt-2">
+      <div key={index} className="form-check form-switch mt-3">
         <input
           type="checkbox"
           id={`${name}-${option.value}`}

@@ -1,5 +1,5 @@
 {
-  "welcome": "Welcome to EMR, Patient Dashboard page1223",
+  "welcome": "Welcome to EMR, Patient Dashboard page",
   "description": "This is a simple example of a multilingual Next.js application.",
   "APP_TITLE": "EMR",
   "MENU": {
@@ -14,6 +14,7 @@
   },
   "PATIENT": {
     "PATIENT_DASHBOARD": "Patient Dashboard",
+    "CREATE_HEADER": "Create Patient",
     "EDIT_HEADER": "Edit Patient",
     "SIDE_MENU": {
       "PATIENT_DETAILS": "Patient Details",
@@ -21,6 +22,55 @@
       "EXAMINATION": "Examination",
       "APPOINTMENT": "Appointment",
       "NOTES": "Notes"
+    },
+    "DETAILS": {
+      "SNO": "S.No",
+      "DESIGNATION": "Designation",
+      "FIRSTNAME": "First name",
+      "SURNAME": "Surname",
+      "FULLNAME": "Full name",
+      "ADDRESS1": "Address 1",
+      "ADDRESS2": "Address 2",
+      "ADDRESS3": "Address 3",
+      "COUNTY": "County",
+      "COUNTRY": "Country",
+      "EIRCODE": "EIR Code",
+      "MRNNO": "MRN No.",
+      "DOCTOR": "Doctor",
+      "SHARED_DOCTORS": "Shared Doctors",
+      "PATIENT_TYPE": "Patient type",
+      "DOB": "DOB",
+      "GENDER": "Gender",
+      "HOME_PHONENO": "Home Phone No.",
+      "WORK_PHONENO": "Work Phone No.",
+      "MOBILE_NO": "Mobile",
+      "SEND_SMS": "Send SMS",
+      "EMAIL": "Email",
+      "SEND_EMAIL": "Send Email",
+      "OCCUPATION": "Occupation",
+      "MARITAL_STATUS": "Maritial status",
+      "RELIGION": "Religion",
+      "NOTES": "Notes",
+      "CLINICAL_NOTES": "Clinical notes",
+      "RIP": "RIP",
+      "ARCHIVE": "Archive",
+      "MESSAGES": {
+        "SAVE_SUCCESS": "Patient saved successfully!"
+      }
+    },
+    "APPOINTMENT":{
+      "CREATE_TITLE": "Create Appointment",
+      "EDIT_TITLE": "Edit Appointment",
+      "SNO": "S.No",
+      "PATIENT": "Patient",
+      "EPISODE": "Episode",
+      "DOCTOR": "Doctor",
+      "LOCATION": "Location",
+      "APPOINTMENT_TYPE": "Type",
+      "DATE": "Date",
+      "FROM_TIME": "From time",
+      "NOTES": "Notes",
+      "STATUS": "Status"      
     }
   },
   "ACCOUNT": {
@@ -39,18 +89,227 @@
     "EDIT_HEADER": "Edit Patient",
     "SIDE_MENU": {
       "DOCTOR": "Doctor",
+      "CONTACT": "Contact",
       "SPECIALITY": "Speciality",
       "REFERENCE": "Reference",
-      "LOCATION": "Location",
+      "FACILITY": "Facility",
       "PURCHASER": "Purchaser",
       "PURCHASER_TYPE": "Purchaser Type",
-      "PATIENT_TYPE": "Patient Type",
+      "PATIENT_CATEGORY": "Patient Category",
       "USER": "User",
-      "ULELEMENTS": "UI Elements"      
+      "ULELEMENTS": "UI Elements",
+      "PROCEDURE": "Procedure",
+      "APPOINTMENT_SERVICE": "Appointment Service",
+      "TEMPLATE": "Template",
+      "CONSULTANT_HOURS": "Consultant Hours"
     },
     "DOCTOR": {
       "CREATE_TITLE": "Create Doctor",
-      "EDIT_TITLE": "Edit Doctor"
+      "EDIT_TITLE": "Edit Doctor",
+      "SNO": "S.No",
+      "NAME": "Name",
+      "SHORT_NAME": "Short Name",
+      "DEGREE": "Degree",
+      "DESTINATION": "Destination",
+      "CONTACT_PERSON": "Contact Person",
+      "CONTACT_NO": "Contact No",
+      "SPECIALITY": "Speciality",
+      "ARCHIVE": "Archive",
+      "REFERENCES" : "References",
+      "REFERENCE" : "Reference",
+      "REFERENCE_NO" : "Reference No.",
+      "CUSTOM_FIELDS" : "Custom Fields",
+      "FIELD" : "Field",
+      "VALUE" : "Value",
+      "MESSAGES": {
+        "SAVE_SUCCESS": "Doctor saved successfully!"
+      }
+    },
+    "CONTACT": {
+      "CREATE_TITLE": "Create Contact",
+      "EDIT_TITLE": "Edit Contact",
+      "SNO": "S.No",
+      "DESTINATION": "Destination",
+      "FIRSTNAME": "First Name",
+      "SURNAME": "Surname",
+      "ORGANIZATION": "Organization",
+      "PROFESSION": "Profession",
+      "ADDRESS1": "Address 1",
+      "ADDRESS2": "Address 2",
+      "ADDRESS3": "Address 3",
+      "COUNTY": "County",
+      "EIRCODE": "Eir Code",
+      "PHONE": "Phone",
+      "MOBILE": "Mobile",
+      "EMAIL": "Email",
+      "ARCHIVE": "Archive",
+      "MESSAGES": {
+        "SAVE_SUCCESS": "Contact saved successfully!"
+      }
+    },
+    "PATIENT_CATEGORY": {
+      "CREATE_TITLE": "Create Category",
+      "EDIT_TITLE": "Edit Category",
+      "SNO": "S.No",
+      "NAME": "Name",
+      "ARCHIVE": "Archive",
+      "CATEGORY_NAME": "Category name",
+      "MESSAGES": {
+        "SAVE_SUCCESS": "Patient category saved successfully!"
+      }
+    },
+    "PROCEDURE": {
+      "CREATE_TITLE": "Create Procedure",
+      "EDIT_TITLE": "Edit Procedure",
+      "SNO": "S.No",
+      "NAME": "Name",
+      "CODE": "Code",
+      "FEE": "Fee",
+      "COLOR_CODE": "Color code",
+      "PROCEDURE_DETAILS": "Procedure details",
+      "PURCHASER": "Purchaser",
+      "ARCHIVE": "Archive",
+      "MESSAGES": {
+        "SAVE_SUCCESS": "Procedure saved successfully!"
+      }
+    },
+    "SPECIALITY": {
+      "CREATE_TITLE": "Create Speciality",
+      "EDIT_TITLE": "Edit Speciality",
+      "SNO": "S.No",
+      "NAME": "Name",
+      "ARCHIVE": "Archive",
+      "MESSAGES": {
+        "SAVE_SUCCESS": "Speciality saved successfully!"
+      }
+    },
+    "FACILITY": {
+      "CREATE_TITLE": "Create Facility",
+      "EDIT_TITLE": "Edit Facility",
+      "SNO": "S.No",
+      "NAME": "Name",
+      "CONTACT_NAME": "Contact Name",
+      "ADDRESS1": "Address 1",
+      "ADDRESS2": "Address 2",
+      "ADDRESS3": "Address 3",
+      "COUNTY": "County",
+      "COUNTRY": "Country",
+      "EIRCODE": "Eircode",
+      "PHONE_NO": "Phone",
+      "MOBILE_NO": "Mobile",
+      "LOCATION": "Location",
+      "ARCHIVE": "Archive",
+      "MESSAGES": {
+        "SAVE_SUCCESS": "Facility saved successfully!"
+      }
+    },
+    "USER": {
+      "CREATE_TITLE": "Create User",
+      "EDIT_TITLE": "Edit User",
+      "SNO": "S.No",
+      "NAME": "Name",
+      "USERNAME": "Username",
+      "EMAIL": "Email",
+      "ROLE": "Role",
+      "STATUS": "Status",
+      "MESSAGES": {
+        "SAVE_SUCCESS": "User saved successfully!"
+      }
+    },
+    "PURCHASER_TYPE": {
+      "CREATE_TITLE": "Create Purchaser Type",
+      "EDIT_TITLE": "Edit Purchaser Type",
+      "SNO": "S.No",
+      "NAME": "Name",
+      "ARCHIVE": "Archive",
+      "MESSAGES": {
+        "SAVE_SUCCESS": "Purchaser type saved successfully!"
+      }
+    },
+    "REFERENCE": {
+      "CREATE_TITLE": "Create Reference",
+      "EDIT_TITLE": "Edit Reference",
+      "SNO": "S.No",
+      "NAME": "Name",
+      "ARCHIVE": "Archive",
+      "MESSAGES": {
+        "SAVE_SUCCESS": "Reference saved successfully!"
+      }
+    },
+    "APPOINTMENT_SERVICE": {
+      "CREATE_TITLE": "Create Appointment Service",
+      "EDIT_TITLE": "Edit Appointment Service",
+      "SNO": "S.No",
+      "NAME": "Name",
+      "CODE": "Code",
+      "FEE": "Fee",
+      "DURATION": "Duration",
+      "COLOR_CODE": "Color code",
+      "AVAILABLE_ONLINE": "Available Online",
+      "NOTES": "Notes",
+      "CONSULTANT": "Consultant",
+      "RATE": "Rate",
+      "ARCHIVE": "Archive",
+      "MESSAGES": {
+        "SAVE_SUCCESS": "Appointment service saved successfully!"
+      }
+    },
+    "PURCHASER": {
+      "CREATE_TITLE": "Create Purchaser",
+      "EDIT_TITLE": "Edit Purchaser",
+      "SNO": "S.No",
+      "NAME": "Name",
+      "STATUS": "Status",
+      "PURCHASER_TYPE": "Purchaser Type",
+      "DESCRIPTION": "Description",
+      "ARCHIVE": "Archive",
+      "MESSAGES": {
+        "SAVE_SUCCESS": "Purchaser saved successfully!"
+      }
+    },
+    "TEMPLATE": {
+      "CREATE_TITLE": "Create Template",
+      "EDIT_TITLE": "Edit Template",
+      "SNO": "S.No",
+      "NAME": "Name",
+      "DOCTOR": "Doctor",
+      "MODULE": "Module",
+      "ARCHIVE": "Archive",
+      "MESSAGES": {
+        "SAVE_SUCCESS": "Template saved successfully!"
+      }
+    },
+    "CONSULTANT_HOURS": {
+      "CREATE_TITLE": "Create Consultant Hours",
+      "EDIT_TITLE": "Edit Consultant Hours",
+      "SNO": "S.No",
+      "DESCRIPTION": "Description",
+      "CONSULTANT": "Consultant",
+      "FROM_DATE": "From Date",
+      "TO_DATE": "To Date",
+      "CONSULTANT_WORK_HOURS": "Consultant Work Hours",
+      "LOCATION": "Location",
+      "OCCURENCE_TYPE": "Occurence Type",
+      "OCCURENCE_VALUE": "Occurence Value",
+      "WEEK_DAYS": "Week Days",
+      "FROM_TIME": "From Time",
+      "TO_TIME": "To Time",
+      "MESSAGES": {
+        "SAVE_SUCCESS": "Consultant Hours saved successfully!"
+      }
+    },    
+    "MESSAGES": {
+      "SELECT_RECORD": "Select a record!",
+      "ARCHIVE": "Archived successfully!",
+      "UNARCHIVE": "Unarchived successfully!",
+      "ACTIVE": "Active successfully!",
+      "INACTIVE": "Inactive successfully!"
     }
+  },
+  "ACTIONS": {
+    "ADDNEW": "Add New",
+    "EDIT": "Edit",
+    "ADDROW": "Add Row",
+    "ACTIONS": "Actions"
   }
 }

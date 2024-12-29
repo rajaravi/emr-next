@@ -20,7 +20,7 @@ const PatientSidebar: React.FC<PatientSidebarProps> = ({ patientId }) => {
   
   return (
     <div className="sidebar">
-      <ul className="nav nav-pills flex-column mb-auto">
+      <ul className="nav nav-pills flex-column">
         <li className="nav-item">
           <Link href={`/patient/${patientId}/patient-details`}
             className={`nav-link ${activeLink === `/patient/${patientId}/patient-details` ? 'active' : ''}`} aria-current="page">

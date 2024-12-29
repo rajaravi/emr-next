@@ -11,7 +11,7 @@ interface OffcanvasComponentProps {
     children: React.ReactNode;
 }
 
-const OffcanvasComponent: React.FC<OffcanvasComponentProps> = ({ 
+const OffcanvasComponent: React.FC<OffcanvasComponentProps> = ({
     size = '30%',  // default size
     show, title, handleClose, onSave, children }) => {
   return (
@@ -24,15 +24,14 @@ const OffcanvasComponent: React.FC<OffcanvasComponentProps> = ({
       </Offcanvas.Body>
       {/* Footer with Save and Close buttons */}
       <div className="offcanvas-footer d-flex justify-content-end p-3 border-top">
-        <Button variant="secondary" onClick={handleClose} className="me-2">
-          Close
+        <Button onClick={handleClose} className="btn btn-light rounded-0 me-auto float-start">
+        <i className="fi fi-ss-circle-xmark"></i> Close
         </Button>
-        <Button variant="primary" onClick={onSave}>
-          Save
+        <Button onClick={onSave} className="btn btn-success rounded-0 float-end">
+        <i className="fi fi-ss-disk"></i> Save
         </Button>
       </div>
     </Offcanvas>
   );
 };
-
 export default OffcanvasComponent;

@@ -21,7 +21,7 @@ const Checkbox: React.FC<CheckboxProps> = ({ label, name, options, required, val
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value: checkboxValue, checked } = e.target;
     let updatedValues = [...value];
-
+    
     if (checked) {
       // Add value to selected array if checked
       if (!updatedValues.includes(checkboxValue)) {
@@ -31,7 +31,6 @@ const Checkbox: React.FC<CheckboxProps> = ({ label, name, options, required, val
       // Remove value from selected array if unchecked
       updatedValues = updatedValues.filter(val => val !== checkboxValue);
     }
-
     onChange({
       target: {
         name,
@@ -42,30 +41,30 @@ const Checkbox: React.FC<CheckboxProps> = ({ label, name, options, required, val
 
   return (
     <div className={`${colClassName} mb-3`}>
-    <label>
+      <label className="form-label">
         {required && <span className="text-danger">*</span>}
         {label}
-    </label>
-    {options.map((option, index) => (
-      <div key={index} className="form-check">
-        <input
-          type="checkbox"
-          id={`${name}-${option.value}`}
-          name={name}
-          value={option.value}
-          className={`form-check-input ${error ? 'is-invalid' : ''}`}
-          checked={value.includes(option.value)}
-          // required={required}
-          onChange={handleCheckboxChange}
-          {...rest}
-        />
-        <label className="form-check-label" htmlFor={`${name}-${option.value}`}>
-          {option.label}
-        </label>
-      </div>
-    ))}
-    {error && <div className="text-danger">{error}</div>}
-  </div>
+      </label>
+      {options.map((option, index) => (
+        <div key={index} className="form-check">
+          <input
+            type="checkbox"
+            id={`${name}-${option.value}`}
+            name={name}
+            value={option.value}
+            className={`form-check-input ${error ? 'is-invalid' : ''}`}
+            checked={value.includes(option.value)}
+            // required={required}
+            onChange={handleCheckboxChange}
+            {...rest}
+          />
+          <label className="form-check-label" htmlFor={`${name}-${option.value}`}>
+            {option.label}
+          </label>
+        </div>
+      ))}
+      {error && <div className="text-danger">{error}</div>}
+    </div>
   );
 }
   

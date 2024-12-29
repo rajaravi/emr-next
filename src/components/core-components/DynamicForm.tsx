@@ -104,15 +104,6 @@ const DynamicForm = forwardRef<DynamicFormHandle, DynamicFormProps> (({
     return validate();
   }
   
-  // const customModelSubmit = (field: String, values: any) => {
-  //   if(field && values) {
-  //     console.log("Values", values);
-  //     formValues[field] = values;
-  //     setFormValues(formValues)
-  //   }
-  //   return handleSubmitCustom();
-  // }
-
   const validate = () => {
     const errors: { [key: string]: string } = {};
     formData.forEach(field => {
@@ -143,14 +134,6 @@ const DynamicForm = forwardRef<DynamicFormHandle, DynamicFormProps> (({
     }
   };
 
-  // const handleSubmitCustom = async  (e: React.FormEvent) => {
-  //   console.log("🚀 ~ handleSubmitCustom ~ formValues:", formValues)
-
-  //   if (validate()) {
-  //       onSubmit?.(formValues);
-  //   }
-  // };
-
   const handleCancel = () => {
     router.push('/patient'); // Redirect to the desired page, e.g., the patient list or patient details page
   };
@@ -159,7 +142,7 @@ const DynamicForm = forwardRef<DynamicFormHandle, DynamicFormProps> (({
   // console.log("🚀 ~ sortedFormData:", sortedFormData)
 
   return (
-    <form onSubmit={handleSubmit} className="container-fluid">
+    <form onSubmit={handleSubmit} className="container-fluid p-0">
       <div className="row">
         {sortedFormData.map((field, index) => {
           const commonProps = {
@@ -175,6 +158,13 @@ const DynamicForm = forwardRef<DynamicFormHandle, DynamicFormProps> (({
             case 'text':
               return <TextInput key={index} {...commonProps} placeholder={field.placeholder}
                 onChange={handleChange} validation={field.validation} colClassName={field.colClass} />;
+            case 'color':
+              return <TextInput key={index} {...commonProps} placeholder={field.placeholder}
+                onChange={handleChange} validation={field.validation} colClassName={field.colClass} textType={field.type} />;
+            case 'email':
+              return <TextInput key={index} {...commonProps} placeholder={field.placeholder}
+                onChange={handleChange} validation={field.validation} colClassName={field.colClass} textType={field.type} 
+                pattern = {field.pattern} />;
             case 'textarea':
               return <TextArea key={index} {...commonProps} placeholder={field.placeholder}
                 onChange={handleChange} rows={field.rows} colClassName={field.colClass} />;

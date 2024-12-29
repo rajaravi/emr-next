@@ -1,6 +1,6 @@
 import { FormField } from "@/types/form";
 
- export const InvoiceFormElements: FormField[] = [
+export const InvoiceFormElements: FormField[] = [
   {
     "type": "date",
     "name": "invDate",

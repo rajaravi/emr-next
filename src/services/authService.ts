@@ -6,7 +6,7 @@ export interface LoginResponse {
   
   export const login = async (practice: string, username: string, password: string): Promise<LoginResponse> => {
     try {
-      const response = await fetch('http://localhost/emr-backend/public/api/app/login/'+practice, { // Adjust URL as needed
+      const response = await fetch('http://localhost/emr-backend-l11/public/api/app/login/'+practice, { // Adjust URL as needed
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

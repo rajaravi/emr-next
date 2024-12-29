@@ -10,12 +10,14 @@ export interface Option {
 }
 
 export interface FormField {
-    type: 'text' | 'dropdown' | 'date' | 'radio' | 'checkbox' | 'typeahead' | 'submit' | 'textarea' | 'switch';
+    type: 'text' | 'dropdown' | 'date' | 'radio' | 'checkbox' | 'typeahead' | 'submit' 
+        | 'textarea' | 'switch' | 'color' | 'email';
     name: string;
     label?: string;
     placeholder?: string;
     required?: boolean;
     validation?: Validation;
+    pattern?: string;
     options?: Option[];
     order: number;
     value?: string;
@@ -23,7 +25,7 @@ export interface FormField {
     rows?: number;
     disablePrevDate?: boolean;
     disableFutureDate?: boolean;
-    defaultValue?: string | number | undefined | string[]; 
+    defaultValue?: string | number | undefined | string[];
     colClass?: string;
 }
   

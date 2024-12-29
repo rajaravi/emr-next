@@ -1,0 +1,13 @@
+.textColor {
+    color: red;
+}
+.tableGridHead {
+    background-color: #5C6672 !important;
+    color: #fff !important;
+}
+.selected {
+    background-color: #45b100 !important;
+    border: 1px solid #007bff;
+    color: #fff;
+    cursor: pointer;
+  }

@@ -23,12 +23,13 @@ const Dropdown: React.FC<DropdownProps> = ({ label, name, options, required, val
     
     return (
       <div className={`${colClassName} mb-3`}>
-        <label className="form-label">
+        <label htmlFor={name} className="form-label">
           {required && <span className="text-danger">*</span>}
           {label}
         </label>
         <select
           name={name}
+          id={name}
           className={`form-control ${error ? 'is-invalid' : ''}`}
           required={required}
           value={value || (multiple ? [] : defaultValue)}
