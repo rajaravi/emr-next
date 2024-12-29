@@ -14,17 +14,23 @@ interface DatePickerProps {
 
 const todayDate = new Date().toISOString().split('T')[0];
 
+const convertToISODate = (date: string): string => {
+  const [day, month, year] = date.split('-'); // Assuming `dd-mm-yyyy`
+  return `${year}-${month}-${day}`;
+};
+
 const DatePicker: React.FC<DatePickerProps> = ({ 
   label, name, required, value, onChange, error, disablePrevDate = true, disableFutureDate = true, colClassName = 'col-sm-12' 
 }) => (
   <div className={`${colClassName} mb-3`}>
-    <label className="form-label">
+    <label htmlFor={name} className="form-label">
       {required && <span className="text-danger">*</span>}
       {label}
     </label>
     <input
       type="date"
       name={name}
+      id={name}
       className={`form-control ${error ? 'is-invalid' : ''}`}
       required={required}
       value={value || todayDate}

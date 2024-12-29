@@ -1,308 +1,324 @@
-import React from 'react';
-import { useRouter } from 'next/router';
-import SettingLayout from '@/components/layout/SettingLayout';
+import React, { useEffect, useRef, useState } from 'react';
+import { execute_axios_post } from '@/utils/services/httpService';
+import { Button, Row, Col, Dropdown, Form } from 'react-bootstrap';
+import ENDPOINTS from '@/utils/constants/endpoints';
 import styles from './_style.module.css';
-// Translation logic - start
-import { GetStaticProps } from 'next';
-import { useTranslation } from 'next-i18next';
-import { getI18nStaticProps } from '@/utils/services/getI18nStaticProps';
-import { height } from '@fortawesome/free-solid-svg-icons/fa0';
 
+// Translation logic - start
+import { useTranslation } from 'next-i18next';
+import { GetStaticPaths, GetStaticProps } from 'next';
+import { getI18nStaticProps } from '@/utils/services/getI18nStaticProps';
+import SettingLayout from '@/components/layout/SettingLayout';
+import Datalist from '@/components/core-components/Datalist';
+import SearchFilter from '@/components/core-components/SearchFilter';
+import { useLoading } from '@/context/LoadingContext';
+import OffcanvasComponent from '@/components/core-components/OffcanvasComponent';
+import DynamicForm, { DynamicFormHandle } from '@/components/core-components/DynamicForm';
+import ToastNotification from '@/components/core-components/ToastNotification';
+import { ReferenceFormElements } from '@/data/ReferenceFormElements';
+import { ReferenceModel } from '@/types/reference';
+
+let pageLimit: number = 8;
+let selectedID: number = 0;
+let archiveID: number = 0;
 export const getStaticProps: GetStaticProps = getI18nStaticProps();
 
-// Translation logic - end
+const initialValue = {
+  name: '',
+  is_archive: 0
+};
 
 const Reference: React.FC = () => {
+  const { showLoading, hideLoading } = useLoading();
+  const [show, setShow] = useState(false);
   const { t } = useTranslation('common');
-  const router = useRouter();
-  const { id } = router.query;
+  
+  const columns: { name: string; class: string; field: string; }[] = [
+    { name: t('SETTING.REFERENCE.SNO'), class: "col-sm-1", field: "sno"},
+    { name: t('SETTING.REFERENCE.NAME'), class: "col-sm-8", field: "name"},
+    { name: t('SETTING.REFERENCE.ARCHIVE'), class: "col-sm-3", field: "is_archive"}
+  ];
+  const filter: { name: string; field: string; }[] = [
+    { name: t('SETTING.REFERENCE.NAME'), field: 'name' }
+  ];
 
+  const dynamicFormRef = useRef<DynamicFormHandle>(null);
+  const [page, setPage] = useState<number>(1);
+  const [total, setTotal] = useState<number>(0);
+  const [selectedReference, setSelectedReference] = useState<number>(0);
+  const [mode, setMode] = useState<boolean>(false);
+  const [clear, setClear] = useState<boolean>(false);
+  const [list, setList] = useState<any>([]);
+  const [searchFilter, setsearchFilter] = useState<any>([]);
+  const [initialValues, setInitialValues] = useState<any>(initialValue);
+  const [translatedElements, setTranslatedElements] = useState<any>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [formReset, setFormReset] = useState(false);
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');  
+  const [toastColor, setToastColor] = useState<'primary' | 'success' | 'danger' | 'warning' | 'info' | 'light' | 'dark'>('primary');
+
+  const initialFormData: ReferenceModel = {
+    "id": null,
+    "name": "",
+    "is_archive": false
+  };
+  const [formData, setFormData] = useState<ReferenceModel>(initialFormData);
+  const handleShow = () => {
+    setShow(true);
+    setFormData(initialFormData);
+  }
+  const handleClose = () => {
+    setShow(false);
+    setMode(false);
+  }
+
+  useEffect(() => {    
+    // Language apply for form label
+    const translatedFormElements = ReferenceFormElements.map((element) => ({
+      ...element,
+      label: t('SETTING.REFERENCE.'+element.label)
+    }));
+    setTranslatedElements(translatedFormElements);
+    fetchReferenceList(page);
+  }, []);
+
+  // Get doctor list
+  const fetchReferenceList = async (page: number, sFilter?: { field: string; text: string }) => {
+    showLoading();
+    try {
+      let passData: string = JSON.stringify({ page: page, limit: pageLimit, sort: null, search: sFilter });
+      const response = await execute_axios_post(ENDPOINTS.POST_REFERENCE_LIST, passData);
+      setList(response.data.list);
+      setTotal(response.data.total);
+    } catch (err) {
+      setError('Failed to load reference data.');
+    } finally {
+      hideLoading();
+    }
+  }; 
+
+  // Search button call
+  const handleSearch = () => {
+    const searchTextElement = document.getElementById('searchText') as HTMLInputElement;
+    if (searchTextElement.value) {
+        const sFilter = {
+            field: (document.getElementById('searchType') as HTMLSelectElement).value,
+            text: searchTextElement.value
+        }
+        setPage(1);
+        setsearchFilter(sFilter);
+        fetchReferenceList(1,sFilter);
+        setClear(true);
+    }
+  }
+
+  // Clear button call
+  const clearSearch = () => {
+    (document.getElementById('searchText') as HTMLInputElement).value = '';
+    setsearchFilter([]);
+    fetchReferenceList(1);
+    setClear(false);
+  }
+
+  // List double click
+  const referenceDblClick = (event: any) => {
+    let x = document.getElementsByClassName("selected");
+    if(x.length > 0) { x[0].classList.remove("selected"); }
+
+    if(event.target.parentNode.getAttribute('custom-id')) {
+      selectedID = event.target.parentNode.getAttribute('custom-id');
+      event.target.parentElement.setAttribute('class', 'row selected');
+      setSelectedReference(selectedID);
+    }
+    getReferenceById('edit');
+  }
+
+  // List single click
+  const referenceClick = (event: any) => {
+    let x = document.getElementsByClassName("selected");
+    if(x.length > 0) { x[0].classList.remove("selected"); }
+
+    if(event.target.parentNode.getAttribute('custom-id')) {
+      selectedID = event.target.parentNode.getAttribute('custom-id');
+      event.target.parentElement.setAttribute('class', 'row selected');
+    }
+    setSelectedReference(selectedID);
+  }
+
+  // Edit action call
+  const createReference = () => {    
+    getReferenceById('add');
+  }
+  
+  // Edit action call
+  const handleEdit = () => {
+    if(selectedReference === 0) {
+      handleShowToast(t('SETTING.MESSAGES.SELECT_RECORD'), 'danger');
+      return false;
+    }
+    getReferenceById('edit');
+  } 
+  
+  // Function to handle form field changes
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>, index?: number) => {
+    setFormReset(false); // block form reset
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });    
+  };  
+
+  // Get form data
+  const getReferenceById = async (type: string) => {
+    try {
+      let editID = 0;      
+      if(type == 'edit') editID = selectedReference;
+      let passData: string = JSON.stringify({ id: editID });
+      const response = await execute_axios_post(ENDPOINTS.POST_REFERENCE_FORMDATA, passData);
+      if(response.success) {        
+        handleShow();
+        if(response.data?.data?.id) {
+          setMode(true);
+          setInitialValues(response.data.data);
+          setFormData(response.data.data);
+        }
+      }
+    } catch (error: any) {
+        console.error('Error on fetching reference details:', error);
+    }
+  }
+
+  // Save button handler
+  const handleSave = async () => {
+    showLoading();
+    // Implement your save logic here
+    if (dynamicFormRef.current?.validateModelForm()) {
+      try {
+        const response = await execute_axios_post(ENDPOINTS.POST_REFERENCE_STORE, formData);
+        handleShowToast(t('SETTING.REFERENCE.MESSAGES.SAVE_SUCCESS'), 'success');
+      } catch (error) {
+        console.error('Error updating notes:', error);
+      } finally {
+          hideLoading();
+          refreshForm();
+      }
+      handleClose(); // Close offcanvas after saving
+      setFormData(initialFormData);
+    } else {
+      console.log('Form is invalid', dynamicFormRef);
+      hideLoading();
+    }
+  };
+
+  // Archive action call
+  const handleArchive = async(event: any) => {
+    showLoading();
+    try {
+      archiveID = event.target.getAttribute('cur-id');
+      let passData: string = JSON.stringify({ id: archiveID, is_archive: event.target.checked });
+      const response = await execute_axios_post(ENDPOINTS.POST_REFERENCE_ARCHIVE, passData);      
+      if(response.success) { 
+        if(event.target.checked === true) {
+          handleShowToast(t('SETTING.MESSAGES.UNARCHIVE'), 'dark');
+        }
+        if(event.target.checked === false) {
+          handleShowToast(t('SETTING.MESSAGES.ARCHIVE'), 'success');
+        }
+        refreshData(page);
+        hideLoading();
+      }
+    } catch (error: any) {
+        console.error('Error on fetching reference details:', error);
+        hideLoading();
+    }
+  }
+
+  // Callback function form save to list refresh
+  const refreshForm = () => {
+    refreshData(page);
+  }
+
+  // Callback function for pagination change event
+  const refreshData = (currentPage: number) => {
+    var listRows = document.querySelectorAll('.row'); // Selection row remove when the page change 
+    listRows.forEach(function(row){
+      row.classList.remove('selected');
+    })
+    setSelectedReference(0);
+    setPage(currentPage);
+    fetchReferenceList(currentPage, searchFilter);
+  }
+
+  // Toast message call
+  const handleShowToast = (message: string, color: typeof toastColor) => {
+    setToastMessage(message);
+    setToastColor(color);
+    setShowToast(true);
+  };
+  
   return (
     <SettingLayout>
-      <h1 className="mb-3">UI Elements</h1>
-      <div className="row white-bg p-1 m-0 top-bottom-shadow pt-3">
-        <div className='col-6'>
-          <div className="mb-3">
-            <h4>Text Box</h4>
-          </div>
-          <div className="mb-3">
-            <label className="form-label">Email</label>
-            <input type="email" className="form-control" id="exampleFormControlInput1" placeholder="name@example.com" />
-          </div>
-          <div className="mb-3">
-            <label className="form-label">Description</label>
-            <textarea className="form-control" id="exampleFormControlTextarea1"></textarea>
-          </div>
-          <div className="mb-3">
-            <h4 className='pt-3'>File Upload</h4>
-          </div>
-          <div className="mb-3">
-            <label className="form-label">Attachment</label>
-            <input className="form-control" type="file" id="formFile" />
-          </div>
-          <div className="mb-3">
-            <h4 className='pt-3'>Type Search</h4>
-          </div>
-          <div className="mb-3">
-            <label className="form-label">Type Search</label>
-            <input className="form-control" list="datalistOptions" id="exampleDataList" placeholder="Type to search..." />
-              <datalist id="datalistOptions">
-                <option value="San Francisco"></option>
-                <option value="New York"></option>
-                <option value="Seattle"></option>
-                <option value="Los Angeles"></option>
-                <option value="Chicago"></option>
-              </datalist>
-          </div>
-          <div className="mb-3">
-            <h4 className='pt-3'>Checkbox / Radio Button</h4>
-          </div>
-          <div className="mb-3">
-            <label className="form-label">Prefer Communication</label>
-            <div className="form-check">
-              <input className="form-check-input" type="checkbox" value="" id="flexCheckDefault" checked />
-              <label className="form-check-label" For="flexCheckDefault">
-                Email
-              </label>
-            </div>
-            <div className="form-check">
-              <input className="form-check-input" type="checkbox" value="" id="flexCheckChecked"  />
-              <label className="form-check-label" For="flexCheckChecked">
-              WhatsApp
-              </label>
-            </div>
-            <div className="form-check">
-              <input className="form-check-input" type="checkbox" value="" id="flexCheckIndeterminateDisabled" disabled />
-              <label className="form-check-label" For="flexCheckIndeterminateDisabled">
-                Postal
-              </label>
-            </div>
-          </div>
-          <div className="mb-3">
-            <label className="form-label">GDPR Guidelines</label>
-            <div className="form-check form-switch">
-              <input className="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault" />
-              <label className="form-check-label" For="flexSwitchCheckDefault">Agree </label>
-            </div>
-          </div>
-          <div className="mb-3">
-            <h4 className='pt-3'>Range Selector</h4>
-          </div>
-          <div className="mb-3">
-            <label For="customRange1" className="form-label">Range</label>
-            <input type="range" className="form-range" id="customRange1"></input>
-          </div>   
-          <div className="mb-3">
-            <h4 className='pt-3'>Input Group</h4>
-          </div>       
-          <div className="mb-3">
-            <label For="customRange1" className="form-label">Email</label>
-            <div className="input-group mb-3">
-              <input type="text" className="form-control" aria-label="Recipient's username" aria-describedby="basic-addon2" />
-              <span className="input-group-text" id="basic-addon2">@acumensoftwares.com</span>
-            </div>
-          </div>
-          <div className="mb-3">
-            <h4 className='pt-3'>Floating Labels</h4>
-          </div>
-          <div className="mb-3">
-            <div className="form-floating mb-3">
-              <input type="text" className="form-control" id="floatingInput" placeholder="cross road" />
-              <label For="floatingInput">Address</label>
-            </div>
-          </div>
-          <div className="mb-3">
-            <div className="form-floating">
-              <textarea className="form-control" placeholder="Leave a comment here" id="floatingTextarea2" Rows="4" ></textarea>
-              <label For="floatingTextarea2">Comments</label>
-            </div>
-          </div>
-          <div className="mb-3">
-            <h4 className='pt-3'>Accordion</h4>
-          </div>
-          <div className="mb-3">
-            <div className="accordion" id="accordionExample">
-              <div className="accordion-item">
-                <h2 className="accordion-header" id="headingOne">
-                  <button className="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                    Accordion Item #1
-                  </button>
-                </h2>
-                <div id="collapseOne" className="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
-                  <div className="accordion-body">
-                    <strong>This is the first item's accordion body.</strong> 
-                  </div>
-                </div>
-              </div>
-              <div className="accordion-item">
-                <h2 className="accordion-header" id="headingTwo">
-                  <button className="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                    Accordion Item #2
-                  </button>
-                </h2>
-                <div id="collapseTwo" className="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
-                  <div className="accordion-body">
-                    <strong>This is the second item's accordion body.</strong>
-                  </div>
-                </div>
-              </div>
-              <div className="accordion-item">
-                <h2 className="accordion-header" id="headingThree">
-                  <button className="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                    Accordion Item #3
-                  </button>
-                </h2>
-                <div id="collapseThree" className="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionExample">
-                  <div className="accordion-body">
-                    <strong>This is the third item's accordion body.</strong>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className='col-6'>
-          <div className="mb-3 row">
-            <label className="col-sm-4 col-form-label">Name</label>
-            <div className="col-sm-8">
-              <input type="text" className="form-control" id="name" />
-            </div>
-          </div>
-          <div className="mb-3 row">
-            <label className="col-sm-4 col-form-label">Password</label>
-            <div className="col-sm-8">
-              <input type="password" className="form-control" id="inputPassword" />
-            </div>
-          </div>
-          <div className="mb-3 row">
-            <label className="col-sm-4 col-form-label">Email</label>
-            <div className="col-sm-8">
-              <input type="text" className="form-control" id="staticEmail" value="email@example.com" disabled />
-            </div>
-          </div>
-          
-          <div className="mb-3 row">
-            <label className="col-sm-4 col-form-label">Gender</label>
-            <div className="col-sm-8">
-              <select className="form-select rounded-0">
-                <option selected>Select</option>
-                <option value="1">Male</option>
-                <option value="2">Female</option>
-                <option value="3">Others</option>
-              </select>
-            </div>
-          </div>
-          <div className="mb-3 row">
-            <label className="col-sm-4 col-form-label">Account</label>
-            <div className="col-sm-8">
-              <select className="form-select rounded-0" disabled>
-                <option>Select</option>
-                <option value="1" selected>Premium</option>
-                <option value="2">Female</option>
-                <option value="3">Others</option>
-              </select>
-            </div>
-          </div>
-          <div className="mb-3 row">
-            <label className="col-sm-4 col-form-label">Role</label>
-            <div className="col-sm-8 pt-1">
-              <div className="form-check form-check-inline">
-                <input className="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="option1" />
-                <label className="form-check-label" For="inlineRadio1">Member</label>
-              </div>
-              <div className="form-check form-check-inline">
-                <input className="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="option2" />
-                <label className="form-check-label" For="inlineRadio2">Accountant</label>
-              </div>
-              <div className="form-check form-check-inline">
-                <input className="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio3" value="option3" disabled />
-                <label className="form-check-label" For="inlineRadio3">Admin</label>
-              </div>
-            </div>
-            <div className="mb-3 row pt-1">
-              <label className="col-sm-4 col-form-label">Username</label>
-              <div className="col-sm-8 ps-4">
-                <div className="input-group mb-3">
-                  <span className="input-group-text rounded-0" id="basic-addon1">@</span>
-                  <input type="text" className="form-control" placeholder="Username" aria-label="Username" aria-describedby="basic-addon1" />
-                </div>
-              </div>
-            </div>
-            <div className="mb-3 row">
-              <h4 className='pt-3'>Color Picker</h4>
-            </div>
-            <div className="mb-3 row">
-              <label className="col-sm-4 col-form-label">Color picker</label>            
-              <input type="color" className="form-control form-control-color ms-3" id="exampleColorInput" value="#563d7c" title="Choose your color"></input>
-            </div>
-            <div className="mb-3 row">
-              <h4 className='pt-3'>Buttons</h4>
-            </div>
-            <div className="mb-3 row">
-              <div className='col-12'>
-                <button type="button" className="btn btn-primary me-1 col-3 rounded-0">Primary</button>
-                <button type="button" className="btn btn-secondary me-1 col-3 rounded-0">Secondary</button>
-                <button type="button" className="btn btn-success me-1 col-3 rounded-0">Success</button>
-                <button type="button" className="btn btn-danger me-1 col-3 mt-1 rounded-0">Danger</button>
-                <button type="button" className="btn btn-warning me-1 col-3 mt-1 rounded-0">Warning</button>
-                <button type="button" className="btn btn-info me-1 col-3 mt-1 rounded-0">Info</button>
-                <button type="button" className="btn btn-dark me-1 col-3 mt-1 rounded-0">Dark</button>
-              </div>
-            </div>
-            <div className="mb-3 row">
-              <h4 className='pt-3'>Outline Buttons</h4>
-            </div>
-            <div className="mb-3 row">
-              <div className='col-12'>
-                <button type="button" className="btn btn-outline-primary me-1 col-3 rounded-0">Primary</button>
-                <button type="button" className="btn btn-outline-secondary me-1 col-3 rounded-0">Secondary</button>
-                <button type="button" className="btn btn-outline-success me-1 col-3 rounded-0">Success</button>
-                <button type="button" className="btn btn-outline-danger me-1 col-3 mt-1 rounded-0">Danger</button>
-                <button type="button" className="btn btn-outline-warning me-1 col-3 mt-1 rounded-0">Warning</button>
-                <button type="button" className="btn btn-outline-info me-1 col-3 mt-1 rounded-0">Info</button>
-                <button type="button" className="btn btn-outline-dark me-1 col-3 mt-1 rounded-0">Dark</button>
-              </div>
-            </div>
-            <div className="mb-3 row">
-              <h4 className='pt-3'>Dropdown</h4>
-            </div>
-            <div className="mb-3 row">
-              <div className='col-12'>
-                <div className="btn-group col-4">
-                  <button type="button" className="btn btn-primary dropdown-toggle rounded-0" data-bs-toggle="dropdown" aria-expanded="false">
-                    Action
-                  </button>
-                  <ul className="dropdown-menu">
-                    <li><a className="dropdown-item" href="#">Action</a></li>
-                    <li><a className="dropdown-item" href="#">Another action</a></li>
-                    <li><a className="dropdown-item" href="#">Something else here</a></li>
-                    <li><hr className="dropdown-divider" /></li>
-                    <li><a className="dropdown-item" href="#">Separated link</a></li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-            <div className="mb-3 row">
-              <h4 className='pt-3'>Card</h4>
-            </div>
-            <div className="mb-3 row">
-              <div className='col-12'>
-                <div className="card rounded-0">
-                  <img src="https://acumensoftwares.com/img/vard-logo.png" className="card-img-top" alt="..." />
-                  <div className="card-body">
-                    <h5 className="card-title">Card title</h5>
-                    <p className="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                    <a href="#" className="btn btn-dark rounded-0">Go somewhere</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-          </div>
-        </div>        
+      <div className="d-flex justify-content-between align-items-center">
+        <h1 className={`${styles.title} mb-3`}>{t('SETTING.SIDE_MENU.REFERENCE')}</h1>
       </div>
+      <Row className="white-bg p-1 m-0 top-bottom-shadow">
+        <Col xs={7} className="mt-3 action">
+          <Button variant='primary' className='btn rounded-0' onClick={createReference}><i className="fi fi-ss-add"></i> {t('ACTIONS.ADDNEW')}</Button>
+          <Dropdown >
+            <Dropdown.Toggle variant="secondary" id="dropdown-basic"  className="btn rounded-0 ms-2">
+              {t('ACTIONS.ACTIONS')}
+            </Dropdown.Toggle>
+            <Dropdown.Menu>
+              <Dropdown.Item onClick={handleEdit}><i className="fi fi-sr-pencil"></i> {t('ACTIONS.EDIT')}</Dropdown.Item>
+            </Dropdown.Menu>
+          </Dropdown>
+        </Col>
+        <Col xs={5} className="float-end">
+          <SearchFilter 
+            filterColumns={filter}
+            handleSearch={handleSearch}
+            clearSearch={clearSearch}
+            clear={clear}
+            showFilter={true}
+          />
+        </Col>
+      </Row>
+      <div>
+        <Datalist
+          columns={columns}
+          list={list}
+          onRowDblClick={referenceDblClick}
+          onRowClick={referenceClick}
+          page={page}
+          total={total}
+          pageLimit={pageLimit}
+          refreshData={refreshData}
+          showPagination={true}
+          archiveRecord={handleArchive}/>
+      </div>
+      <OffcanvasComponent
+        show={show}
+        title={ (mode) ? t('SETTING.REFERENCE.EDIT_TITLE') : t('SETTING.REFERENCE.CREATE_TITLE') }
+        handleClose={handleClose}
+        onSave={handleSave}
+        size="30%">
+
+        <DynamicForm ref={dynamicFormRef}
+          formData={translatedElements}
+          initialValues={initialValues}
+          formReset={formReset}
+          onSubmit={handleSave}
+          isEditMode={mode}
+          modelFormInputs={handleInputChange}/>
+        
+      </OffcanvasComponent>
+      <ToastNotification
+        show={showToast}
+        message={toastMessage}
+        position='top-end'
+        color={toastColor}
+        onClose={() => setShowToast(false)}
+      />
     </SettingLayout>
   );
 };
-
 export default Reference;

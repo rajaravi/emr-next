@@ -53,13 +53,13 @@
 .calendarApp {
 	display: flex;
 	min-height: 100%;
-	font-family: Arial, Helvetica Neue, Helvetica, sans-serif;
+	/* font-family: Arial, Helvetica Neue, Helvetica, sans-serif; */
 	font-size: 14px;
 }
 
 .calendarAppMain {
 	flex-grow: 1;
-	padding: 3em;
+	padding: 15px;
 }
 
 .fc {
@@ -98,3 +98,17 @@
 	}
   }
   
+  /* Make the event fill the full timeslot */
+  .fc-event {
+	background-color: transparent !important; /* Prevent default event styling */
+	border: none !important; /* Remove borders */
+  }
+  .fc-timegrid-col {
+	position: relative;
+  }  
+  .fc-timegrid-event {
+	background-color: inherit; /* Use the resource's background color */
+	width: 100%; /* Fill the full width */
+	border-radius: 0; /* Remove rounded corners */	
+  }
+ 

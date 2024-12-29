@@ -1,113 +1,191 @@
 import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/router';
-import { NextApiRequest, NextApiResponse } from 'next';
-import { execute_axios_get, execute_axios_post } from '@/utils/services/httpService';
+import { execute_axios_post } from '@/utils/services/httpService';
 import ENDPOINTS from '@/utils/constants/endpoints';
 import styles from './_style.module.css';
 import { uuidToId } from '@/utils/helpers/uuid';
-import axios from 'axios';
 import DynamicForm from '@/components/core-components/DynamicForm';
-import { FormField } from '@/types/form';
-import { PatientFormElements } from '@/data/PatientFormElements';
-import { PatientForm } from '@/data/PatientForm';
 import { useTranslation } from 'next-i18next';
-import Skeleton from '@/components/suspense/Skeleton';
 import FormSkeleton from '@/components/suspense/FormSkeleton';
+import ToastNotification from '@/components/core-components/ToastNotification';
+import { PatientFormElements } from '@/data/PatientFormElements';
+
+const initialValue = {
+  id: 0,
+  designation_id: 0,
+  first_name: '',
+  surname: '',
+  full_name: '',
+  address1: '',
+  address2: '',
+  address3: '',
+  county: '',
+  country: '',
+  eircode: '',
+  mrn_no: '',
+  doctor_id: 0,
+  shared_doctor_ids: '',
+  patient_type_id: 0,
+  dob: '',
+  gender_id: 0,
+  home_phone_no: '',
+  work_phone_no: '',
+  mobile_no: '',
+  send_sms: 0,
+  email: '',
+  send_email: 0,
+  occupation: '',
+  marital_status_id: 0,
+  religion: '',
+  notes: '',
+  clinical_notes: '',
+  rip: 0,
+  is_archive: 0
+};
 
 interface PatientDetailsProps {
   patientId: string,
 }
 
-// Dummy data to represent fetched patient data. Replace this with actual data fetching logic.
-const patientData = {
-  name: 'John Doe',
-  age: 30,
-  address: '123 Main St',
-  phone: '555-1234',
-  email: 'johndoe@example.com'
-};
-const initialValues = {
-  title: ["mrs"],
-  firstName: 'John',
-  surName: 'Doe',
-  gender: ["male"],
-  dob: '1989-11-19',
-  address1: 'Dublin',
-  sendEmail: '0'
-};
-
 const PatientDetails: React.FC<PatientDetailsProps> = ({ patientId }) => {
   const { t } = useTranslation('common');
-  const [initialValues, setInitialValues] = useState<{ [key: string]: any }>({});
+  // const [initialValues, setInitialValues] = useState<{ [key: string]: any }>({});
+  const [initialValues, setInitialValues] = useState<any>(initialValue);  
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [translatedElements, setTranslatedElements] = useState<any>([]);
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');  
+  const [toastColor, setToastColor] = useState<'primary' | 'success' | 'danger' | 'warning' | 'info' | 'light' | 'dark'>('primary');
+
+  // const initialFormData: Patient = {
+  //   "id": 0,
+  //   "designation_id": 0,
+  //   "first_name": "",
+  //   "surname": "",
+  //   "full_name": "",
+  //   "address1": "",
+  //   "address2": "",
+  //   "address3": "",
+  //   "county": "",
+  //   "country": "",
+  //   "eircode": "",
+  //   "mrn_no": "",
+  //   "doctor_id": 0,
+  //   "shared_doctor_ids": "",
+  //   "patient_type_id": 0,
+  //   "dob": "",
+  //   "gender_id": 0,
+  //   "home_phone_no": "",
+  //   "work_phone_no": "",
+  //   "mobile_no": "",
+  //   "email": "",
+  //   "is_archive": false 
+  // };
 
   useEffect(() => {
+     // Language apply for form label
+    const translatedFormElements = PatientFormElements.map((element) => ({
+      ...element,
+      label: t('PATIENT.DETAILS.'+element.label)
+    }));
+    
     const fetchInitialValues = async () => {
       try {
-        const response = await execute_axios_get('/mock/getPatientData'); // Replace with your actual API endpoint
-        console.log("🚀 ~ fetchInitialValues ~ response:", response.data)
-        // await new Promise((resolve) => setTimeout(resolve, 3000));
-        setInitialValues(response.data);
+        let passData: any = { id: uuidToId(patientId) };
+        const response = await execute_axios_post(ENDPOINTS.POST_PATIENT_FORMDATA, passData);
+        if(response.success) {
+          setInitialValues(response.data.data);
+        }
+        // Designations options assign
+        let designation = new Array;
+        if(response.data.designations) {
+            response.data.designations.map((design: any, s: number) => {
+            designation.push({'label':design.description, 'value': design.id});
+          })
+        }
+  
+        // Doctors options assign
+        let doctor = new Array;
+        if(response.data.doctors) {
+          response.data.doctors.map((spec: any, s: number) => {
+            doctor.push({'label':spec.name, 'value': spec.id});
+          })
+        }
+  
+        // Patient types options assign
+        let patientType = new Array;
+        if(response.data.patient_types) {
+          response.data.patient_types.map((ptype: any, s: number) => {
+            patientType.push({'label':ptype.name, 'value': ptype.id});
+          })
+        }
+        // Dynamic values options format
+        translatedFormElements.map((elements: any, k: number) => {
+          if(elements.name == 'designation_id') {
+            elements.options = [];
+            elements.options = designation;
+          }
+          if(elements.name == 'doctor_id') {
+            elements.options = [];
+            elements.options = doctor;
+          }
+          if(elements.name == 'patient_type_id') {
+            elements.options = [];
+            elements.options = patientType;
+          }        
+        })
+        setTranslatedElements(translatedFormElements);
       } catch (err) {
         setError('Failed to load form data.');
       } finally {
         setLoading(false);
       }
     };
-
     const timer = setTimeout(() => {
       fetchInitialValues();
-    }, 3000); // Delay to demonstrate Suspense
-
+    }, 1000); // Delay to demonstrate Suspense
     return () => clearTimeout(timer);
+  }, []);  
 
-  }, []);
-
-  // const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  //   try {
-  //     const getData = await execute_axios_get(ENDPOINTS.GET_PATIENT);
-  //     console.log('GET data:', getData);
-
-  //     res.status(200).json({ message: 'Success', getData });
-  //   } catch (error: any) {
-  //     res.status(500).json({ message: error.message });
-  //   }
-  // };
-
-  const handleUpdate = async (values: any) => {
-    console.log('Updating patient with values:ss', values);
-
+  const handleUpdate = async (formData: any) => {
     try {
-      const response = await execute_axios_post('/api/updatePatient', values);
-      console.log(response.data.message); // Display success message or handle success
+      const response = await execute_axios_post(ENDPOINTS.POST_PATIENT_STORE, formData);
+      if(response.success) {
+        handleShowToast(t('PATIENT.DETAILS.MESSAGES.SAVE_SUCCESS'), 'success');
+      }      
     } catch (error) {
       console.error('Error updating patient:', error);
     }
   };
 
+  // Toast message call
+  const handleShowToast = (message: string, color: typeof toastColor) => {
+    setToastMessage(message);
+    setToastColor(color);
+    setShowToast(true);
+  };
 
-  if (loading) return <p><FormSkeleton /></p>;
-  if (error) return <p>{error}</p>;
+  if (loading) return <><FormSkeleton /></>;
+  if (error) return <>{error}</>;
 
   return (
     <>
-      <div className="container mt-4">
-        <h2>{t('PATIENT.EDIT_HEADER')}</h2>
-        {/* <PatientForm
-          initialValues={patientData} // Pass the patient data for editing
-          onSubmit={handleUpdate}
-          isEditMode={true} // Indicates it's an edit form
-        /> */}
-        
+      <div className="p-0">
+        <h1 className={`${styles.title} my-3`}>{t('PATIENT.EDIT_HEADER')}</h1>        
         <DynamicForm
-          formData={PatientFormElements}
+          formData={translatedElements}
           initialValues={initialValues}
           onSubmit={handleUpdate}
           isEditMode={true} />
       </div>
+      <ToastNotification
+        show={showToast}
+        message={toastMessage}
+        position='top-end'
+        color={toastColor}
+        onClose={() => setShowToast(false)}
+      />
     </>
   );
 };
-
 export default PatientDetails;

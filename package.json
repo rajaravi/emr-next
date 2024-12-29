@@ -9,9 +9,9 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@flaticon/flaticon-uicons": "^3.3.1",
     "@ckeditor/ckeditor5-build-classic": "^43.1.0",
     "@ckeditor/ckeditor5-react": "^9.1.0",
+    "@flaticon/flaticon-uicons": "^3.3.1",
     "@fortawesome/fontawesome-free": "^6.6.0",
     "@fortawesome/fontawesome-svg-core": "^6.6.0",
     "@fortawesome/free-solid-svg-icons": "^6.6.0",
@@ -21,7 +21,11 @@
     "@fullcalendar/daygrid": "^6.1.15",
     "@fullcalendar/interaction": "^6.1.15",
     "@fullcalendar/react": "^6.1.15",
+    "@fullcalendar/resource-daygrid": "^6.1.15",
+    "@fullcalendar/resource-timegrid": "^6.1.15",
+    "@fullcalendar/resource-timeline": "^6.1.15",
     "@fullcalendar/timegrid": "^6.1.15",
+    "@syncfusion/ej2-documenteditor": "^27.2.4",
     "@syncfusion/ej2-react-documenteditor": "^26.2.11",
     "ag-grid-community": "^32.1.0",
     "ag-grid-react": "^32.1.0",

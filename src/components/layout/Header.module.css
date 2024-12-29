@@ -3,8 +3,11 @@
 /* Customize Navbar */
 .navbar {
   background-color: #fff;
-  box-shadow: 0 0 10px #E9EDF3;
+  /* box-shadow: 0 0 10px #E9EDF3; */
+  border-bottom: 1px solid #004eff;
   height: 60px;
+  width: 100%;
+  z-index: 100;
 }
 ul.navbar-nav li.nav-item a.nav-link {
   color: #000 !important;
@@ -23,10 +26,6 @@ ul.navbar-nav li.nav-item a.nav-link {
   text-align: center;
 }
 
-.navbar {
-  /* Your navbar styles */
-}
-
 .nav-link {
   text-decoration: none;
   color: #000; /* Default color */
@@ -38,18 +37,19 @@ ul.navbar-nav li.nav-item a.nav-link {
   color: #0056b3; /* Blue on hover */
 }
 
-.active {
-  color: #0056b3; /* Highlight active menu text */
+.navbar .nav-link.active {
+  color: #0056b3 !important; /* Highlight active menu text */
   position: relative; /* For positioning the underline */
 }
 
-.active::after {
+/* .active::after {
   content: '';
   display: block;
   width: 100%;
-  height: 3px; /* Thickness of the underline */
-  background-color: #0056b3; /* Blue underline */
+  height: 2px;
+  background-color: #004eff;
   position: absolute;
-  bottom: 0; /* Align the underline to the bottom */
-  left: 0; /* Start underline from the left */
-}
+  bottom: -9px;
+  left: 0;
+} */
+

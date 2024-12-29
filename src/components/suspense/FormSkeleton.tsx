@@ -8,6 +8,8 @@ const FormSkeleton = () => {
         <div key={rowIndex} className={styles.row}>
           <div className={styles.skeletonField} />
           <div className={styles.skeletonField} />
+          <div className={styles.skeletonField} />
+          <div className={styles.skeletonField} />
         </div>
       ))}
     </div>

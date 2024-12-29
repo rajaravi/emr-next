@@ -1,4 +1,4 @@
-const BASE_API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost/emr-backend/public/api';
+const BASE_API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost/emr-backend-l11/public/api';
 
 const ENDPOINTS = {
     // GET METHODS
@@ -6,14 +6,82 @@ const ENDPOINTS = {
     GET_APPOINTMENTS: `${BASE_API_URL}/appointments`,
     GET_PATIENT_HISTORY: `${BASE_API_URL}/patient-history`,
     GET_EXAMINATION: `${BASE_API_URL}/examination`,
-    GET_DOCTOR: `${BASE_API_URL}/doctor/index`,
     GET_SPECIALITY: `${BASE_API_URL}/speciality/index`,
-    GET_REREFENCE_LIST: `${BASE_API_URL}/reference/get-list`,    
+    GET_SPECIALITY_LIST: `${BASE_API_URL}/speciality/get-list`,
+    GET_REREFENCE_LIST: `${BASE_API_URL}/reference/get-list`,
+    GET_PURCHASER_LIST: `${BASE_API_URL}/purchaser/get-list`,
+    GET_DOCTOR_LIST: `${BASE_API_URL}/doctor/get-list`,
+    GET_PURCHASER_TYPE_LIST: `${BASE_API_URL}/purchaser-type/get-list`,
+    GET_ENCOUNTER_LIST: `${BASE_API_URL}/encounter/get-list`,    
 
     // POST METHODS
     POST_CREATE_PATIENT: `${BASE_API_URL}/store`,
-    POST_CREATE_DOCTOR: `${BASE_API_URL}/doctor/store`,
-    POST_CREATE_SPECIALITY: `${BASE_API_URL}/speciality/store`,
+    POST_DOCTOR_LIST: `${BASE_API_URL}/doctor/index`,
+    POST_DOCTOR_FORMDATA: `${BASE_API_URL}/doctor/form-data`,
+    POST_DOCTOR_STORE: `${BASE_API_URL}/doctor/store`,
+    POST_DOCTOR_ARCHIVE: `${BASE_API_URL}/doctor/archive`,
+    POST_PATIENT_CATEGORY_LIST: `${BASE_API_URL}/patient-type/index`,
+    POST_PATIENT_CATEGORY_FORMDATA: `${BASE_API_URL}/patient-type/form-data`,
+    POST_PATIENT_CATEGORY_ARCHIVE: `${BASE_API_URL}/patient-type/archive`,
+    POST_PATIENT_CATEGORY_STORE: `${BASE_API_URL}/patient-type/store`,
+    POST_PROCEDURE_LIST: `${BASE_API_URL}/procedure/index`,
+    POST_PROCEDURE_FORMDATA: `${BASE_API_URL}/procedure/form-data`,
+    POST_PROCEDURE_ARCHIVE: `${BASE_API_URL}/procedure/archive`,
+    POST_PROCEDURE_STORE: `${BASE_API_URL}/procedure/store`,
+    POST_SPECIALITY_LIST: `${BASE_API_URL}/speciality/index`,
+    POST_SPECIALITY_FORMDATA: `${BASE_API_URL}/speciality/form-data`,
+    POST_SPECIALITY_ARCHIVE: `${BASE_API_URL}/speciality/archive`,
+    POST_SPECIALITY_STORE: `${BASE_API_URL}/speciality/store`,
+    POST_CONTACT_LIST: `${BASE_API_URL}/contact/index`,
+    POST_CONTACT_FORMDATA: `${BASE_API_URL}/contact/form-data`,
+    POST_CONTACT_ARCHIVE: `${BASE_API_URL}/contact/archive`,
+    POST_CONTACT_STORE: `${BASE_API_URL}/contact/store`,
+    POST_FACILITY_LIST: `${BASE_API_URL}/location/index`,
+    POST_FACILITY_FORMDATA: `${BASE_API_URL}/location/form-data`,
+    POST_FACILITY_ARCHIVE: `${BASE_API_URL}/location/archive`,
+    POST_FACILITY_STORE: `${BASE_API_URL}/location/store`,
+    POST_USER_LIST: `${BASE_API_URL}/user/index`,
+    POST_USER_FORMDATA: `${BASE_API_URL}/user/form-data`,
+    POST_USER_ARCHIVE: `${BASE_API_URL}/user/archive`,
+    POST_USER_STORE: `${BASE_API_URL}/user/store`,
+    POST_PURCHASER_TYPE_LIST: `${BASE_API_URL}/purchaser-type/index`,
+    POST_PURCHASER_TYPE_FORMDATA: `${BASE_API_URL}/purchaser-type/form-data`,
+    POST_PURCHASER_TYPE_ARCHIVE: `${BASE_API_URL}/purchaser-type/archive`,
+    POST_PURCHASER_TYPE_STORE: `${BASE_API_URL}/purchaser-type/store`,
+    POST_REFERENCE_LIST: `${BASE_API_URL}/reference/index`,
+    POST_REFERENCE_FORMDATA: `${BASE_API_URL}/reference/form-data`,
+    POST_REFERENCE_ARCHIVE: `${BASE_API_URL}/reference/archive`,
+    POST_REFERENCE_STORE: `${BASE_API_URL}/reference/store`,
+    POST_APPOINTMENT_SERVICE_LIST: `${BASE_API_URL}/appointment-type/index`,
+    POST_APPOINTMENT_SERVICE_FORMDATA: `${BASE_API_URL}/appointment-type/form-data`,
+    POST_APPOINTMENT_SERVICE_ARCHIVE: `${BASE_API_URL}/appointment-type/archive`,
+    POST_APPOINTMENT_SERVICE_STORE: `${BASE_API_URL}/appointment-type/store`,
+    POST_PURCHASER_LIST: `${BASE_API_URL}/purchaser/index`,
+    POST_PURCHASER_FORMDATA: `${BASE_API_URL}/purchaser/form-data`,
+    POST_PURCHASER_ARCHIVE: `${BASE_API_URL}/purchaser/archive`,
+    POST_PURCHASER_STORE: `${BASE_API_URL}/purchaser/store`,
+    POST_TEMPLATE_LIST: `${BASE_API_URL}/template/index`,
+    POST_TEMPLATE_FORMDATA: `${BASE_API_URL}/template/form-data`,
+    POST_TEMPLATE_ARCHIVE: `${BASE_API_URL}/template/archive`,
+    POST_TEMPLATE_STORE: `${BASE_API_URL}/template/store`,
+    POST_CONSULTANT_HOURS_LIST: `${BASE_API_URL}/consultant-work-hour/index`,
+    POST_CONSULTANT_HOURS_FORMDATA: `${BASE_API_URL}/consultant-work-hour/form-data`,
+    POST_CONSULTANT_HOURS_ARCHIVE: `${BASE_API_URL}/consultant-work-hour/archive`,
+    POST_CONSULTANT_HOURS_STORE: `${BASE_API_URL}/consultant-work-hour/store`,
+
+
+    POST_PATIENT_LIST: `${BASE_API_URL}/patient/index`,
+    POST_PATIENT_FORMDATA: `${BASE_API_URL}/patient/form-data`,
+    POST_PATIENT_ARCHIVE: `${BASE_API_URL}/patient/archive`,
+    POST_PATIENT_STORE: `${BASE_API_URL}/patient/store`,
+    POST_PATIENT_GETLIST: `${BASE_API_URL}/patient/get-list`,
+    
+    POST_APPOINTMENT_LIST: `${BASE_API_URL}/appointment/index`,
+    POST_APPOINTMENT_FORMDATA: `${BASE_API_URL}/appointment/form-data`,
+    POST_APPOINTMENT_ARCHIVE: `${BASE_API_URL}/appointment/archive`,
+    POST_APPOINTMENT_STORE: `${BASE_API_URL}/appointment/store`,
+    POST_AVAILABLE_SLOTS: `${BASE_API_URL}/consultant-work-hour/available-slots`,    
+
     
     // PATCH METHODS
     PATCH_PATIENT: `${BASE_API_URL}/updatePatient`,
@@ -21,5 +89,4 @@ const ENDPOINTS = {
     // DELETE METHODS
     DELETE_PATIENT: `${BASE_API_URL}/deletePatient`,
 };
-
 export default ENDPOINTS;

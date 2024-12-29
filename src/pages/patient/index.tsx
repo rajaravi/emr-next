@@ -1,116 +1,197 @@
 import React, { useEffect, useState } from 'react';
-import Link from 'next/link';
-import { Row } from 'react-bootstrap';
 import { useRouter } from 'next/router';
+import { execute_axios_post } from '@/utils/services/httpService';
+import { Button, Row, Col, Dropdown } from 'react-bootstrap';
+import ENDPOINTS from '@/utils/constants/endpoints';
 import styles from './_style.module.css';
-import { useNavigate } from 'react-router-dom';
-
 import { idToUuid } from '@/utils/helpers/uuid';
+// Translation logic - start
 import { useTranslation } from 'next-i18next';
 import { GetStaticProps } from 'next';
 import { getI18nStaticProps } from '@/utils/services/getI18nStaticProps';
-import AgGridComponent from '@/components/core-components/AgGridComponent';
-import { ColDef } from 'ag-grid-community';
-import { RowDoubleClickedEvent } from 'ag-grid-community';// Import Quartz theme CSS
-import { faPlus, faEdit } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Patient, samplePatients } from '@/types/patient';
+import Datalist from '@/components/core-components/Datalist';
+import SearchFilter from '@/components/core-components/SearchFilter';
 import { useLoading } from '@/context/LoadingContext';
+import ToastNotification from '@/components/core-components/ToastNotification';
 
+let pageLimit: number = 8;
+let selectedID: number = 0;
 export const getStaticProps: GetStaticProps = getI18nStaticProps();
 
 const PatientIndex: React.FC = () => {
+  let uuid;
   const { showLoading, hideLoading } = useLoading();
   const { t } = useTranslation('common');
   const router = useRouter();
-  // const { id } = router.query;
+  const columns: { name: string; class: string; field: string; }[] = [
+    { name: t('PATIENT.DETAILS.SNO'), class: "col-sm-1", field: "sno"},
+    { name: t('PATIENT.DETAILS.MRNNO'), class: "col-sm-1", field: "mrn_no"},
+    { name: t('PATIENT.DETAILS.FIRSTNAME'), class: "col-sm-2", field: "first_name"},
+    { name: t('PATIENT.DETAILS.SURNAME'), class: "col-sm-2", field: "surname"},
+    { name: t('PATIENT.DETAILS.DOB'), class: "col-sm-2", field: "dob"},
+    { name: t('PATIENT.DETAILS.COUNTY'), class: "col-sm-2", field: "county"},
+    { name: t('PATIENT.DETAILS.MOBILE_NO'), class: "col-sm-2", field: "mobile_no"}
+  ];
+  const filter: { name: string; field: string; }[] = [
+    { name: t('PATIENT.DETAILS.FIRSTNAME'), field: 'first_name' },
+    { name: t('PATIENT.DETAILS.SURNAME'), field: 'surname' }
+  ];
 
-  // TODO: convert patiend ID selected from the datatable
-  // const patientId = 62; // 62: e1195a2c-5150-4173-82e1-e0e6377c086d // Testing purpose
-  // let uuid = idToUuid(patientId).toString();
-  // console.log("🚀 ~ uuid:", patientId, uuid);
-  let uuid;
-  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
-  const [rowData, setRowData] = useState<Patient[]>([]);
-  const [columnDefs, setColumnDefs] = useState<ColDef[]>([]);
+  const [page, setPage] = useState<number>(1);
+  const [total, setTotal] = useState<number>(0);
+  const [selectedPatient, setSelectedPatient] = useState<number>(0);
+  const [mode, setMode] = useState<boolean>(false);
+  const [clear, setClear] = useState<boolean>(false);
+  const [list, setList] = useState<any>([]);
+  const [searchFilter, setsearchFilter] = useState<any>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [toastColor, setToastColor] = useState<'primary' | 'success' | 'danger' | 'warning' | 'info' | 'light' | 'dark'>('primary');
 
   useEffect(() => {
-    showLoading();
-    const fetchCarsData = async () => {
-      const rowDataFromApi: Patient[] = samplePatients;
-      const columnDefsFromApi: ColDef[] = [
-        { headerName: 'Doctor', field: 'doctor', sortable: true, filter: true, resizable: true, width: 250  },
-        { headerName: 'ID', field: 'patient_id', sortable: true, filter: true, resizable: true, width: 120 },
-        { headerName: 'Name', field: 'display_name', sortable: true, filter: true, resizable: true, width: 300 },
-        { headerName: 'Date of Birth', field: 'dob', valueFormatter: (params) => params.value.toLocaleDateString() },
-        { headerName: 'Address', field: 'address_1' },
-        { headerName: 'Home Phone', field: 'home_phone' },
-        { headerName: 'Mobile', field: 'mobile' },
-      ];
-
-      setRowData(rowDataFromApi);
-      setColumnDefs(columnDefsFromApi);
-      setTimeout(() => {
-        hideLoading();
-      }, 1000);
-    };
-
-    fetchCarsData();
+    fetchPatientList(page);
   }, []);
 
-  const addNewPatinet = () => {
-    router.push('/patient/create'); 
+  const fetchPatientList = async (page: number, sFilter?: { field: string; text: string }) => {
+    showLoading();
+    try {
+      let passData: string = JSON.stringify({ page: page, limit: pageLimit, sort: null, search: sFilter });
+      const response = await execute_axios_post(ENDPOINTS.POST_PATIENT_LIST, passData);
+      setList(response.data.list);
+      setTotal(response.data.total);
+    } catch (err) {
+      setError('Failed to load doctor data.');
+    } finally {
+      hideLoading();
+    }
   };
 
-  const editPatinet = () => {
-    if (selectedPatient) {
-      const patientId = selectedPatient.patient_id;
-      uuid = idToUuid(patientId).toString();
-      router.push(`/patient/${uuid}`);
+  const handleSearch = () => {
+    const searchTextElement = document.getElementById('searchText') as HTMLInputElement;
+    if (searchTextElement.value) {
+        const sFilter = {
+            field: (document.getElementById('searchType') as HTMLSelectElement).value,
+            text: searchTextElement.value
+        }
+        setPage(1);
+        setsearchFilter(sFilter);
+        fetchPatientList(1,sFilter);
+        setClear(true);
     }
   }
 
-  const onRowDoubleClicked = (event: RowDoubleClickedEvent<Patient>): void => {
-    if (event.data) {
-      const patientId = event.data.patient_id;
-      uuid = idToUuid(patientId).toString();
-      router.push(`/patient/${uuid}`);
-      // Perform additional actions with the row ID
-    } else {
-      console.error('Row data is undefined');
-    }
-  };
+  const clearSearch = () => {
+    (document.getElementById('searchText') as HTMLInputElement).value = '';
+    setsearchFilter([]);
+    fetchPatientList(1);
+    setClear(false);
+  }
 
-  const onRowClicked = (event: RowDoubleClickedEvent<Patient>): void => {
-    if (event.data) {
-      const patientId = event.data;
-      setSelectedPatient(patientId)
+  const patientDblClick = (event: any) => {
+    let x = document.getElementsByClassName("selected");
+    if(x.length > 0) { x[0].classList.remove("selected"); }
+
+    if(event.target.parentNode.getAttribute('custom-id')) {
+      selectedID = event.target.parentNode.getAttribute('custom-id');
+      event.target.parentElement.setAttribute('class', 'row selected');
+      uuid = idToUuid(selectedID).toString();
+      router.push(`/patient/${uuid}/patient-details`);
     }
+  }
+
+  const patientClick = (event: any) => {
+    let x = document.getElementsByClassName("selected");
+    if(x.length > 0) { x[0].classList.remove("selected"); }
+
+    if(event.target.parentNode.getAttribute('custom-id')) {
+      selectedID = event.target.parentNode.getAttribute('custom-id');
+      event.target.parentElement.setAttribute('class', 'row selected');
+    }
+    setSelectedPatient(selectedID);
+  }
+
+  const createPatient = () => {
+    router.push('/patient/create');
+  }
+  
+  const handleEdit = () => {
+    if(selectedPatient == 0) {
+      handleShowToast(t('SETTING.MESSAGES.SELECT_RECORD'), 'danger');
+      return false;
+    }
+    else {
+      uuid = idToUuid(selectedPatient).toString();
+      router.push(`/patient/${uuid}/patient-details`);
+    }
+  }
+   
+  const refreshData = (currentPage: number) => {
+    var listRows = document.querySelectorAll('.row');
+    listRows.forEach(function(row) {
+      row.classList.remove('selected');
+    })
+    setSelectedPatient(0);
+    setPage(currentPage);
+    fetchPatientList(currentPage, searchFilter);
+  }
+
+  const handleShowToast = (message: string, color: typeof toastColor) => {
+    setToastMessage(message);
+    setToastColor(color);
+    setShowToast(true);
   };
   
-
   return (
-    <div className="container-fluid">
+    <>
+    <div className="container-fluid pt-60">
       <div className="d-flex justify-content-between align-items-center">
-        <h1 className={`${styles.title} my-3`}>Patient</h1>
-        <div className={styles.buttonGroup}>
-          <button className={`${styles.btn} btn btn-sm btn-success rounded-0`} onClick={addNewPatinet}>
-            <FontAwesomeIcon icon={faPlus} /> Add New</button>
-          <button className="btn btn-sm btn-primary rounded-0" onClick={editPatinet}>
-            <FontAwesomeIcon icon={faEdit} /> Edit</button>
-        </div>
+        <h1 className={`${styles.title} my-3`}>{t('MENU.MENU_PATIENT')}</h1>
       </div>
+      <Row className="white-bg p-1 m-0 top-bottom-shadow">
+        <Col xs={8} className="mt-3 action">
+          <Button variant='primary' className='btn rounded-0' onClick={createPatient}><i className="fi fi-ss-add"></i> {t('ACTIONS.ADDNEW')}</Button>
+          <Dropdown>
+            <Dropdown.Toggle variant="secondary" id="dropdown-basic"  className="btn rounded-0 ms-2">
+              {t('ACTIONS.ACTIONS')}
+            </Dropdown.Toggle>
+            <Dropdown.Menu>
+              <Dropdown.Item onClick={handleEdit}><i className="fi fi-sr-pencil"></i> {t('ACTIONS.EDIT')}</Dropdown.Item>
+            </Dropdown.Menu>
+          </Dropdown>
+        </Col>
+        <Col xs={4} className="float-end">
+          <SearchFilter 
+            filterColumns={filter}
+            handleSearch={handleSearch}
+            clearSearch={clearSearch}
+            clear={clear}
+            showFilter={true}
+          />
+        </Col>
+      </Row>
       <div>
-        <AgGridComponent<Patient>
-          rowData={rowData}
-          columnDefs={columnDefs}
-          onRowDoubleClicked={onRowDoubleClicked}
-          onRowClicked={onRowClicked}
-          customGridOptions={{ suppressCellSelection: true }}
-        />
+        <Datalist
+          columns={columns}
+          list={list}
+          onRowDblClick={patientDblClick}
+          onRowClick={patientClick}
+          page={page}
+          total={total}
+          pageLimit={pageLimit}
+          refreshData={refreshData}
+          showPagination={true}
+          />
       </div>
-    </div>
+      <ToastNotification
+        show={showToast}
+        message={toastMessage}
+        position='top-end'
+        color={toastColor}
+        onClose={() => setShowToast(false)}
+      />
+      </div>
+    </>
   );
 };
-
 export default PatientIndex;

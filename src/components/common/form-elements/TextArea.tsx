@@ -24,7 +24,7 @@ const TextArea: React.FC<TextAreaProps> = ({
   colClassName = 'col-sm-12'
 }) => (
   <div className={`${colClassName} mb-3`}>
-    <label htmlFor="name" className="form-label">
+    <label htmlFor={name} className="form-label">
       {required && <span className="text-danger">*</span>}
       {label}
     </label>
