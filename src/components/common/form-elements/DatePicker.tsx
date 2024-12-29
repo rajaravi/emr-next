@@ -14,11 +14,6 @@ interface DatePickerProps {
 
 const todayDate = new Date().toISOString().split('T')[0];
 
-const convertToISODate = (date: string): string => {
-  const [day, month, year] = date.split('-'); // Assuming `dd-mm-yyyy`
-  return `${year}-${month}-${day}`;
-};
-
 const DatePicker: React.FC<DatePickerProps> = ({ 
   label, name, required, value, onChange, error, disablePrevDate = true, disableFutureDate = true, colClassName = 'col-sm-12' 
 }) => (
