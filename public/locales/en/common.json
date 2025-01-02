@@ -68,7 +68,8 @@
       "LOCATION": "Location",
       "APPOINTMENT_TYPE": "Type",
       "DATE": "Date",
-      "FROM_TIME": "From time",
+      "START_TIME": "Start time",
+      "END_TIME": "End time",
       "NOTES": "Notes",
       "STATUS": "Status"      
     }
