@@ -54,9 +54,11 @@ const Datalist: FC<DatalistProps> = ({columns, list, page, total, pageLimit, onR
                             {
                                 columns.map((cols, j) => {
                                     let f: string = cols.field;
-
                                     let pageNo = ((page-1) * pageLimit) + (i + 1);
                                     lastNo = pageNo;
+                                    if(f.includes(".")) {
+                                        data[f] = eval('data.'+f);
+                                    }
                                     if(f === 'sno') {
                                         data[f] = pageNo;
                                     }

@@ -80,7 +80,9 @@ const ENDPOINTS = {
     POST_APPOINTMENT_FORMDATA: `${BASE_API_URL}/appointment/form-data`,
     POST_APPOINTMENT_ARCHIVE: `${BASE_API_URL}/appointment/archive`,
     POST_APPOINTMENT_STORE: `${BASE_API_URL}/appointment/store`,
-    POST_AVAILABLE_SLOTS: `${BASE_API_URL}/consultant-work-hour/available-slots`,    
+    POST_AVAILABLE_SLOTS: `${BASE_API_URL}/consultant-work-hour/available-slots`,
+    POST_DAY_SLOTS: `${BASE_API_URL}/consultant-work-hour/day-slots`,
+    POST_MONTH_SLOTS: `${BASE_API_URL}/appointment/month`,   
 
     
     // PATCH METHODS
