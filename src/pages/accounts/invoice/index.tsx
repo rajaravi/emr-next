@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Table, Button } from 'react-bootstrap';
 import { useRouter } from 'next/router';
 import styles from './_style.module.css';
-import { execute_axios_get } from '@/utils/services/httpService';
+import { execute_axios_post } from '@/utils/services/httpService';
 import { ColDef, RowClickedEvent, RowDoubleClickedEvent } from 'ag-grid-community';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faEdit, faPrint, faSave, faClose, faSearch, faCheck } from '@fortawesome/free-solid-svg-icons';
@@ -16,7 +16,7 @@ import { InvoiceFormElements } from '@/data/InvoiceFormElements';
 import { ProcedureTable, sampleProcedureTable } from '@/types/procedure';
 import { AccountTable, sampleAccountRecords, InvoiceModel } from '@/types/accounts';
 
-import { Patient } from '@/types/patient';
+import { Patient, typeaheadColumnConfig } from '@/types/patient';
 import { idToUuid } from '@/utils/helpers/uuid';
 import { EMR_CONFIG } from '@/utils/constants/config'
 
@@ -77,25 +77,6 @@ const Invoice: React.FC = () => {
   };
 
   useEffect(() => {
-    const fetchPatientList = async () => {
-      showLoading();
-      try {
-        const response = await execute_axios_get('/mock/getPatientList'); // Replace with your actual API endpoint
-        updateTypeaheadOptions(response.data);
-      } catch (err) {
-        setError('Failed to load patient data.');
-      } finally {
-        setLoading(false);
-        setTimeout(() => {
-          hideLoading();
-        }, 1000);
-      }
-    };
-
-    fetchPatientList();
-  }, []);
-
-  useEffect(() => {
     const fetchAccountData = async () => {
       const rowDataFromApi: AccountTable[] = sampleAccountRecords;
       const columnDefsFromApi: ColDef[] = [
@@ -133,16 +114,17 @@ const Invoice: React.FC = () => {
   }, []);
 
   // Function to update options in form config
-  const updateTypeaheadOptions = (apiData: Option[]) => {
-    const updatedConfig = invoiceFormConfig.map((field: { type: string; }) => {
-        if (field.type === "typeahead") {
-            return {
-                ...field,
-                options: apiData,
-            };
-        }
-        return field;
+  const updateTypeaheadOptions = (apiData: Option[], appliedString: string) => {
+    const updatedConfig = invoiceFormConfig.map((field: { type: string; name: string }) => {
+      if (["typeahead", "typeaheadDynamic"].includes(field.type) && field.name === appliedString) {
+        return {
+          ...field,
+          options: apiData,
+        };
+      }
+      return field;
     });
+    // console.log("🚀 ~ updatedConfig ~ updatedConfig:", updatedConfig)
     setInvoiceFormConfig(updatedConfig);
   };
 
@@ -255,9 +237,39 @@ const Invoice: React.FC = () => {
     }
   };
 
-  const handleTypeaheadInputChange = (name: string, selected: any) => {
-    setFormReset(false); // block form reset
-    setFormData({ ...formData, [name]: selected });
+  const handleTypeaheadInputChange = async (name: string, selected: any, label: string, isClicked: any = false) => {
+    if ( ! isClicked) {
+      if (name.length >= 3) {
+        showLoading();
+        try {
+          let passData: string = JSON.stringify({ search: name, search_type: 1 });
+          const response = await execute_axios_post('/patient/get-list', passData); // Replace with your actual API endpoint
+          const formData = response.data.map((patient: { id: any; full_name: string; dob: string, mrn_no: string }) => ({
+            value: patient.id, // default mandatory typeahead property: value
+            label: patient.full_name, // default mandatory typeahead property: label
+            
+            full_name: patient.full_name,
+            mrn_no: patient.mrn_no,
+            dob: patient.dob
+          }))
+          updateTypeaheadOptions(formData, selected);
+        } catch (err) {
+          setError('Failed to load patient data.');
+        } finally {
+          setLoading(false);
+          setTimeout(() => {
+            hideLoading();
+          }, 1000);
+        }
+
+      } else {
+        updateTypeaheadOptions([], ''); // reset the values
+      }
+    } else {
+      setFormReset(false); // block form reset
+      setFormData({ ...formData, [name]: selected });
+    }
+
   };
   // Function to calculate invoice
   const calculateInvoice = (invoice: InvoiceModel) => {
@@ -355,6 +367,7 @@ const Invoice: React.FC = () => {
             initialValues={initialFormData}
             modelFormInputs={handleInputChange}
             modelFormTypeahead={handleTypeaheadInputChange}
+            columHeaderTypeahead={typeaheadColumnConfig} // table column config for dynamic typeaheader
             colClass="col-md-4"
           />
           <div className="container">

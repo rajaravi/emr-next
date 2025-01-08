@@ -1,7 +1,5 @@
 import { samplePatients } from '@/types/patient';
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { from } from 'rxjs';
-import { map } from 'rxjs/operators';
 
 type Data = {
   success: boolean;
@@ -14,6 +12,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     const formData = samplePatients.map((patient: { id: any; full_name: string; email: string }) => ({
       value: patient.id,
       label: patient.full_name,
+      patient_id: patient.id,
+      display_name: patient.full_name,
+      email: patient.email
     }))
     res.status(200).json({ success: true, data: formData });
   } else {

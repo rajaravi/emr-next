@@ -54,7 +54,7 @@ export const InvoiceFormElements: FormField[] = [
     "order": 4
   },
   {
-    "type": 'typeahead',
+    "type": 'typeaheadDynamic',
     "name": 'patientName',
     "label": 'Patient Name',
     "options": [],

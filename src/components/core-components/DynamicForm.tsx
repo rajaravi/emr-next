@@ -11,6 +11,7 @@ import TypeaheadInput from '@/components/common/form-elements/TypeaheadInput';
 import { useRouter } from 'next/router';
 import { FormField } from '@/types/form';
 import TextArea from '@/components/common/form-elements/TextArea';
+import TypeaheadDynamic from '../common/form-elements/TypeaheadInputDynamic';
 
 interface Option {
   label: string;
@@ -31,6 +32,7 @@ interface DynamicFormProps {
   colClass?: string;
   modelFormInputs?: React.ChangeEventHandler<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>;
   modelFormTypeahead?: any;
+  columHeaderTypeahead?: any;
 }
 
 const DynamicForm = forwardRef<DynamicFormHandle, DynamicFormProps> (({
@@ -41,7 +43,8 @@ const DynamicForm = forwardRef<DynamicFormHandle, DynamicFormProps> (({
     isEditMode = false,
     colClass = 'col-md-6',
     modelFormInputs,
-    modelFormTypeahead
+    modelFormTypeahead,
+    columHeaderTypeahead
   },
     ref: Ref<DynamicFormHandle>
   ) => {
@@ -84,14 +87,14 @@ const DynamicForm = forwardRef<DynamicFormHandle, DynamicFormProps> (({
     }
   };
 
-  const handleTypeaheadChange = (selected: Option[], name: string, label: string) => {
+  const handleTypeaheadChange = (selected: Option[], name: string, label: string, isCliked = false) => {
     setFormValues({
       ...formValues,
       [name]: selected,
     });
 
     if (modelFormTypeahead) {
-      modelFormTypeahead?.(name, selected)
+      modelFormTypeahead?.(name, selected, label, isCliked = true)
       if (selected) {
         formErrors[name] = '';
         setFormErrors(formErrors);
@@ -186,7 +189,12 @@ const DynamicForm = forwardRef<DynamicFormHandle, DynamicFormProps> (({
                 onChange={handleChange} colClassName={field.colClass} checked={true} />;
             case 'typeahead': 
               return <TypeaheadInput key={index} {...commonProps}
-                onChange={handleTypeaheadChange} options={field.options!} colClassName={field.colClass} />;
+                onChange={handleTypeaheadChange} options={field.options!} colClassName={field.colClass} 
+                onInputChange={modelFormTypeahead} />;
+            case 'typeaheadDynamic': 
+              return <TypeaheadDynamic key={index} {...commonProps} columnHeader={columHeaderTypeahead}
+                onChange={handleTypeaheadChange} options={field.options!} colClassName={field.colClass} 
+                onInputChange={modelFormTypeahead} />;
             case 'submit':
               return (
                 <div key={index} className="col-12">
