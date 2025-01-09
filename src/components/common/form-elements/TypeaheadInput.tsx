@@ -13,6 +13,7 @@ interface TypeaheadInputProps {
   value: Option[]; // Selected value(s) as an array of objects
   options: Option[]; // List of available options as objects with label and value
   onChange: (selected: any[], name: string, label: string) => void;
+  onInputChange: (selected: string, name: string, label: string, isClicked: boolean) => void; // Notify parent when user types
   error?: string;
   colClassName?: string;
 }
@@ -25,6 +26,7 @@ const TypeaheadInput: React.FC<TypeaheadInputProps> = ({
   value,
   options,
   onChange,
+  onInputChange,
   error,
   colClassName = 'col-sm-12',
 }) => (
@@ -36,9 +38,10 @@ const TypeaheadInput: React.FC<TypeaheadInputProps> = ({
     <Typeahead
       id={name}
       options={options}
-      placeholder={placeholder || 'Select an option...'}
+      placeholder={placeholder || 'Enter min 3 chars for patient'}
       selected={value || []}
       onChange={(val) => onChange(val, name, label)} // Map selected values to strings
+      onInputChange={(val) => onInputChange(val, name, label, false) }
       multiple={false} // Set to true if you want to allow multiple selections
       className={`form-control ${styles.paddingUnset} ${error ? 'is-invalid' : ''}`}
     />

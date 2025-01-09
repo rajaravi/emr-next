@@ -168,16 +168,6 @@ const Invoice: React.FC = () => {
               modelFormInputs={handleInputChange}
               colClass="col-md-12"
               isEditMode={true} />
-
-            {/* <Button onClick={() => handleShowToast('This is a success notification!', 'success')}>
-              Show Success Toast
-            </Button>
-            <Button onClick={() => handleShowToast('This is a warning notification!', 'warning')} className="ms-2">
-              Show Warning Toast
-            </Button>
-            <Button onClick={() => handleShowToast('This is a danger notification!', 'danger')} className="ms-2">
-              Show Danger Toast
-            </Button> */}
           </OffcanvasComponent>
           <ToastNotification
             show={showToast}

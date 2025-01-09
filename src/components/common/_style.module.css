@@ -67,3 +67,74 @@
 	max-width: 1100px;
 	margin: 0 auto;
 }
+
+.typeaheadTableRow {
+  display: flex;
+  background-color: #ffffff;
+}
+.typeaheadTableRowOdd {
+  display: flex;
+  background-color: #f9f9f9;
+}
+
+.typeaheadTableCell {
+  width: 50%;
+  padding: 5px;
+  /* border-bottom: 1px solid #ddd; */
+}
+
+/* TypeaheadDynamic css */
+
+.typeaheadContainer {
+	border: 1px solid #ddd;
+	border-radius: 5px;
+	background-color: #fff;
+	max-height: 300px;
+	overflow-y: auto;
+	width: 100%;
+	z-index: 1050;
+
+  }
+  
+  .typeaheadHeader {
+	display: table;
+	width: 100%;
+	background-color: #f1f1f1;
+	font-weight: bold;
+	padding: 5px;
+  }
+  
+  .typeaheadHeaderRow {
+	display: flex;
+  }
+  
+  .typeaheadHeaderCell {
+	/* display: table-cell; */
+	padding: 5px;
+	border-bottom: 1px solid #ddd;
+	width: 50%;
+  }
+  
+  .typeaheadItem {
+	display: table;
+	width: 100%;
+  }
+  
+  .typeaheadItemRow {
+	display: flex;
+  }
+  
+  .typeaheadItemCell {
+	padding: 5px;
+	border-bottom: 1px solid #ddd;
+	width: 50%;
+  }
+  
+  .typeaheadItemOdd {
+	background-color: #f9f9f9;
+  }
+  
+  .typeaheadItemEven {
+	background-color: #ffffff;
+  }
+  
