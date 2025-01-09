@@ -2,7 +2,7 @@ const BASE_API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost/emr-ba
 
 const ENDPOINTS = {
     // GET METHODS
-    GET_PATIENT: `${BASE_API_URL}/patient/index`,
+    GET_PATIENT_LIST: `${BASE_API_URL}/patient/get-list`,
     GET_APPOINTMENTS: `${BASE_API_URL}/appointments`,
     GET_PATIENT_HISTORY: `${BASE_API_URL}/patient-history`,
     GET_EXAMINATION: `${BASE_API_URL}/examination`,
@@ -12,7 +12,8 @@ const ENDPOINTS = {
     GET_PURCHASER_LIST: `${BASE_API_URL}/purchaser/get-list`,
     GET_DOCTOR_LIST: `${BASE_API_URL}/doctor/get-list`,
     GET_PURCHASER_TYPE_LIST: `${BASE_API_URL}/purchaser-type/get-list`,
-    GET_ENCOUNTER_LIST: `${BASE_API_URL}/encounter/get-list`,    
+    GET_ENCOUNTER_LIST: `${BASE_API_URL}/encounter/get-list`,
+    GET_PROCEDURE_LIST: `${BASE_API_URL}/procedure/get-list`,    
 
     // POST METHODS
     POST_CREATE_PATIENT: `${BASE_API_URL}/store`,
@@ -83,6 +84,11 @@ const ENDPOINTS = {
     POST_AVAILABLE_SLOTS: `${BASE_API_URL}/consultant-work-hour/available-slots`,
     POST_DAY_SLOTS: `${BASE_API_URL}/consultant-work-hour/day-slots`,
     POST_MONTH_SLOTS: `${BASE_API_URL}/appointment/month`,   
+
+    POST_SURGERY_LIST: `${BASE_API_URL}/surgery/index`,
+    POST_SURGERY_FORMDATA: `${BASE_API_URL}/surgery/form-data`,
+    POST_SURGERY_ARCHIVE: `${BASE_API_URL}/surgery/archive`,
+    POST_SURGERY_STORE: `${BASE_API_URL}/surgery/store`,
 
     
     // PATCH METHODS

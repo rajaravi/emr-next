@@ -485,6 +485,10 @@ a.fc-event, a.fc-event:hover {
   background-color: #fff3e6;
   color: #d98f3f;
 }
+.fc-daygrid-day-events {
+  float: left;
+  padding: 5px;
+}
 ul.weekdays {
   margin: 0;
   padding: 0;
@@ -525,4 +529,34 @@ ul.timeSlots li {
 }
 .autoCompleteTable tbody tr:hover td {
   background: #ffe1ea;
+}
+/* .fc-header-toolbar .fc-toolbar-chunk {
+  position: absolute;
+  left: 15px;
+  top: 125px;
+}
+.fc-header-toolbar .fc-toolbar-chunk:nth-child(2) {
+  left: 350px;
+}
+.fc-header-toolbar .fc-toolbar-chunk:nth-child(3) {
+  left: 170px;
+}
+.fc .fc-view-harness-active > .fc-view {
+  top: 20px;
+} */
+.cal-actions {
+  width: auto;
+  position: absolute;
+  right: 0;
+  display: flex;
+  top: 75px;
+}
+.cal-actions div:first-child {
+  width: auto;
+}
+.cal-actions .btn {
+  float: left;
+}
+.cal-actions .dropdown {
+  float: left;
 }

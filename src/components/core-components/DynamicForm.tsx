@@ -165,6 +165,10 @@ const DynamicForm = forwardRef<DynamicFormHandle, DynamicFormProps> (({
               return <TextInput key={index} {...commonProps} placeholder={field.placeholder}
                 onChange={handleChange} validation={field.validation} colClassName={field.colClass} textType={field.type} 
                 pattern = {field.pattern} />;
+            case 'time':
+              return <TextInput key={index} {...commonProps} placeholder={field.placeholder}
+                onChange={handleChange} validation={field.validation} colClassName={field.colClass} textType={field.type} 
+                pattern = {field.pattern} />;
             case 'textarea':
               return <TextArea key={index} {...commonProps} placeholder={field.placeholder}
                 onChange={handleChange} rows={field.rows} colClassName={field.colClass} />;
