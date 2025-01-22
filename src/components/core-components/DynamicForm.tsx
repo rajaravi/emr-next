@@ -168,6 +168,10 @@ const DynamicForm = forwardRef<DynamicFormHandle, DynamicFormProps> (({
               return <TextInput key={index} {...commonProps} placeholder={field.placeholder}
                 onChange={handleChange} validation={field.validation} colClassName={field.colClass} textType={field.type} 
                 pattern = {field.pattern} />;
+            case 'time':
+              return <TextInput key={index} {...commonProps} placeholder={field.placeholder}
+                onChange={handleChange} validation={field.validation} colClassName={field.colClass} textType={field.type} 
+                pattern = {field.pattern} />;
             case 'textarea':
               return <TextArea key={index} {...commonProps} placeholder={field.placeholder}
                 onChange={handleChange} rows={field.rows} colClassName={field.colClass} />;
@@ -176,7 +180,7 @@ const DynamicForm = forwardRef<DynamicFormHandle, DynamicFormProps> (({
                 onChange={handleChange} colClassName={field.colClass} />;
             case 'date':
               return <DatePicker key={index} {...commonProps} disablePrevDate={field.disablePrevDate}
-                disableFutureDate={field.disableFutureDate} 
+                disableFutureDate={field.disableFutureDate} dateSelection={field.dateSelection}
                 onChange={handleChange} colClassName={field.colClass} />;
             case 'radio':
               return <RadioButton key={index} {...commonProps} options={field.options!}

@@ -9,14 +9,17 @@ interface DatePickerProps {
   error?: string;
   disablePrevDate?: boolean;
   disableFutureDate?: boolean;
+  dateSelection?: boolean;
   colClassName?: string;
 }
 
-const todayDate = new Date().toISOString().split('T')[0];
+
 
 const DatePicker: React.FC<DatePickerProps> = ({ 
-  label, name, required, value, onChange, error, disablePrevDate = true, disableFutureDate = true, colClassName = 'col-sm-12' 
-}) => (
+  label, name, required, value, onChange, error, disablePrevDate = true, disableFutureDate = true, dateSelection = true, colClassName = 'col-sm-12' 
+}) => {
+  const todayDate = dateSelection ? new Date().toISOString().split('T')[0] : '';
+  return (
   <div className={`${colClassName} mb-3`}>
     <label htmlFor={name} className="form-label">
       {required && <span className="text-danger">*</span>}
@@ -35,6 +38,7 @@ const DatePicker: React.FC<DatePickerProps> = ({
     />
     {error && <div className="text-danger">{error}</div>}
   </div>
-);
+  );
+};
 
 export default DatePicker;

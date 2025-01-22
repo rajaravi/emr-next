@@ -21,6 +21,7 @@
       "PATIENT_HISTORY": "Patient History",
       "EXAMINATION": "Examination",
       "APPOINTMENT": "Appointment",
+      "SURGERY": "Surgery",
       "NOTES": "Notes"
     },
     "DETAILS": {
@@ -70,6 +71,24 @@
       "DATE": "Date",
       "START_TIME": "Start time",
       "END_TIME": "End time",
+      "NOTES": "Notes",
+      "STATUS": "Status"      
+    },
+    "SURGERY":{
+      "CREATE_TITLE": "Create Surgery",
+      "EDIT_TITLE": "Edit Surgery",
+      "SNO": "S.No",
+      "PATIENT": "Patient",
+      "EPISODE": "Episode",
+      "DOCTOR": "Doctor",
+      "LOCATION": "Location",
+      "APPOINTMENT_TYPE": "Type",
+      "DATE": "Date",
+      "FROM_TIME": "Start time",
+      "TO_TIME": "End time",
+      "ADMISSION_DATE": "Admission Date",
+      "DISCHARGE_DATE": "Discharge Date",
+      "DISCHARGE_TIME": "Discharge Time",
       "NOTES": "Notes",
       "STATUS": "Status"      
     }
@@ -311,6 +330,8 @@
     "ADDNEW": "Add New",
     "EDIT": "Edit",
     "ADDROW": "Add Row",
-    "ACTIONS": "Actions"
+    "ACTIONS": "Actions",
+    "ADDAPPOINTMENT": "Add Appointment",
+    "ADDSURGERY": "Add Surgery"
   }
 }

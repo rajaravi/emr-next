@@ -10,8 +10,9 @@ import PatientLayout from '@/components/layout/PatientLayout';
 import Datalist from '@/components/core-components/Datalist';
 import SearchFilter from '@/components/core-components/SearchFilter';
 import { useLoading } from '@/context/LoadingContext';
-import OffcanvasComponent from '@/components/core-components/OffcanvasComponent';
+
 import DynamicForm, { DynamicFormHandle } from '@/components/core-components/DynamicForm';
+import AppointmentForm from './form';
 import ToastNotification from '@/components/core-components/ToastNotification';
 // Translation logic - start
 import { GetStaticPaths, GetStaticProps } from 'next';
@@ -37,18 +38,13 @@ let pageLimit: number = 6;
 let selectedID: number = 0;
 let archiveID: number = 0;
 
-interface Record {
-  id: number;
-  full_name: string;
-  mrn_no: string;
-  dob: string;
-}
+const MIN_CHARACTERS = 3;
 
 export const getStaticProps: GetStaticProps = getI18nStaticProps();
 
 const initialValue = {
   patient_id: 0,
-  episode_id: 0,
+  encounter_id: 0,
   doctor_id: 0,
   location_id: 0,
   appointment_type_id: 0,
@@ -65,58 +61,46 @@ const Appointment: React.FC = () => {
   const { t } = useTranslation('common');
   const router = useRouter();
   const { id } = router.query;
-  const columns: { name: string; class: string; field: string; }[] = [
+  const columns: { name: string; class: string; field: string; format?: string }[] = [
     { name: t('PATIENT.APPOINTMENT.SNO'), class: "col-sm-1", field: "sno"},
-    { name: t('PATIENT.APPOINTMENT.APPOINTMENT_TYPE'), class: "col-sm-3", field: "type_id"},
-    { name: t('PATIENT.APPOINTMENT.DOCTOR'), class: "col-sm-3", field: "doctor_id"},
-    { name: t('PATIENT.APPOINTMENT.LOCATION'), class: "col-sm-3", field: "location_id"},
-    { name: t('PATIENT.APPOINTMENT.STATUS'), class: "col-sm-2", field: "status_id"}
+    { name: t('PATIENT.APPOINTMENT.DATE'), class: "col-sm-2", field: "date", format:'date'},
+    { name: t('PATIENT.APPOINTMENT.APPOINTMENT_TYPE'), class: "col-sm-2", field: "appointment_type.name"},
+    { name: t('PATIENT.APPOINTMENT.DOCTOR'), class: "col-sm-2", field: "doctor.name"},
+    { name: t('PATIENT.APPOINTMENT.LOCATION'), class: "col-sm-3", field: "location.name"},
+    { name: t('PATIENT.APPOINTMENT.STATUS'), class: "col-sm-2", field: "status.description"}
   ];
   const filter: { name: string; field: string; }[] = [
     { name: t('PATIENT.APPOINTMENT.PATIENT'), field: 'patient' }
   ];
 
   const dynamicFormRef = useRef<DynamicFormHandle>(null);
-  const [page, setPage] = useState<number>(1);
+  const [page, setPage] = useState<number>(1);  
   const [total, setTotal] = useState<number>(0);
   const [selectedAppointment, setSelectedAppointment] = useState<number>(0);
   const [mode, setMode] = useState<boolean>(false);
-  const [clear, setClear] = useState<boolean>(false);
-  const [list, setList] = useState<any>([]);
-  const [encounterList, setEncounterList] = useState<any>([]);
-  const [doctorList, setDoctorList] = useState<any>([]);
-  const [locationList, setLocationList] = useState<any>([]);
-  const [typeList, setTypeList] = useState<any>([]);  
-  const [statusList, setStatusList] = useState<any>([]);
-  const [slotsList, setSlotsList] = useState<any>([]);  
+  const [clear, setClear] = useState<boolean>(false);  
+  const [list, setList] = useState<any>([]); 
+  const [slotsList, setSlotsList] = useState<any>([]);
+  const [slotBookedTime, setSlotBookedTime] = useState<string | null>(null);     
   const [searchFilter, setsearchFilter] = useState<any>([]);
-  const [slotsData, setSlotsData] = useState<any>([]);  
-  const [initialValues, setInitialValues] = useState<any>(initialValue);
   const [translatedElements, setTranslatedElements] = useState<any>([]);
+  const [initialValues, setInitialValues] = useState<any>(initialValue);
   const [error, setError] = useState<string | null>(null);
   const [formReset, setFormReset] = useState(false);
-  const [showToast, setShowToast] = useState(false);
-  const [toastMessage, setToastMessage] = useState('');
-  const [toastColor, setToastColor] = useState<'primary' | 'success' | 'danger' | 'warning' | 'info' | 'light' | 'dark'>('primary');
-
-  const [query, setQuery] = useState<string>("");
-  const [results, setResults] = useState<Record[]>([]);  
-  const [selectedId, setSelectedId] = useState<number>();
-  const [isResultSelected, setIsResultSelected] = useState<boolean>(false);
-
   const [field1, setField1] = useState<string | null>(null); // First field
   const [field2, setField2] = useState<string | null>(null); // Second field
   const [field3, setField3] = useState<string | null>(null); // Third field
   const [field4, setField4] = useState<string | null>(null); // Third field
-  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const [activeIndex, setActiveIndex] = useState<number>(0);
   const [selectedFromTime, setSelectedFromTime] = useState<string | null>("");
-  
-
-  const MIN_CHARACTERS = 3;
-  const initialFormData: AppointmentModel = {
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [toastColor, setToastColor] = useState<'primary' | 'success' | 'danger' | 'warning' | 'info' | 'light' | 'dark'>('primary');
+    
+  const initialFormData: AppointmentModel = { 
     "id": null,
     "patient_id": 0,
-    "episode_id": 0,
+    "encounter_id": 0,
     "doctor_id": 0,
     "location_id": 0,
     "appointment_type_id": 0,
@@ -125,16 +109,9 @@ const Appointment: React.FC = () => {
     "to_time": "",
     "notes": "",
     "status_id": 0
-  };
-  const [formData, setFormData] = useState<AppointmentModel>(initialFormData);
-  const handleShow = () => {
-    setShow(true);
-    setFormData(initialFormData);
-  }
-  const handleClose = () => {
-    setShow(false);
-    setMode(false);
-  }
+};
+
+const [formData, setFormData] = useState<AppointmentModel>(initialFormData);
 
   // Onload function
   useEffect(() => {    
@@ -144,7 +121,6 @@ const Appointment: React.FC = () => {
       label: t('PATIENT.APPOINTMENT.'+element.label)
     }));
     setTranslatedElements(translatedFormElements);
-    getEncounterList();
     fetchAppointmentList(page);
   }, []);
 
@@ -224,92 +200,6 @@ const Appointment: React.FC = () => {
     }
     getAppointmentId('edit');
   } 
-  
-  // Function to handle form field changes
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setFormReset(false); // block form reset
-    const { name, value } = e.target; 
-
-    if(name == 'patient_name') {
-      setQuery(value);
-      setSelectedId(""); 
-      setIsResultSelected(false); 
-  
-      if (value.length >= MIN_CHARACTERS) {
-        fetchPatients(value); // Fetch records when query length >= 3        
-      } else {
-        setResults([]); // Clear results if query length < 3
-        setEncounterList([]);
-      }
-    }
-    if(name == 'doctor_id') {
-      setField1(value);
-      getAvailableSlots(value, field2, field3, field4);      
-    }
-    if(name == 'location_id') {
-      setField2(value);
-      getAvailableSlots(field1, value, field3, field4);      
-    }
-    if(name == 'appointment_type_id') {
-      setField3(value);
-      getAvailableSlots(field1, field2, value, field4);      
-    }
-    if(name == 'date') {
-      setField4(value);
-      getAvailableSlots(field1, field2, field3, value);      
-    }
-    setFormData({ ...formData, [name]: value });  
-  };  
-
-  // Get form data
-  const getAppointmentId = async (type: string) => {
-    try {
-      let editID = 0;      
-      if(type == 'edit') editID = selectedAppointment;
-      let passData: string = JSON.stringify({ id: editID });
-      const response = await execute_axios_post(ENDPOINTS.POST_APPOINTMENT_FORMDATA, passData);
-      if(response.success) {        
-        handleShow();
-        if(response.data?.data?.id) {
-          setMode(true);
-          setInitialValues(response.data.data);
-          setFormData(response.data.data);
-        }
-        setDoctorList(response.data.doctors);
-        setLocationList(response.data.locations);
-        setTypeList(response.data.appointment_types);
-        setStatusList(response.data.status_list);
-      }
-    } catch (error: any) {
-        console.error('Error on fetching doctor details:', error);
-    }
-  }
-
-  // Save button handler
-  const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {    
-    e.preventDefault();
-    // const formData = new FormData(); // Create FormData object
-    // formData.append("patient_id", selectedId); // Append the hidden value
-
-    console.log("🚀 ~ handleSubmit ~ formValues:", formData)
-    showLoading();
-    // Implement your save logic here
-
-      try {
-        const response = await execute_axios_post(ENDPOINTS.POST_APPOINTMENT_STORE, formData);
-        if(response.success) {
-          handleShowToast(t('PATIENT.APPOINTMENT.MESSAGES.SAVE_SUCCESS'), 'success');
-        }
-      } catch (error) {
-        console.error('Error updating notes:', error);
-      } finally {
-          hideLoading();
-          refreshForm();
-      }
-      handleClose(); // Close offcanvas after saving
-      setFormData(initialFormData);
-   
-  };
 
   // Archive action call
   const handleArchive = async(event: any) => {
@@ -357,48 +247,182 @@ const Appointment: React.FC = () => {
     setShowToast(true);
   };
 
-  const formatDate = (dateString: string): string => {
-    const [year, month, day] = dateString.split("-");
-    return `${day}-${month}-${year}`;
-  };
-
-  // Fetch patient records from the API
-  const fetchPatients = async (searchTerm: string) => {
+  const getAppointmentId = async (type: string) => {
     try {
-      let passData: string = JSON.stringify({ search: searchTerm, search_type: 1 });
-      const result = await execute_axios_post(ENDPOINTS.POST_PATIENT_GETLIST, passData);
-      setResults(result.data);
-    } catch (error) {
-      console.error("Error fetching records:", error);
+      let editID = 0;
+      if(type == 'edit') editID = selectedAppointment;
+      let passData: string = JSON.stringify({ id: editID });
+      const response = await execute_axios_post(ENDPOINTS.POST_APPOINTMENT_FORMDATA, passData);
+      if(response.success) {        
+        handleShow();
+        if(response.data?.data?.id) {          
+          setInitialValues(response.data.data);              
+        }
+        else {
+          setFormData(initialFormData);
+        }
+        let doctor = new Array;
+        if(response.data.doctors) {
+          response.data.doctors.map((doc: any, d: number) => {
+            doctor.push({'label':doc.name, 'value': doc.id});
+          })
+        }        
+        let location = new Array;
+        if(response.data.locations) {
+          response.data.locations.map((loc: any, l: number) => {
+            location.push({'label':loc.name, 'value': loc.id});
+          })
+        }
+        let status = new Array;
+        if(response.data.status_list) {
+          response.data.status_list.map((stat: any, s: number) => {
+            status.push({'label':stat.description, 'value': stat.id});
+          })
+        }
+        let appType = new Array;
+        if(response.data.appointment_types) {
+          response.data.appointment_types.map((app: any, a: number) => {
+            appType.push({'label':app.name, 'value': app.id});
+          })
+        }
+        
+        // setProcedureList(response.data.procedures);
+
+        // Dynamic values options format
+        translatedElements.map((elements: any, k: number) => {
+          if(elements.name == 'doctor_id') {
+            elements.options = [];
+            elements.options = doctor;
+          }
+          else if(elements.name == 'location_id') {
+            elements.options = [];
+            elements.options = location;
+          }
+          else if(elements.name == 'status_id') {
+            elements.options = [];
+            elements.options = status;
+          }
+          else if(elements.name == 'appointment_type_id') {
+            elements.options = [];
+            elements.options = appType;
+          }
+        })        
+      }
+    } catch (error: any) {
+        console.error('Error on fetching doctor details:', error);
+    }
+    
+  }
+  const handleShow = () => {
+    setShow(true);   
+  }
+  const handleClose = () => {
+      setShow(false);
+      setMode(false);
+  }
+
+  // Save button handler
+  const handleSave = async () => {
+    showLoading();
+    console.log(formData);
+    // Implement your save logic here
+    if (dynamicFormRef.current?.validateModelForm()) {
+      try {
+        const response = await execute_axios_post(ENDPOINTS.POST_APPOINTMENT_STORE, formData);
+        if(response.success) {
+          handleShowToast(t('PATIENT.APPOINTMENT.MESSAGES.SAVE_SUCCESS'), 'success');
+        }
+      } catch (error) {
+        console.error('Error updating notes:', error);
+      } finally {
+          hideLoading();
+          refreshForm();
+      }
+      setFormData(initialFormData);
+    } else {
+      console.log('Form is invalid', dynamicFormRef);
+      hideLoading();
     }
   };
+  
+  const handleTypeaheadInputChange = async (name: string, selected: any, label: string, isClicked: any = false) => {
+    if ( ! isClicked) {
+      if (name.length >= 3) {
+        showLoading();
+        try {
+          let passData: string = JSON.stringify({ search: name, search_type: 1 });
+          const response = await execute_axios_post('/patient/get-list', passData); // Replace with your actual API endpoint
+          const formData = response.data.map((patient: { id: any; full_name: string; dob: string, mrn_no: string }) => ({
+            value: patient.id, // default mandatory typeahead property: value
+            label: patient.full_name, // default mandatory typeahead property: label            
+            full_name: patient.full_name,
+            mrn_no: patient.mrn_no,
+            dob: patient.dob            
+          }))          
+          updateTypeaheadOptions(formData, selected);          
+        } catch (err) {
+          setError('Failed to load patient data.');
+        } finally {
+          // setLoading(false);
+          setTimeout(() => {
+            hideLoading();
+          }, 1000);
+        }
 
-  // Handle record click
-  const handleRecordClick = (record: Record) => {    
-    setQuery(record.full_name); // Update the input box
-    setSelectedId(record.id);
-    setFormData({ ...formData, ['patient_id']: record.id });
-    setResults([]); // Clear the results    
-    setIsResultSelected(true);    
+      } else {
+        updateTypeaheadOptions([], ''); // reset the values
+      }
+    } else {
+      setFormReset(false); // block form reset
+      setFormData({ ...formData, [name]: selected });
+    }  
   };
 
-  // Fetch encounter records from the API
-  const getEncounterList = async () => {
-    try {
-      let passData: string = JSON.stringify({ patient_id: uuidToId(id) });
-      const result = await execute_axios_post(ENDPOINTS.GET_ENCOUNTER_LIST, passData);      
-      setEncounterList(result.data);            
-    } catch (error) {
-      console.error("Error fetching records:", error);
+  // Function to update options in form config
+  const updateTypeaheadOptions = (apiData: Option[], appliedString: string) => {
+    const updatedConfig = translatedElements.map((field: { type: string; name: string }) => {
+      if (["typeahead", "typeaheadDynamic"].includes(field.type) && field.name === appliedString) {
+        return {
+          ...field,
+          options: apiData,
+        };
+      }      
+      return field;
+    });
+    // console.log("🚀 ~ updatedConfig ~ updatedConfig:", updatedConfig)
+    setTranslatedElements(updatedConfig);
+    getEncounterList();
+  };
+
+  // Function to handle form field changes
+  const handleInputChange = (e:any) => {
+    setFormReset(false); // block form reset
+    const { name, value } = e.target;
+    if(name == 'doctor_id') {
+        setField1(value);
+        getAvailableSlots(value, field2, field3, field4);
     }
-  };
+    if(name == 'location_id') {
+        setField2(value);
+        getAvailableSlots(field1, value, field3, field4);
+    }
+    if(name == 'appointment_type_id') {
+        setField3(value);
+        getAvailableSlots(field1, field2, value, field4);
+    }
+    if(name == 'date') {
+        setField4(value);
+        getAvailableSlots(field1, field2, field3, value);    
+    }
+      setFormData({ ...formData, [name]: value });
+  }; 
 
   // Fetch available slots records from the API
   const getAvailableSlots = async (val1: string | null, val2: string | null, val3: string | null, val4: string | null) => {   
     if (val1 && val2 && val3 && val4) {
       setSlotsList([]);
       setSelectedFromTime('');
-      try {
+    try {
         let passData: string = JSON.stringify({ consultant_id: val1, location_id: val2, appointment_type_id: val3, date: val4 });
         const result = await execute_axios_post(ENDPOINTS.POST_AVAILABLE_SLOTS, passData);
         setSlotsList(result.data);        
@@ -406,14 +430,36 @@ const Appointment: React.FC = () => {
         console.error("Error fetching records:", error);
       }
     }
-  };  
+  }; 
+
+  // Fetch encounter records from the API
+  const getEncounterList = async () => {
+    try {
+      let passData: string = JSON.stringify({ patient_id: patientID });
+      const result = await execute_axios_post(ENDPOINTS.GET_ENCOUNTER_LIST, passData);
+      let encounter = new Array;
+      if(result.data) {
+        result.data.map((enc: any, e: number) => {
+          encounter.push({'label':enc.name, 'value': enc.id});
+        })
+      }
+      translatedElements.map((elements: any, k: number) => {
+        if(elements.name == 'episode_id') {
+          elements.options = [];
+          elements.options = encounter;
+        }          
+      })        
+    } catch (error) {
+      console.error("Error fetching records:", error);
+    }
+  };
 
   // Handle click on an <li> element
-  const handleItemClick = (fromTime: string, toTime: string, index: number) => {    
+  const handleItemClick = (fromTime: string, toTime: string, index: number) => {
     setFormData({ ...formData, ['from_time']: fromTime, ['to_time']: toTime });
     setActiveIndex(index); // Update the active index
   };
-    
+
   return (
     <PatientLayout patientId={id as string}>
       <div className="d-flex justify-content-between align-items-center">
@@ -453,181 +499,23 @@ const Appointment: React.FC = () => {
           refreshData={refreshData}
           showPagination={true}
           archiveRecord={handleArchive}/>
-      </div>
-      <OffcanvasComponent
+      </div>      
+      <AppointmentForm 
+        formLabels={translatedElements}
+        initialValues={initialValues}
+        slotsList={slotsList}
+        editID = {selectedAppointment}
+        refreshForm={refreshForm}
         show={show}
-        title={ (mode) ? t('PATIENT.APPOINTMENT.EDIT_TITLE') : t('PATIENT.APPOINTMENT.CREATE_TITLE') }
+        mode={mode}
         handleClose={handleClose}
-        onSave={handleSave}
-        size="75%">
-        <form onSubmit={handleSave} className="container-fluid">
-          <Row>
-            <Col className='col-sm-8 p-0'>
-              <Row>
-                <Col xs={6} className={`${id ? '' : ''} mb-3`}>
-                  <label className='form-label'>
-                    <span className="text-danger">*</span> {t('PATIENT.APPOINTMENT.PATIENT')} {uuidToId(id)}
-                  </label>
-                  <Form.Control
-                    type="text"
-                    name="patient_name"
-                    value={query}   
-                    className="form-control rounded-0"
-                    placeholder="Type to search (min 3 characters)"
-                    onChange={handleInputChange}
-                    autoComplete='off'
-                  />                  
-                  {query.length >= MIN_CHARACTERS && results.length > 0 && (
-                    <table
-                      className='autoCompleteTable'
-                      style={{
-                        width: "500px",
-                        borderCollapse: "collapse",
-                        marginTop: "0px",
-                        position: 'absolute',
-                        backgroundColor: '#ffffff',
-                      }}
-                    >
-                      <thead>
-                        <tr>
-                          <th width="5%" style={tableHeaderStyle} className='d-none'>ID</th>
-                          <th width="50%" style={tableHeaderStyle}>Name</th>
-                          <th width="25%" style={tableHeaderStyle}>MRN</th>
-                          <th width="20%" style={tableHeaderStyle}>DOB</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {results.map((record) => (
-                          <tr
-                            key={record.id}
-                            onClick={() => handleRecordClick(record)}
-                            style={{ cursor: "pointer" }}
-                          >
-                            <td style={tableCellStyle} className='d-none'>{record.id}</td>
-                            <td style={tableCellStyle}>{record.full_name}</td>
-                            <td style={tableCellStyle}>{record.mrn_no}</td>
-                            <td style={tableCellStyle}>{formatDate(record.dob)}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  )}
-                </Col>
-                <Col xs={6} className='mb-3'>
-                  <label className='form-label'>{t('PATIENT.APPOINTMENT.EPISODE')}</label>
-                  <Form.Select
-                    name="episode_id"
-                    id="episode_id"
-                    className="rounded-0"              
-                    onChange={handleInputChange}>
-                      <option value="">Select...</option>
-                      {encounterList?.map((option: any, index: number) => (
-                        <option key={index} value={option.id}>{option.name}</option>
-                      ))}
-                  </Form.Select>
-                </Col>
-                <Col xs={6} className='mb-3'>
-                  <label className='form-label'>{t('PATIENT.APPOINTMENT.DOCTOR')}</label>
-                  <Form.Select
-                    name="doctor_id"
-                    id="doctor_id"
-                    className="rounded-0"              
-                    onChange={handleInputChange}>
-                      <option value="">Select...</option>
-                      {doctorList?.map((option: any, index: number) => (
-                        <option key={index} value={option.id}>{option.name}</option>
-                      ))}
-                  </Form.Select>
-                </Col>
-                <Col xs={6} className='mb-3'>
-                  <label className='form-label'>{t('PATIENT.APPOINTMENT.LOCATION')}</label>
-                  <Form.Select
-                    name="location_id"
-                    id="location_id"
-                    className="rounded-0"              
-                    onChange={handleInputChange}>
-                      <option value="">Select...</option>
-                      {locationList?.map((option: any, index: number) => (
-                        <option key={index} value={option.id}>{option.name}</option>
-                      ))}
-                  </Form.Select>
-                </Col>
-                <Col xs={6} className='mb-3'>
-                  <label className='form-label'>{t('PATIENT.APPOINTMENT.APPOINTMENT_TYPE')}</label>
-                  <Form.Select
-                    name="appointment_type_id"
-                    id="appointment_type_id"
-                    className="rounded-0"              
-                    onChange={handleInputChange}>
-                      <option value="">Select...</option>
-                      {typeList?.map((option: any, index: number) => (
-                        <option key={index} value={option.id}>{option.name}</option>
-                      ))}
-                  </Form.Select>
-                </Col>
-                <Col xs={6} className='mb-3'>
-                  <label className='form-label'>{t('PATIENT.APPOINTMENT.DATE')}</label>
-                  <Form.Control
-                    type="date"
-                    name="date"
-                    value={formData.date}
-                    className="form-control rounded-0"                    
-                    onChange={handleInputChange}                    
-                  />
-                </Col>
-                <Col xs={12} className='mb-3'>
-                  <label className='form-label'>{t('PATIENT.APPOINTMENT.NOTES')}</label>
-                  <Form.Control
-                    as="textarea"                    
-                    name="notes"
-                    className="form-control rounded-0"                    
-                    onChange={handleInputChange}                    
-                  />
-                </Col>
-                <Col xs={6} className='mb-3'>
-                  <label className='form-label'>{t('PATIENT.APPOINTMENT.STATUS')}</label>
-                  <Form.Select
-                    name="status_id"
-                    id="status_id"
-                    className="rounded-0"              
-                    onChange={handleInputChange}>
-                      <option value="">Select...</option>
-                      {statusList?.map((option: any, index: number) => (
-                        <option key={index} value={option.id}>{option.description}</option>
-                      ))}
-                  </Form.Select>
-                </Col>
-              </Row>
-            </Col>
-            <Col className='col-sm-4'> 
-              <ul className='timeSlots'>
-                {slotsList.map((record:any, index:number) => (
-                  <li
-                    key={index}
-                    onClick={() => handleItemClick(record.start, record.end, index)}
-                    style={{
-                      marginBottom: "5px",
-                      cursor: "pointer",
-                      backgroundColor: activeIndex === index ? "#007BFF" : "#f4f4f4", // Change background for active <li>
-                      color: activeIndex === index ? "#fff" : "#000", // Change text color for active <li>
-                    }}
-                  >
-                    {record.start.substr(11, 5)} - {record.end.substr(11, 5)}
-                  </li>
-                ))}
-              </ul>
-            </Col>
-          </Row>          
-        </form>
-        {/* <DynamicForm ref={dynamicFormRef}
-          formData={translatedElements}
-          initialValues={initialValues}
-          formReset={formReset}
-          onSubmit={handleSave}
-          isEditMode={mode}
-          modelFormInputs={handleInputChange}/> */}
-
-      </OffcanvasComponent>
+        handleTypeaheadInputChange={handleTypeaheadInputChange}
+        handleInputChange={handleInputChange}
+        handleSave={handleSave}
+        handleItemClick={handleItemClick}
+        formReset={formReset}
+        activeIndex={activeIndex}
+      />
       <ToastNotification
         show={showToast}
         message={toastMessage}
@@ -639,16 +527,5 @@ const Appointment: React.FC = () => {
   );
 };
 
-// Styles for table headers and cells
-const tableHeaderStyle: React.CSSProperties = {
-  border: "1px solid #ccc",
-  padding: "10px",
-  textAlign: "left",
-  backgroundColor: "#f9f9f9",
-};
 
-const tableCellStyle: React.CSSProperties = {
-  border: "1px solid #ccc",
-  padding: "10px",
-};
 export default Appointment;

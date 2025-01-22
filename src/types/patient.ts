@@ -29,7 +29,7 @@ export const typeaheadColumnConfig = [
   { key: 'full_name', name: 'Patient Name', show: true },
   { key: 'mrn_no', name: 'MRN', show: true },
   { key: 'dob', name: 'DOB', show: true },
-  ];
+];
 
 export const samplePatients: Patient[] = [
     {
