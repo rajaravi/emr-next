@@ -11,6 +11,10 @@ import { getI18nStaticProps } from '@/utils/services/getI18nStaticProps';
 import Datalist from '@/components/core-components/Datalist';
 import SearchFilter from '@/components/core-components/SearchFilter';
 import { useLoading } from '@/context/LoadingContext';
+import DynamicForm, { DynamicFormHandle } from '@/components/core-components/DynamicForm';
+import { SurgeryFormElements } from '@/data/SurgeryFormElements';
+import { SurgeryModel } from '@/types/surgery';
+import SurgeryForm from '../patient/[id]/surgery/form';
 
 export const getStaticProps: GetStaticProps = getI18nStaticProps();
 
@@ -40,22 +44,51 @@ const Calendar = () => {
   const [error, setError] = useState<string | null>(null);
   const [viewType, setViewType] = useState<string>('d-none');
   const [moduleType, setModuleType] = useState<number>(1);
-
-  const columns: { name: string; class: string; field: string; }[] = [
-    { name: t('PATIENT.SURGERY.SNO'), class: "col-sm-1", field: "sno"},
-    { name: t('PATIENT.SURGERY.PATIENT'), class: "col-sm-3", field: "patient_id"},
-    { name: t('PATIENT.SURGERY.DOCTOR'), class: "col-sm-3", field: "doctor_id"},
-    { name: t('PATIENT.SURGERY.LOCATION'), class: "col-sm-3", field: "location_id"},
-    { name: t('PATIENT.SURGERY.STATUS'), class: "col-sm-2", field: "status_id"}
+  const [patientID, setPatientID] = useState<number>(0);
+  const dynamicFormRef = useRef<DynamicFormHandle>(null);  
+  const columns: { name: string; class: string; field: string; format: string; }[] = [
+    { name: t('PATIENT.SURGERY.SNO'), class: "col-sm-1", field: "sno", format:''},
+    { name: t('PATIENT.SURGERY.DATE'), class: "col-sm-2", field: "date", format:'date'},
+    { name: t('PATIENT.SURGERY.DOCTOR'), class: "col-sm-3", field: "doctor.name", format:''},
+    { name: t('PATIENT.SURGERY.LOCATION'), class: "col-sm-4", field: "location.name", format:''},
+    { name: t('PATIENT.SURGERY.STATUS'), class: "col-sm-2", field: "status.description", format:''},    
   ];
   const filter: { name: string; field: string; }[] = [
     { name: t('PATIENT.SURGERY.PATIENT'), field: 'patient_id' }
   ];
+  const [show, setShow] = useState(false);
+  const [mode, setMode] = useState<boolean>(false);  
   const [list, setList] = useState<any>([]);
   const [page, setPage] = useState<number>(1);
   const [total, setTotal] = useState<number>(0);
   const [searchFilter, setsearchFilter] = useState<any>([]);
+  const [encounterList, setEncounterList] = useState<any>([]);  
+  const [procedureList, setProcedureList] = useState<any>([]);
+  const [translatedElements, setTranslatedElements] = useState<any>([]);
+  const [selectedSurgery, setSelectedSurgery] = useState<number>(0);
+  const [formReset, setFormReset] = useState(false);
   const [clear, setClear] = useState<boolean>(false);
+  const [selectedDate, setSelectedDate] = useState<Date | string>();
+
+  const initialFormData: SurgeryModel = {
+    "id": null,
+    "patient_id": 0,
+    "episode_id": 0,
+    "doctor_id": 0,
+    "location_id": 0,
+    "date": "",
+    "from_time": "",
+    "to_time": "",
+    "admission_date": "",
+    "discharge_date": "",
+    "discharge_time": "",
+    "notes": "",
+    "status_id": 0,    
+    "surgery_details": [
+        { "procedure_id": 0 }
+    ]
+  };
+  const [formData, setFormData] = useState<SurgeryModel>(initialFormData);
 
   // Fetch events and resources from API
   useEffect(() => {
@@ -80,7 +113,22 @@ const Calendar = () => {
       }
     };
     fetchData();
+
+    const translatedFormElements = SurgeryFormElements.map((element) => ({
+      ...element,
+      label: t('PATIENT.SURGERY.'+element.label)
+    })); 
+    setTranslatedElements(translatedFormElements);
   }, []);
+
+  const handleShow = () => {
+    setShow(true);
+    setFormData(initialFormData);
+  }
+  const handleClose = () => {
+    setShow(false);
+    setMode(false);
+  }
 
   // Month view events API
   const fetchMonthViewEvents = async(sDate: string, eDate: string) => {
@@ -136,6 +184,7 @@ const Calendar = () => {
     } else if (view.type === 'resourceTimeGridDay') {
       const start = view.activeStart.toISOString().split('T')[0];
       const end = view.activeEnd.toISOString().split('T')[0];
+      setSelectedDate(end);
       fetchDayOrWeekViewEvents(start, end);
       setViewType('');
     }    
@@ -145,8 +194,19 @@ const Calendar = () => {
     setModuleType(1);
   }
 
-  const showSurgery = () => {
+  const showSurgery = async(sDate: string) => {
     setModuleType(2);
+    showLoading();
+    try {
+      let passData: string = JSON.stringify({ page: page, limit: pageLimit, sort: null, search: { date: selectedDate} });
+      const response = await execute_axios_post(ENDPOINTS.POST_SURGERY_LIST, passData);
+      setList(response.data.list);
+      setTotal(response.data.total);
+    } catch (err) {
+      setError('Failed to load surgery data.');
+    } finally {
+      hideLoading();
+    }
   }
 
   // Search button call
@@ -197,6 +257,11 @@ const Calendar = () => {
     // setSelectedDoctor(selectedID);
   }
 
+  // Callback function form save to list refresh
+  const refreshForm = () => {
+    refreshData(page);
+  }
+
   // Callback function for pagination change event
   const refreshData = (currentPage: number) => {
     var listRows = document.querySelectorAll('.row'); // Selection row remove when the page change 
@@ -208,12 +273,252 @@ const Calendar = () => {
     // fetchDoctorList(currentPage, searchFilter);
   }
 
+  // Function to handle form field changes
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>, index?: number) => {
+    setFormReset(false); // block form reset
+    const { name, value } = e.target;
+
+    if (index !== undefined) {
+      const updateProcedure = [...formData.surgery_details];
+      updateProcedure[index] = {
+        ...updateProcedure[index], [name]: value
+      };
+
+      const updatedFormData = { ...formData, surgery_details: updateProcedure };
+      setFormData(updatedFormData);
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
+  };  
+
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>, index?: number) => {
+    const { name, value } = e.target;
+    setSelectedDate(value);
+    getSurgeryList(value);
+  }
+  
+
+  const handleTypeaheadInputChange = async (name: string, selected: any, label: string, isClicked: any = false) => {
+    if ( ! isClicked) {
+      if (name.length >= 3) {
+        showLoading();
+        try {
+          let passData: string = JSON.stringify({ search: name, search_type: 1 });
+          const response = await execute_axios_post('/patient/get-list', passData); // Replace with your actual API endpoint
+          const formData = response.data.map((patient: { id: any; full_name: string; dob: string, mrn_no: string }) => ({
+            value: patient.id, // default mandatory typeahead property: value
+            label: patient.full_name, // default mandatory typeahead property: label            
+            full_name: patient.full_name,
+            mrn_no: patient.mrn_no,
+            dob: patient.dob            
+          }))
+          updateTypeaheadOptions(formData, selected);          
+          console.log('sds',formData, selected);
+        } catch (err) {
+          setError('Failed to load patient data.');
+        } finally {
+          // setLoading(false);
+          setTimeout(() => {
+            hideLoading();
+          }, 1000);
+        }
+
+      } else {
+        updateTypeaheadOptions([], ''); // reset the values
+      }
+    } else {
+      setFormReset(false); // block form reset
+      setFormData({ ...formData, [name]: selected });
+    }  
+  };
+  
+  // Function to update options in form config
+  const updateTypeaheadOptions = (apiData: Option[], appliedString: string) => {
+    console.log('apiData',apiData);
+    console.log('appliedString',translatedElements);
+    const updatedConfig = translatedElements.map((field: { type: string; name: string }) => {
+      if (["typeahead", "typeaheadDynamic"].includes(field.type) && field.name === appliedString) {
+        return {
+          ...field,
+          options: apiData,
+        };
+      }
+      return field;
+    });
+    // console.log("🚀 ~ updatedConfig ~ updatedConfig:", updatedConfig)
+    setTranslatedElements(updatedConfig);
+    getEncounterList();
+  };
+
+  // Fetch encounter records from the API
+  const getEncounterList = async () => {
+    try {
+        let passData: string = JSON.stringify({ patient_id: patientID });
+        const result = await execute_axios_post(ENDPOINTS.GET_ENCOUNTER_LIST, passData);
+        let encounter = new Array;
+        if(result.data) {
+          result.data.map((enc: any, e: number) => {
+            encounter.push({'label':enc.name, 'value': enc.id});
+          })
+        }
+        translatedElements.map((elements: any, k: number) => {
+          if(elements.name == 'episode_id') {
+            elements.options = [];
+            elements.options = encounter;
+          }          
+        })        
+        setEncounterList(result.data);            
+    } catch (error) {
+        console.error("Error fetching records:", error);
+    }
+  };
+
+  // Function to add a new reference row
+  const handleAddPurchaser = () => {
+    const newProcedure = { procedure_id: 0 };
+    setFormData({
+      ...formData,
+      surgery_details: [...formData.surgery_details, newProcedure],
+    });
+  };
+
+  // Function to remove a reference row
+  const handleRemoveProcedure = (index: number) => {
+    const updateProcedure = formData.surgery_details.filter((_, i) => i !== index);    
+    const updatedFormData = { ...formData, surgery_details: updateProcedure };
+    setFormData(updatedFormData);
+  };
+
+  const getSurgeryById = async (type: string) => {
+    try {
+      let editID = 0;
+      if(type == 'edit') editID = selectedSurgery;
+      let passData: string = JSON.stringify({ id: editID });
+      const response = await execute_axios_post(ENDPOINTS.POST_APPOINTMENT_FORMDATA, passData);
+      if(response.success) {        
+          handleShow();
+          if(response.data?.data?.id) {
+            setFormData(response.data.data);                  
+          }
+          else {
+            setFormData(initialFormData);
+          }
+          let doctor = new Array;
+          if(response.data.doctors) {
+            response.data.doctors.map((doc: any, d: number) => {
+              doctor.push({'label':doc.name, 'value': doc.id});
+            })
+          }        
+          let location = new Array;
+          if(response.data.locations) {
+            response.data.locations.map((loc: any, l: number) => {
+              location.push({'label':loc.name, 'value': loc.id});
+            })
+          }
+          let status = new Array;
+          if(response.data.status_list) {
+            response.data.status_list.map((stat: any, s: number) => {
+              status.push({'label':stat.description, 'value': stat.id});
+            })
+          }
+          // setProcedureList(response.data.procedures);
+          fetchProcedureList();
+          // Dynamic values options format
+          translatedElements.map((elements: any, k: number) => {
+            if(elements.name == 'doctor_id') {
+              elements.options = [];
+              elements.options = doctor;
+            }
+            else if(elements.name == 'location_id') {
+              elements.options = [];
+              elements.options = location;
+            }
+            else if(elements.name == 'status_id') {
+              elements.options = [];
+              elements.options = status;
+            }
+          })        
+      }
+    } catch (error: any) {
+        console.error('Error on fetching doctor details:', error);
+    }
+  }
+
+  const createSurgery = () => {
+    getSurgeryById('add');
+  }
+
+  // Save button handler
+  const handleSave = async () => {
+    showLoading();
+    alert('sdf');
+    console.log('formData', formData);
+    // Implement your save logic here
+    if (dynamicFormRef.current?.validateModelForm()) {
+      try {
+        const response = await execute_axios_post(ENDPOINTS.POST_SURGERY_STORE, formData);
+        console.log(response);
+        // handleShowToast(t('SETTING.PROCEDURE.MESSAGES.SAVE_SUCCESS'), 'success');
+      } catch (error) {
+        console.error('Error updating notes:', error);
+      } finally {
+          hideLoading();
+      }
+      // setFormData(initialFormData);
+    } else {
+      console.log('Form is invalid', dynamicFormRef);
+      hideLoading();
+    }
+  };
+
+  const getDate = (e:any) => {
+    console.log(e)
+    // setSelectedDate(selectedDate);
+  }
+
+  const prevDay = () => {
+    let prevDate: Date = new Date(selectedDate);
+    prevDate.setDate(prevDate.getDate() - 1);    
+    setSelectedDate(prevDate.toISOString().split('T')[0]);
+    getSurgeryList(prevDate.toISOString().split('T')[0]);
+  }
+  const nextDay = () => {
+    let nextDate: Date = new Date(selectedDate);
+    nextDate.setDate(nextDate.getDate() + 1);    
+    setSelectedDate(nextDate.toISOString().split('T')[0]);
+    getSurgeryList(nextDate.toISOString().split('T')[0]);
+  }
+
+  const getSurgeryList = async(sDate: string) => {
+    setModuleType(2);
+    showLoading();
+    try {
+      let passData: string = JSON.stringify({ page: page, limit: pageLimit, sort: null, search: { date: sDate} });
+      const response = await execute_axios_post(ENDPOINTS.POST_SURGERY_LIST, passData);
+      setList(response.data.list);
+      setTotal(response.data.total);
+    } catch (err) {
+      setError('Failed to load surgery data.');
+    } finally {
+      hideLoading();
+    }
+  }
+
+  // Get procedure list
+  const fetchProcedureList = async () => {
+    try {
+      const response = await execute_axios_post(ENDPOINTS.GET_PROCEDURE_LIST, []);
+      setProcedureList(response.data);
+    } catch (err) {
+      setError('Failed to load purchaser data.');
+    }
+  };
 
   return (
     <div className='container-fluid pt-60'>
       <div className='row'>
         <div className='col-2'>
-          <h1 className='mt-3'>Calendar</h1>
+          <h1 className='mt-3'>Calendar </h1>
         </div> 
         <div className={`${viewType} col-3 mt-3 text-start`}>
           <Button variant="info" className='me-1 rounded-0' onClick={showAppointment}>Appointment</Button>
@@ -232,7 +537,7 @@ const Calendar = () => {
             </Dropdown>
           </div>
           <div className={(moduleType === 2) ? '' : 'd-none'}>
-            <Button variant='primary' className='btn rounded-0'><i className="fi fi-ss-add"></i> {t('ACTIONS.ADDSURGERY')}</Button>
+            <Button variant='primary' className='btn rounded-0' onClick={createSurgery}><i className="fi fi-ss-add"></i> {t('ACTIONS.ADDSURGERY')}</Button>
             <Dropdown >
               <Dropdown.Toggle variant="secondary" id="dropdown-basic"  className="btn rounded-0 ms-2">
                 {t('ACTIONS.ACTIONS')}
@@ -250,11 +555,26 @@ const Calendar = () => {
           resources={resources}
           events={events}
           handleViewChange={handleViewChange}
+          selectDate={getDate}
         />
       </div>
       <div className={(moduleType === 2) ? 'mt-3' : 'd-none'}>
-      <Row className="white-bg p-1 m-0 top-bottom-shadow ">
-        <Col xs={7}></Col>        
+      <Row className="white-bg p-1 m-0 top-bottom-shadow ">        
+        <Col xs={4}>
+          <Row className='m-0'>
+            <button className='btn btn-light rounded-0 col-sm-3 float-start mt-3 text-primary' onClick={prevDay}><i className="fi fi-ss-angle-circle-left"></i> Previous </button>
+            <input 
+              type="date"
+              name="surgery_date"
+              value={selectedDate}   
+              className="form-control rounded-0 mt-3 col-sm-6 float-start"
+              onChange={handleDateChange}
+              style={{ width: '40%' }}
+            />           
+            <button className='btn btn-light rounded-0 col-sm-3 float-start mt-3 text-primary' onClick={nextDay}>Next &nbsp;<i className="fi fi-ss-angle-circle-right"></i></button>
+          </Row>          
+        </Col>
+        <Col xs={3}></Col>
         <Col xs={5} className="float-end">
           <SearchFilter 
             filterColumns={filter}
@@ -277,6 +597,22 @@ const Calendar = () => {
           showPagination={true}
           />
       </div>
+      <SurgeryForm
+        formLabels={translatedElements} 
+        editID = {selectedSurgery}
+        refreshForm={refreshForm}
+        show={show}
+        mode={mode}
+        formCurData={formData}
+        procedureList={procedureList}
+        handleClose={handleClose}
+        createPurchaser={handleAddPurchaser}
+        deleteProcedure={handleRemoveProcedure}
+        handleTypeaheadInputChange={handleTypeaheadInputChange}
+        handleInputChange={handleInputChange}
+        handleSave={handleSave}
+        formReset={formReset}
+      />
     </div>
   );
 };

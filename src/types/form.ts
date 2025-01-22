@@ -25,6 +25,7 @@ export interface FormField {
     rows?: number;
     disablePrevDate?: boolean;
     disableFutureDate?: boolean;
+    dateSelection?: boolean;
     defaultValue?: string | number | undefined | string[];
     colClass?: string;
 }

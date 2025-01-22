@@ -14,15 +14,14 @@ import PatientLayout from '@/components/layout/PatientLayout';
 import Datalist from '@/components/core-components/Datalist';
 import SearchFilter from '@/components/core-components/SearchFilter';
 import { useLoading } from '@/context/LoadingContext';
-import OffcanvasComponent from '@/components/core-components/OffcanvasComponent';
-import DynamicForm, { DynamicFormHandle } from '@/components/core-components/DynamicForm';
 import ToastNotification from '@/components/core-components/ToastNotification';
+import DynamicForm, { DynamicFormHandle } from '@/components/core-components/DynamicForm';
 import { SurgeryFormElements } from '@/data/SurgeryFormElements';
 import { SurgeryModel } from '@/types/surgery';
+import SurgeryForm from './form';
 
 let pageLimit: number = 6;
 let selectedID: number = 0;
-let archiveID: number = 0;
 
 export const getStaticPaths: GetStaticPaths = async () => {
   // Hardcode some IDs
@@ -40,54 +39,36 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
 export const getStaticProps: GetStaticProps = getI18nStaticProps();
 
-const initialValue = {  
-  patient_id: 0,
-  episode_id: 0,
-  doctor_id: 0,
-  location_id: 0,
-  date: '',
-  from_time: '',
-  to_time: '',
-  admission_date: '',
-  discharge_date: '',
-  discharge_time: '',
-  notes: '',
-  status_id: 0,    
-  surgery_details: [
-    { procedure_id: '' },
-  ]    
-};
-
 const Surgery: React.FC = () => {
   const { showLoading, hideLoading } = useLoading();
   const [show, setShow] = useState(false);
+  const [mode, setMode] = useState<boolean>(false);    
   const { t } = useTranslation('common');
   const router = useRouter();
   const { id } = router.query;
 
-  const columns: { name: string; class: string; field: string; }[] = [
-    { name: t('PATIENT.SURGERY.SNO'), class: "col-sm-1", field: "sno"},
-    { name: t('PATIENT.SURGERY.DATE'), class: "col-sm-2", field: "date"},
-    { name: t('PATIENT.SURGERY.DOCTOR'), class: "col-sm-2", field: "doctor_id"},
-    { name: t('PATIENT.SURGERY.LOCATION'), class: "col-sm-5", field: "location_id"},
-    { name: t('PATIENT.SURGERY.STATUS'), class: "col-sm-2", field: "status_id"},
-    
+  const columns: { name: string; class: string; field: string; format: string; }[] = [
+    { name: t('PATIENT.SURGERY.SNO'), class: "col-sm-1", field: "sno", format:''},
+    { name: t('PATIENT.SURGERY.DATE'), class: "col-sm-2", field: "date", format:'date'},
+    { name: t('PATIENT.SURGERY.DOCTOR'), class: "col-sm-3", field: "doctor.name", format:''},
+    { name: t('PATIENT.SURGERY.LOCATION'), class: "col-sm-4", field: "location.name", format:''},
+    { name: t('PATIENT.SURGERY.STATUS'), class: "col-sm-2", field: "status.description", format:''},    
   ];
   const filter: { name: string; field: string; }[] = [
     { name: t('PATIENT.SURGERY.DATE'), field: 'date' }
   ];
 
-  const dynamicFormRef = useRef<DynamicFormHandle>(null);
+  const dynamicFormRef = useRef<DynamicFormHandle>(null);  
   const [page, setPage] = useState<number>(1);
   const [total, setTotal] = useState<number>(0);
-  const [selectedProcedure, setSelectedProcedure] = useState<number>(0);
-  const [mode, setMode] = useState<boolean>(false);
   const [clear, setClear] = useState<boolean>(false);
   const [list, setList] = useState<any>([]);
   const [searchFilter, setsearchFilter] = useState<any>([]);
-  const [initialValues, setInitialValues] = useState<any>(initialValue);  
+  const [selectedSurgery, setSelectedSurgery] = useState<number>(0);
+  const [encounterList, setEncounterList] = useState<any>([]);  
   const [procedureList, setProcedureList] = useState<any>([]);
   const [translatedElements, setTranslatedElements] = useState<any>([]);
+  const [patientID, setPatientID] = useState<number>(0);
   const [error, setError] = useState<string | null>(null);
   const [formReset, setFormReset] = useState(false);
   const [showToast, setShowToast] = useState(false);
@@ -113,6 +94,18 @@ const Surgery: React.FC = () => {
     ]
   };
   const [formData, setFormData] = useState<SurgeryModel>(initialFormData);
+
+  useEffect(() => {   
+    // Language apply for form label
+    const translatedFormElements = SurgeryFormElements.map((element) => ({
+      ...element,
+      label: t('PATIENT.SURGERY.'+element.label)
+    })); 
+    setTranslatedElements(translatedFormElements);
+    fetchSurgeryList(page);
+    fetchProcedureList();
+  }, []);
+
   const handleShow = () => {
     setShow(true);
     setFormData(initialFormData);
@@ -121,17 +114,6 @@ const Surgery: React.FC = () => {
     setShow(false);
     setMode(false);
   }
-
-  useEffect(() => {    
-    // Language apply for form label
-    const translatedFormElements = SurgeryFormElements.map((element) => ({
-      ...element,
-      label: t('PATIENT.SURGERY.'+element.label)
-    }));
-    setTranslatedElements(translatedFormElements);
-    fetchSurgeryList(page);
-    fetchPatientList();
-  }, []);
 
   // Get doctor list
   const fetchSurgeryList = async (page: number, sFilter?: { field: string; text: string }) => {
@@ -179,7 +161,8 @@ const Surgery: React.FC = () => {
     if(event.target.parentNode.getAttribute('custom-id')) {
       selectedID = event.target.parentNode.getAttribute('custom-id');
       event.target.parentElement.setAttribute('class', 'row selected');
-      setSelectedProcedure(selectedID);
+      alert(selectedID);
+      setSelectedSurgery(selectedID);
     }
     getSurgeryById('edit');
   }
@@ -193,31 +176,113 @@ const Surgery: React.FC = () => {
       selectedID = event.target.parentNode.getAttribute('custom-id');
       event.target.parentElement.setAttribute('class', 'row selected');
     }
-    setSelectedProcedure(selectedID);
+    setSelectedSurgery(selectedID);
   }
 
-  const fetchPatientList = async () => {
-    try {
-      const response = await execute_axios_post(ENDPOINTS.GET_PATIENT_LIST, []);      
-    } catch (err) {
-      setError('Failed to load reference data.');
-    }
-  }; 
-
-  // Edit action call
-  const createSurgery = () => {    
-    getSurgeryById('add');
-  }
-  
   // Edit action call
   const handleEdit = () => {
-    if(selectedProcedure === 0) {
+    if(selectedSurgery === 0) {
       handleShowToast(t('SETTING.MESSAGES.SELECT_RECORD'), 'danger');
       return false;
     }
     getSurgeryById('edit');
   }
 
+  const getSurgeryById = async (type: string) => {
+    try {
+      let editID = 0;
+      if(type == 'edit') editID = selectedSurgery;
+      let passData: string = JSON.stringify({ id: editID });
+      const response = await execute_axios_post(ENDPOINTS.POST_SURGERY_FORMDATA, passData);
+      if(response.success) {        
+          handleShow();
+          if(response.data?.data?.id) {
+            setFormData(response.data.data);                  
+          }
+          else {
+            setFormData(initialFormData);
+          }
+          let doctor = new Array;
+          if(response.data.doctors) {
+            response.data.doctors.map((doc: any, d: number) => {
+              doctor.push({'label':doc.name, 'value': doc.id});
+            })
+          }        
+          let location = new Array;
+          if(response.data.locations) {
+            response.data.locations.map((loc: any, l: number) => {
+              location.push({'label':loc.name, 'value': loc.id});
+            })
+          }
+          let status = new Array;
+          if(response.data.status_list) {
+            response.data.status_list.map((stat: any, s: number) => {
+              status.push({'label':stat.description, 'value': stat.id});
+            })
+          }
+          // setProcedureList(response.data.procedures);
+
+          // Dynamic values options format
+          translatedElements.map((elements: any, k: number) => {
+            if(elements.name == 'doctor_id') {
+              elements.options = [];
+              elements.options = doctor;
+            }
+            else if(elements.name == 'location_id') {
+              elements.options = [];
+              elements.options = location;
+            }
+            else if(elements.name == 'status_id') {
+              elements.options = [];
+              elements.options = status;
+            }
+          })        
+      }
+    } catch (error: any) {
+        console.error('Error on fetching doctor details:', error);
+    }
+  }
+
+  // Save button handler
+  const handleSave = async () => {
+    showLoading();
+    
+    // Implement your save logic here
+    if (dynamicFormRef.current?.validateModelForm()) {
+      console.log('id', formData.patient_name);
+      try {
+        const response = await execute_axios_post(ENDPOINTS.POST_SURGERY_STORE, formData);
+        // handleShowToast(t('SETTING.PROCEDURE.MESSAGES.SAVE_SUCCESS'), 'success');
+      } catch (error) {
+        console.error('Error updating notes:', error);
+      } finally {
+          hideLoading();
+      }
+      // setFormData(initialFormData);
+    } else {
+      console.log('Form is invalid', dynamicFormRef);
+      hideLoading();
+    }
+  };
+
+  const createSurgery = () => {
+    getSurgeryById('add');
+  }
+  // Callback function form save to list refresh
+  const refreshForm = () => {
+    refreshData(page);
+  }
+
+  // Callback function for pagination change event
+  const refreshData = (currentPage: number) => {
+    var listRows = document.querySelectorAll('.row'); // Selection row remove when the page change 
+    listRows.forEach(function(row){
+      row.classList.remove('selected');
+    })
+    setSelectedSurgery(0);
+    setPage(currentPage);
+    fetchSurgeryList(currentPage, searchFilter);
+  }
   // Function to handle form field changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>, index?: number) => {
     setFormReset(false); // block form reset
@@ -236,132 +301,87 @@ const Surgery: React.FC = () => {
     }
   };  
 
-  // Get form data
-  const getSurgeryById = async (type: string) => {
-    try {
-      let editID = 0;      
-      if(type == 'edit') editID = selectedProcedure;
-      let passData: string = JSON.stringify({ id: editID });    
-      const response = await execute_axios_post(ENDPOINTS.POST_SURGERY_FORMDATA, passData);
-      if(response.success) {        
-        handleShow();
-        if(response.data?.data?.id) {
-          setMode(true);
-          setInitialValues(response.data.data);
-          setFormData(response.data.data);
+  const handleTypeaheadInputChange = async (name: string, selected: any, label: string, isClicked: any = false) => {
+    if ( ! isClicked) {
+      if (name.length >= 3) {
+        showLoading();
+        try {
+          let passData: string = JSON.stringify({ search: name, search_type: 1 });
+          const response = await execute_axios_post('/patient/get-list', passData); // Replace with your actual API endpoint
+          const formData = response.data.map((patient: { id: any; full_name: string; dob: string, mrn_no: string }) => ({
+            value: patient.id, // default mandatory typeahead property: value
+            label: patient.full_name, // default mandatory typeahead property: label            
+            full_name: patient.full_name,
+            mrn_no: patient.mrn_no,
+            dob: patient.dob            
+          }))          
+          updateTypeaheadOptions(formData, selected);          
+        } catch (err) {
+          setError('Failed to load patient data.');
+        } finally {
+          // setLoading(false);
+          setTimeout(() => {
+            hideLoading();
+          }, 1000);
         }
 
-        let doctor = new Array;
-        if(response.data.doctors) {
-          response.data.doctors.map((doc: any, d: number) => {
-            doctor.push({'label':doc.name, 'value': doc.id});
-          })
-        }
+      } else {
+        updateTypeaheadOptions([], ''); // reset the values
+      }
+    } else {
+      setFormReset(false); // block form reset
+      setFormData({ ...formData, [name]: selected });
+    }  
+  };
+
+  // Function to update options in form config
+  const updateTypeaheadOptions = (apiData: Option[], appliedString: string) => {
+    const updatedConfig = translatedElements.map((field: { type: string; name: string }) => {
+      if (["typeahead", "typeaheadDynamic"].includes(field.type) && field.name === appliedString) {
+        return {
+          ...field,
+          options: apiData,
+        };
+      }
+      return field;
+    });
+    // console.log("🚀 ~ updatedConfig ~ updatedConfig:", updatedConfig)
+    setTranslatedElements(updatedConfig);
+    getEncounterList();
+  };
+
+  // Fetch encounter records from the API
+  const getEncounterList = async () => {
+    try {
+        let passData: string = JSON.stringify({ patient_id: patientID });
+        const result = await execute_axios_post(ENDPOINTS.GET_ENCOUNTER_LIST, passData);
         let encounter = new Array;
-        if(response.data.encounters) {
-          response.data.encounters.map((enc: any, e: number) => {
+        if(result.data) {
+          result.data.map((enc: any, e: number) => {
             encounter.push({'label':enc.name, 'value': enc.id});
           })
         }
-        let location = new Array;
-        if(response.data.locations) {
-          response.data.locations.map((loc: any, l: number) => {
-            location.push({'label':loc.name, 'value': loc.id});
-          })
-        }
-        let status = new Array;
-        if(response.data.status_list) {
-          response.data.status_list.map((stat: any, s: number) => {
-            status.push({'label':stat.description, 'value': stat.id});
-          })
-        }
-        setProcedureList(response.data.procedures);
-
-        // Dynamic values options format
         translatedElements.map((elements: any, k: number) => {
-          if(elements.name == 'doctor_id') {
-            elements.options = [];
-            elements.options = doctor;
-          }
-          else if(elements.name == 'encounter_id') {
+          if(elements.name == 'episode_id') {
             elements.options = [];
             elements.options = encounter;
-          }
-          else if(elements.name == 'location_id') {
-            elements.options = [];
-            elements.options = location;
-          }
-          else if(elements.name == 'status_id') {
-            elements.options = [];
-            elements.options = status;
-          }
+          }          
         })        
-      }
-    } catch (error: any) {
-        console.error('Error on fetching procedure details:', error);
-    }
-  }
-
-  // Save button handler
-  const handleSave = async () => {
-    showLoading();
-    // Implement your save logic here
-    if (dynamicFormRef.current?.validateModelForm()) {
-      try {
-        const response = await execute_axios_post(ENDPOINTS.POST_SURGERY_STORE, formData);
-        handleShowToast(t('SETTING.PROCEDURE.MESSAGES.SAVE_SUCCESS'), 'success');
-      } catch (error) {
-        console.error('Error updating notes:', error);
-      } finally {
-          hideLoading();
-          refreshForm();
-      }
-      handleClose(); // Close offcanvas after saving
-      setFormData(initialFormData);
-    } else {
-      console.log('Form is invalid', dynamicFormRef);
-      hideLoading();
+        setEncounterList(result.data);            
+    } catch (error) {
+        console.error("Error fetching records:", error);
     }
   };
 
-  // Archive action call
-  const handleArchive = async(event: any) => {
-    showLoading();
+  // Get procedure list
+  const fetchProcedureList = async () => {
     try {
-      archiveID = event.target.getAttribute('cur-id');
-      let passData: string = JSON.stringify({ id: archiveID, is_archive: event.target.checked });
-      const response = await execute_axios_post(ENDPOINTS.POST_SURGERY_ARCHIVE, passData);      
-      if(response.success) { 
-        if(event.target.checked === true) {
-          handleShowToast(t('SETTING.MESSAGES.UNARCHIVE'), 'dark');
-        }
-        if(event.target.checked === false) {
-          handleShowToast(t('SETTING.MESSAGES.ARCHIVE'), 'success');
-        }
-        refreshData(page);
-        hideLoading();
-      }
-    } catch (error: any) {
-        console.error('Error on fetching procedure details:', error);
-        hideLoading();
+      const response = await execute_axios_post(ENDPOINTS.GET_PROCEDURE_LIST, []);
+      setProcedureList(response.data);
+    } catch (err) {
+      setError('Failed to load purchaser data.');
     }
-  }
-
-  // Callback function form save to list refresh
-  const refreshForm = () => {
-    refreshData(page);
-  }
-
-  // Callback function for pagination change event
-  const refreshData = (currentPage: number) => {
-    var listRows = document.querySelectorAll('.row'); // Selection row remove when the page change 
-    listRows.forEach(function(row){
-      row.classList.remove('selected');
-    })
-    setSelectedProcedure(0);
-    setPage(currentPage);
-    fetchSurgeryList(currentPage, searchFilter);
-  }
+  };
 
   // Function to add a new reference row
   const handleAddPurchaser = () => {
@@ -378,7 +398,7 @@ const Surgery: React.FC = () => {
     const updatedFormData = { ...formData, surgery_details: updateProcedure };
     setFormData(updatedFormData);
   };
-
+    
   // Toast message call
   const handleShowToast = (message: string, color: typeof toastColor) => {
     setToastMessage(message);
@@ -424,57 +444,24 @@ const Surgery: React.FC = () => {
           pageLimit={pageLimit}
           refreshData={refreshData}
           showPagination={true}
-          archiveRecord={handleArchive}/>
+          />
       </div>
-      <OffcanvasComponent
+      <SurgeryForm
+        formLabels={translatedElements}
+        formCurData={formData}
+        editID = {selectedSurgery}
+        refreshForm={refreshForm}
         show={show}
-        title={ (mode) ? t('PATIENT.SURGERY.EDIT_TITLE') : t('PATIENT.SURGERY.CREATE_TITLE') }
+        mode={mode}
         handleClose={handleClose}
-        onSave={handleSave}
-        size="75%">
-
-        <DynamicForm ref={dynamicFormRef}
-          formData={translatedElements}
-          initialValues={initialValues}
-          formReset={formReset}
-          onSubmit={handleSave}
-          isEditMode={mode}
-          modelFormInputs={handleInputChange}/>
-
-        <Container className='p-0'>
-          <Button variant='primary' size='sm' className='rounded-0 float-end mb-2' onClick={handleAddPurchaser}><i className="fi fi-bs-plus"></i> {t('ACTIONS.ADDROW')}</Button>
-          <Table>
-            <thead>
-              <tr>
-                <th className={`${styles.tableGridHead} col-sm-11`}>{t('SETTING.SIDE_MENU.PROCEDURE')}</th>
-                <th className={`${styles.tableGridHead} col-sm-1`}></th>
-              </tr>
-            </thead>
-            <tbody>            
-              {formData.surgery_details.map((surgery, index) => (
-                <tr key={index} style={{borderStyle: 'hidden'}}>
-                  <td>
-                    <Form.Select
-                      name="procedure_id"
-                      id={`procedure_id-${index}`}
-                      className="rounded-0"
-                      value={surgery.procedure_id}
-                      onChange={(e) => handleInputChange(e, index)}>
-                        <option value="">Select...</option>
-                        {procedureList?.map((option: any, index: number) => (
-                          <option key={index} value={option.id}>{option.name}</option>
-                        ))}
-                    </Form.Select>
-                  </td>                  
-                  <td>
-                    <Button className="text-danger rounded-0" variant="" onClick={() => handleRemoveProcedure(index)}><i className="fi fi-br-trash"></i></Button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
-        </Container>        
-      </OffcanvasComponent>
+        procedureList={procedureList}
+        createPurchaser={handleAddPurchaser}
+        deleteProcedure={handleRemoveProcedure}
+        handleTypeaheadInputChange={handleTypeaheadInputChange}
+        handleInputChange={handleInputChange}
+        handleSave={handleSave}
+        formReset={formReset}
+      />
       <ToastNotification
         show={showToast}
         message={toastMessage}

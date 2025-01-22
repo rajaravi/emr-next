@@ -53,8 +53,8 @@
 .calendarApp {
 	display: flex;
 	min-height: 100%;
-	font-family: Arial, Helvetica Neue, Helvetica, sans-serif;
-	font-size: 14px;
+	/* font-family: Arial, Helvetica Neue, Helvetica, sans-serif;
+	font-size: 14px; */
 }
 
 .calendarAppMain {
@@ -79,7 +79,7 @@
 
 .typeaheadTableCell {
   width: 50%;
-  padding: 5px;
+  padding: 0px;
   /* border-bottom: 1px solid #ddd; */
 }
 
@@ -87,13 +87,14 @@
 
 .typeaheadContainer {
 	border: 1px solid #ddd;
-	border-radius: 5px;
+	border-radius: 0px;
 	background-color: #fff;
 	max-height: 300px;
 	overflow-y: auto;
 	width: 100%;
 	z-index: 1050;
-
+	padding: 0;
+	margin: 0;
   }
   
   .typeaheadHeader {
@@ -125,7 +126,7 @@
   }
   
   .typeaheadItemCell {
-	padding: 5px;
+	padding: 0px;
 	border-bottom: 1px solid #ddd;
 	width: 50%;
   }

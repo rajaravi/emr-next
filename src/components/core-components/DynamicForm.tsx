@@ -180,7 +180,7 @@ const DynamicForm = forwardRef<DynamicFormHandle, DynamicFormProps> (({
                 onChange={handleChange} colClassName={field.colClass} />;
             case 'date':
               return <DatePicker key={index} {...commonProps} disablePrevDate={field.disablePrevDate}
-                disableFutureDate={field.disableFutureDate} 
+                disableFutureDate={field.disableFutureDate} dateSelection={field.dateSelection}
                 onChange={handleChange} colClassName={field.colClass} />;
             case 'radio':
               return <RadioButton key={index} {...commonProps} options={field.options!}

@@ -22,22 +22,15 @@ interface DatalistProps {
     archiveRecord?: (event: any) => void;
 }
 
-
 const Datalist: FC<DatalistProps> = ({columns, list, page, total, pageLimit, onRowClick, onRowDblClick, refreshData, showPagination, archiveRecord }) => {
     let emptyRowsCount:number = pageLimit - ((list?.length) ? list?.length : 0);
     let emptyRows = Array();
     let lastNo = 0;
-    const formatDate = (dateString: string): string => {
-        // Split the input date string (Y-m-d)
-        const [year, month, day] = dateString.split("-");
-        // Return the formatted date (d-m-Y)
-        return `${day}-${month}-${year}`;
-    };
     if (emptyRowsCount)
         emptyRows = Array.from(Array(emptyRowsCount).keys())
     return (
         <>
-            <Row className="listHead">
+            <Row className="listHead" key={9999}>
             {
                 columns.map((cols, index) => {
                     return (
@@ -70,11 +63,14 @@ const Datalist: FC<DatalistProps> = ({columns, list, page, total, pageLimit, onR
                                             data[f] = <Form.Check cur-id={data?.id} type="switch" name={'unarchive'+data?.id} id={'unarchive'+data?.id} onChange={archiveRecord} checked = {false} className='pt-12' role="button"/>;
                                         }                    
                                     }                                    
-                                    if(cols.format === 'date') {
-                                        data[f] = formatDate(data[f]);
+                                    if(cols.format === 'date') { // date format change                              
+                                        let splitDate = data[f].split("-");
+                                        if(splitDate[0].length === 4) {
+                                            data[f] = `${splitDate[2]}-${splitDate[1]}-${splitDate[0]}`;
+                                        }                                    
                                     }
                                     return (
-                                        <Col className={cols.class}>{data[f]}</Col>
+                                        <Col key={(data?.id + i + j)} className={cols.class}>{data[f]}</Col>
                                     );
                                 })
                             }
@@ -85,7 +81,7 @@ const Datalist: FC<DatalistProps> = ({columns, list, page, total, pageLimit, onR
             { // Empty rows generate code
                 emptyRows.map((data: any, i) => {
                     return (
-                        <Row key={'emp_'+(i+1)+lastNo} custom-key={(i+1)+lastNo}></Row>                        
+                        <Row key={(i+1)+lastNo} custom-key={(i+1)+lastNo}></Row>                        
                     );
                 })
             }            

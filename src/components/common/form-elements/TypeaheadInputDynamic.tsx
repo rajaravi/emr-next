@@ -69,9 +69,9 @@ const TypeaheadDynamic: React.FC<TypeaheadDynamicProps> = ({
           // Add alternating row colors
           const rowStyle = {
             backgroundColor: index % 2 === 0 ? '#ffffff' : '#f9f9f9',
-            padding: '5px',
+            padding: '0px',
             display: 'flex',
-            justifyContent: 'space-between',
+            // justifyContent: 'space-between',
           };
           return (
             <>
@@ -80,8 +80,9 @@ const TypeaheadDynamic: React.FC<TypeaheadDynamicProps> = ({
                       display: 'table',
                       width: '100%',
                       backgroundColor: '#f1f1f1',
-                      fontWeight: 'bold',
-                      padding: '5px',
+                      fontWeight: 'normal',
+                      padding: '0px',
+                      margin: '0',
                     }}
                   >
                   <div style={{ display: 'table-row' }}>
@@ -92,7 +93,11 @@ const TypeaheadDynamic: React.FC<TypeaheadDynamicProps> = ({
                           key={col.key}
                           style={{
                             display: 'table-cell',
-                            padding: '5px',
+                            padding: '0px',
+                            lineHeight: '1.4',
+                            height: '36px',
+                            fontSize: '0.85rem',
+                            margin: '0',
                           }}
                         >
                           {col.name}
@@ -106,7 +111,7 @@ const TypeaheadDynamic: React.FC<TypeaheadDynamicProps> = ({
                 {columnHeader.map(
                   (col) =>
                     col.show && (
-                      <div key={col.key} style={{ flex: 1, textAlign: 'center' }}>
+                      <div key={col.key} style={{ flex: 1, textAlign: 'left', fontSize: '0.85rem', margin: '0', padding: '0' }}>
                         {item[col.key as keyof Option]}
                       </div>
                     )

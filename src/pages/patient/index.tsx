@@ -23,14 +23,14 @@ const PatientIndex: React.FC = () => {
   const { showLoading, hideLoading } = useLoading();
   const { t } = useTranslation('common');
   const router = useRouter();
-  const columns: { name: string; class: string; field: string; }[] = [
-    { name: t('PATIENT.DETAILS.SNO'), class: "col-sm-1", field: "sno"},
-    { name: t('PATIENT.DETAILS.MRNNO'), class: "col-sm-1", field: "mrn_no"},
-    { name: t('PATIENT.DETAILS.FIRSTNAME'), class: "col-sm-2", field: "first_name"},
-    { name: t('PATIENT.DETAILS.SURNAME'), class: "col-sm-2", field: "surname"},
-    { name: t('PATIENT.DETAILS.DOB'), class: "col-sm-2", field: "dob"},
-    { name: t('PATIENT.DETAILS.COUNTY'), class: "col-sm-2", field: "county"},
-    { name: t('PATIENT.DETAILS.MOBILE_NO'), class: "col-sm-2", field: "mobile_no"}
+  const columns: { name: string; class: string; field: string; format: string; }[] = [
+    { name: t('PATIENT.DETAILS.SNO'), class: "col-sm-1", field: "sno", format:''},
+    { name: t('PATIENT.DETAILS.MRNNO'), class: "col-sm-1", field: "mrn_no", format:''},
+    { name: t('PATIENT.DETAILS.FIRSTNAME'), class: "col-sm-2", field: "first_name", format:''},
+    { name: t('PATIENT.DETAILS.SURNAME'), class: "col-sm-2", field: "surname", format:''},
+    { name: t('PATIENT.DETAILS.DOB'), class: "col-sm-2", field: "dob", format:'date'},
+    { name: t('PATIENT.DETAILS.COUNTY'), class: "col-sm-2", field: "county", format:''},
+    { name: t('PATIENT.DETAILS.MOBILE_NO'), class: "col-sm-2", field: "mobile_no", format:''}
   ];
   const filter: { name: string; field: string; }[] = [
     { name: t('PATIENT.DETAILS.FIRSTNAME'), field: 'first_name' },

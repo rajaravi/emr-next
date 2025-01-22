@@ -38,7 +38,22 @@ let pageLimit: number = 6;
 let selectedID: number = 0;
 let archiveID: number = 0;
 
+const MIN_CHARACTERS = 3;
+
 export const getStaticProps: GetStaticProps = getI18nStaticProps();
+
+const initialValue = {
+  patient_id: 0,
+  encounter_id: 0,
+  doctor_id: 0,
+  location_id: 0,
+  appointment_type_id: 0,
+  date: '',
+  from_time: '',
+  to_time: '',
+  notes:'',
+  status_id: 0
+};
 
 const Appointment: React.FC = () => {
   const { showLoading, hideLoading } = useLoading();
@@ -63,16 +78,40 @@ const Appointment: React.FC = () => {
   const [total, setTotal] = useState<number>(0);
   const [selectedAppointment, setSelectedAppointment] = useState<number>(0);
   const [mode, setMode] = useState<boolean>(false);
-  const [clear, setClear] = useState<boolean>(false);
-  const [list, setList] = useState<any>([]);  
+  const [clear, setClear] = useState<boolean>(false);  
+  const [list, setList] = useState<any>([]); 
+  const [slotsList, setSlotsList] = useState<any>([]);
+  const [slotBookedTime, setSlotBookedTime] = useState<string | null>(null);     
   const [searchFilter, setsearchFilter] = useState<any>([]);
   const [translatedElements, setTranslatedElements] = useState<any>([]);
+  const [initialValues, setInitialValues] = useState<any>(initialValue);
   const [error, setError] = useState<string | null>(null);
   const [formReset, setFormReset] = useState(false);
+  const [field1, setField1] = useState<string | null>(null); // First field
+  const [field2, setField2] = useState<string | null>(null); // Second field
+  const [field3, setField3] = useState<string | null>(null); // Third field
+  const [field4, setField4] = useState<string | null>(null); // Third field
+  const [activeIndex, setActiveIndex] = useState<number>(0);
+  const [selectedFromTime, setSelectedFromTime] = useState<string | null>("");
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [toastColor, setToastColor] = useState<'primary' | 'success' | 'danger' | 'warning' | 'info' | 'light' | 'dark'>('primary');
     
+  const initialFormData: AppointmentModel = { 
+    "id": null,
+    "patient_id": 0,
+    "encounter_id": 0,
+    "doctor_id": 0,
+    "location_id": 0,
+    "appointment_type_id": 0,
+    "date": "",
+    "from_time": "",
+    "to_time": "",
+    "notes": "",
+    "status_id": 0
+};
+
+const [formData, setFormData] = useState<AppointmentModel>(initialFormData);
 
   // Onload function
   useEffect(() => {    
@@ -210,19 +249,69 @@ const Appointment: React.FC = () => {
 
   const getAppointmentId = async (type: string) => {
     try {
-      let editID = 0;      
+      let editID = 0;
       if(type == 'edit') editID = selectedAppointment;
       let passData: string = JSON.stringify({ id: editID });
       const response = await execute_axios_post(ENDPOINTS.POST_APPOINTMENT_FORMDATA, passData);
       if(response.success) {        
         handleShow();
-        if(response.data?.data?.id) {
-          setMode(true);
+        if(response.data?.data?.id) {          
+          setInitialValues(response.data.data);              
         }
+        else {
+          setFormData(initialFormData);
+        }
+        let doctor = new Array;
+        if(response.data.doctors) {
+          response.data.doctors.map((doc: any, d: number) => {
+            doctor.push({'label':doc.name, 'value': doc.id});
+          })
+        }        
+        let location = new Array;
+        if(response.data.locations) {
+          response.data.locations.map((loc: any, l: number) => {
+            location.push({'label':loc.name, 'value': loc.id});
+          })
+        }
+        let status = new Array;
+        if(response.data.status_list) {
+          response.data.status_list.map((stat: any, s: number) => {
+            status.push({'label':stat.description, 'value': stat.id});
+          })
+        }
+        let appType = new Array;
+        if(response.data.appointment_types) {
+          response.data.appointment_types.map((app: any, a: number) => {
+            appType.push({'label':app.name, 'value': app.id});
+          })
+        }
+        
+        // setProcedureList(response.data.procedures);
+
+        // Dynamic values options format
+        translatedElements.map((elements: any, k: number) => {
+          if(elements.name == 'doctor_id') {
+            elements.options = [];
+            elements.options = doctor;
+          }
+          else if(elements.name == 'location_id') {
+            elements.options = [];
+            elements.options = location;
+          }
+          else if(elements.name == 'status_id') {
+            elements.options = [];
+            elements.options = status;
+          }
+          else if(elements.name == 'appointment_type_id') {
+            elements.options = [];
+            elements.options = appType;
+          }
+        })        
       }
     } catch (error: any) {
-      console.error('Error on fetching doctor details:', error);
+        console.error('Error on fetching doctor details:', error);
     }
+    
   }
   const handleShow = () => {
     setShow(true);   
@@ -231,6 +320,145 @@ const Appointment: React.FC = () => {
       setShow(false);
       setMode(false);
   }
+
+  // Save button handler
+  const handleSave = async () => {
+    showLoading();
+    console.log(formData);
+    // Implement your save logic here
+    if (dynamicFormRef.current?.validateModelForm()) {
+      try {
+        const response = await execute_axios_post(ENDPOINTS.POST_APPOINTMENT_STORE, formData);
+        if(response.success) {
+          handleShowToast(t('PATIENT.APPOINTMENT.MESSAGES.SAVE_SUCCESS'), 'success');
+        }
+      } catch (error) {
+        console.error('Error updating notes:', error);
+      } finally {
+          hideLoading();
+          refreshForm();
+      }
+      setFormData(initialFormData);
+    } else {
+      console.log('Form is invalid', dynamicFormRef);
+      hideLoading();
+    }
+  };
+  
+  const handleTypeaheadInputChange = async (name: string, selected: any, label: string, isClicked: any = false) => {
+    if ( ! isClicked) {
+      if (name.length >= 3) {
+        showLoading();
+        try {
+          let passData: string = JSON.stringify({ search: name, search_type: 1 });
+          const response = await execute_axios_post('/patient/get-list', passData); // Replace with your actual API endpoint
+          const formData = response.data.map((patient: { id: any; full_name: string; dob: string, mrn_no: string }) => ({
+            value: patient.id, // default mandatory typeahead property: value
+            label: patient.full_name, // default mandatory typeahead property: label            
+            full_name: patient.full_name,
+            mrn_no: patient.mrn_no,
+            dob: patient.dob            
+          }))          
+          updateTypeaheadOptions(formData, selected);          
+        } catch (err) {
+          setError('Failed to load patient data.');
+        } finally {
+          // setLoading(false);
+          setTimeout(() => {
+            hideLoading();
+          }, 1000);
+        }
+
+      } else {
+        updateTypeaheadOptions([], ''); // reset the values
+      }
+    } else {
+      setFormReset(false); // block form reset
+      setFormData({ ...formData, [name]: selected });
+    }  
+  };
+
+  // Function to update options in form config
+  const updateTypeaheadOptions = (apiData: Option[], appliedString: string) => {
+    const updatedConfig = translatedElements.map((field: { type: string; name: string }) => {
+      if (["typeahead", "typeaheadDynamic"].includes(field.type) && field.name === appliedString) {
+        return {
+          ...field,
+          options: apiData,
+        };
+      }      
+      return field;
+    });
+    // console.log("🚀 ~ updatedConfig ~ updatedConfig:", updatedConfig)
+    setTranslatedElements(updatedConfig);
+    getEncounterList();
+  };
+
+  // Function to handle form field changes
+  const handleInputChange = (e:any) => {
+    setFormReset(false); // block form reset
+    const { name, value } = e.target;
+    if(name == 'doctor_id') {
+        setField1(value);
+        getAvailableSlots(value, field2, field3, field4);
+    }
+    if(name == 'location_id') {
+        setField2(value);
+        getAvailableSlots(field1, value, field3, field4);
+    }
+    if(name == 'appointment_type_id') {
+        setField3(value);
+        getAvailableSlots(field1, field2, value, field4);
+    }
+    if(name == 'date') {
+        setField4(value);
+        getAvailableSlots(field1, field2, field3, value);    
+    }
+      setFormData({ ...formData, [name]: value });
+  }; 
+
+  // Fetch available slots records from the API
+  const getAvailableSlots = async (val1: string | null, val2: string | null, val3: string | null, val4: string | null) => {   
+    if (val1 && val2 && val3 && val4) {
+      setSlotsList([]);
+      setSelectedFromTime('');
+    try {
+        let passData: string = JSON.stringify({ consultant_id: val1, location_id: val2, appointment_type_id: val3, date: val4 });
+        const result = await execute_axios_post(ENDPOINTS.POST_AVAILABLE_SLOTS, passData);
+        setSlotsList(result.data);        
+      } catch (error) {
+        console.error("Error fetching records:", error);
+      }
+    }
+  }; 
+
+  // Fetch encounter records from the API
+  const getEncounterList = async () => {
+    try {
+      let passData: string = JSON.stringify({ patient_id: patientID });
+      const result = await execute_axios_post(ENDPOINTS.GET_ENCOUNTER_LIST, passData);
+      let encounter = new Array;
+      if(result.data) {
+        result.data.map((enc: any, e: number) => {
+          encounter.push({'label':enc.name, 'value': enc.id});
+        })
+      }
+      translatedElements.map((elements: any, k: number) => {
+        if(elements.name == 'episode_id') {
+          elements.options = [];
+          elements.options = encounter;
+        }          
+      })        
+    } catch (error) {
+      console.error("Error fetching records:", error);
+    }
+  };
+
+  // Handle click on an <li> element
+  const handleItemClick = (fromTime: string, toTime: string, index: number) => {
+    setFormData({ ...formData, ['from_time']: fromTime, ['to_time']: toTime });
+    setActiveIndex(index); // Update the active index
+  };
 
   return (
     <PatientLayout patientId={id as string}>
@@ -274,13 +502,19 @@ const Appointment: React.FC = () => {
       </div>      
       <AppointmentForm 
         formLabels={translatedElements}
-        isEditMode={mode}
+        initialValues={initialValues}
+        slotsList={slotsList}
         editID = {selectedAppointment}
         refreshForm={refreshForm}
-        page={page}
         show={show}
         mode={mode}
         handleClose={handleClose}
+        handleTypeaheadInputChange={handleTypeaheadInputChange}
+        handleInputChange={handleInputChange}
+        handleSave={handleSave}
+        handleItemClick={handleItemClick}
+        formReset={formReset}
+        activeIndex={activeIndex}
       />
       <ToastNotification
         show={showToast}

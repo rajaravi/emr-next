@@ -14,9 +14,10 @@ interface CalendarProps {
   resources: [];
   events: [],
   handleViewChange: (event: any) => void;
+  selectDate: (event: any) => void;
 }
 
-const MyFullCalendar: React.FC<CalendarProps> = ({viewType, resources, events, handleViewChange, }) => {
+const MyFullCalendar: React.FC<CalendarProps> = ({viewType, resources, events, handleViewChange, selectDate}) => {
   const calendarRef = useRef<FullCalendar | null>(null);
 
   // Month to day view double click

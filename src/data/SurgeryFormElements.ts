@@ -2,8 +2,8 @@ import { FormField } from "@/types/form";
 
 export const SurgeryFormElements: FormField[] = [
   {
-    "type": 'typeahead',
-    "name": 'patient_id',
+    "type": 'typeaheadDynamic',
+    "name": 'patient_name',
     "label": 'PATIENT',
     "options": [],
     "required": true,
@@ -12,7 +12,7 @@ export const SurgeryFormElements: FormField[] = [
   },
   {
     "type": "dropdown",
-    "name": "episode_id",
+    "name": "encounter_id",
     "label": "EPISODE",
     "options": [],
     "required": false,
@@ -87,6 +87,7 @@ export const SurgeryFormElements: FormField[] = [
     "required": false,
     "disablePrevDate": true,
     "disableFutureDate": false,
+    "dateSelection": false, 
     "colClass": "col-sm-4",
     "order": 9
   },
