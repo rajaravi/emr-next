@@ -5,6 +5,7 @@ interface Procedures {
 export interface SurgeryModel {
     id?: number | null;
     patient_id: number,
+    patient: [ { value: number, label: string}];
     episode_id: number,
     doctor_id: number,
     location_id: number,
