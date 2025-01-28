@@ -149,8 +149,27 @@ const Calendar = () => {
     }    
   };
 
+  // Week view events API
+  const fetchWeekViewEvents = async(sDate: string, eDate: string) => {
+    try {
+      let passData: string = JSON.stringify({ date: sDate.split('T')[0] });
+      const response = await execute_axios_post(ENDPOINTS.POST_WEEK_SLOTS, passData);
+      setEvents(response.data.events);
+      const formattedResources = response.data.resources.map((event: { id: number; name: string; color: string }) => ({        
+        id: event.id,
+        title: event.name,        
+        color: event.color
+      }));
+      setResources(formattedResources);      
+    } catch (error) {
+      setError('Error fetching month view events:');
+    } finally {
+      hideLoading();
+    }    
+  };
+  
   // Day view events API
-  const fetchDayOrWeekViewEvents = async(sDate: string, eDate: string) => {
+  const fetchDayViewEvents = async(sDate: string, eDate: string) => {
     try {
       let passData: string = JSON.stringify({ date: eDate.split('T')[0] });
       const response = await execute_axios_post(ENDPOINTS.POST_DAY_SLOTS, passData);
@@ -168,24 +187,28 @@ const Calendar = () => {
     }    
   };
 
+
   // Handle view change
   const handleViewChange = (view: any) => {
     showLoading();
+    console.log(view);
     if (view.type === 'dayGridMonth') {
       const start = view.currentStart.toISOString().split('T')[0];
       const end = view.currentEnd.toISOString().split('T')[0];
       fetchMonthViewEvents(start, end);
       setViewType('d-none');
-    } else if (view.type === 'timeGridWeek') {
-      const start = view.activeStart.toISOString().split('T')[0];
+    } else if (view.type === 'timeGridWeek') {      
       const end = view.activeEnd.toISOString().split('T')[0];
-      fetchDayOrWeekViewEvents(start, end);
+      let startDate: Date = new Date(view.activeStart);
+      startDate.setDate(startDate.getDate() + 1);
+      const start = startDate.toISOString().split('T')[0];
+      fetchWeekViewEvents(start , end);
       setViewType('d-none');
     } else if (view.type === 'resourceTimeGridDay') {
       const start = view.activeStart.toISOString().split('T')[0];
       const end = view.activeEnd.toISOString().split('T')[0];
       setSelectedDate(end);
-      fetchDayOrWeekViewEvents(start, end);
+      fetchDayViewEvents(start, end);
       setViewType('');
     }    
   };
@@ -198,7 +221,7 @@ const Calendar = () => {
     setModuleType(2);
     showLoading();
     try {
-      let passData: string = JSON.stringify({ page: page, limit: pageLimit, sort: null, search: { date: selectedDate} });
+      let passData: string = JSON.stringify({ page: page, limit: pageLimit, sort: null, date: selectedDate });
       const response = await execute_axios_post(ENDPOINTS.POST_SURGERY_LIST, passData);
       setList(response.data.list);
       setTotal(response.data.total);
@@ -334,8 +357,6 @@ const Calendar = () => {
   
   // Function to update options in form config
   const updateTypeaheadOptions = (apiData: Option[], appliedString: string) => {
-    console.log('apiData',apiData);
-    console.log('appliedString',translatedElements);
     const updatedConfig = translatedElements.map((field: { type: string; name: string }) => {
       if (["typeahead", "typeaheadDynamic"].includes(field.type) && field.name === appliedString) {
         return {
@@ -493,7 +514,7 @@ const Calendar = () => {
     setModuleType(2);
     showLoading();
     try {
-      let passData: string = JSON.stringify({ page: page, limit: pageLimit, sort: null, search: { date: sDate} });
+      let passData: string = JSON.stringify({ page: page, limit: pageLimit, sort: null, date: sDate });
       const response = await execute_axios_post(ENDPOINTS.POST_SURGERY_LIST, passData);
       setList(response.data.list);
       setTotal(response.data.total);
@@ -516,13 +537,13 @@ const Calendar = () => {
 
   return (
     <div className='container-fluid pt-60'>
-      <div className='row'>
-        <div className='col-2'>
+      <div className='row mt-1'>
+        {/* <div className='col-2'>
           <h1 className='mt-3'>Calendar </h1>
-        </div> 
-        <div className={`${viewType} col-3 mt-3 text-start`}>
-          <Button variant="info" className='me-1 rounded-0' onClick={showAppointment}>Appointment</Button>
-          <Button variant="warning" className='rounded-0' onClick={showSurgery}>Surgery</Button>         
+        </div>  */}
+        <div className={`${viewType} col-3 mt-2 text-start tabType`}>
+          <Button className={`${(moduleType === 1) ? `active` : ''} me-1 rounded-0`} onClick={showAppointment}>Appointment</Button>
+          <Button className={`${(moduleType === 2) ? `active` : ''} rounded-0`} onClick={showSurgery}>Surgery</Button>         
         </div>        
         <div className={`${viewType} cal-actions`}>
           <div className={(moduleType === 1) ? '' : 'd-none'}>
@@ -560,21 +581,21 @@ const Calendar = () => {
       </div>
       <div className={(moduleType === 2) ? 'mt-3' : 'd-none'}>
       <Row className="white-bg p-1 m-0 top-bottom-shadow ">        
-        <Col xs={4}>
+        <Col xs={3}>
           <Row className='m-0'>
-            <button className='btn btn-light rounded-0 col-sm-3 float-start mt-3 text-primary' onClick={prevDay}><i className="fi fi-ss-angle-circle-left"></i> Previous </button>
+            <button className='btn btn-light rounded-0 col-sm-2 float-start mt-3' onClick={prevDay}><i className="fi fi-ss-angle-circle-left"></i> </button>
             <input 
               type="date"
               name="surgery_date"
               value={selectedDate}   
-              className="form-control rounded-0 mt-3 col-sm-6 float-start"
+              className="form-control rounded-0 mt-3 col-sm-8 float-start"
               onChange={handleDateChange}
               style={{ width: '40%' }}
             />           
-            <button className='btn btn-light rounded-0 col-sm-3 float-start mt-3 text-primary' onClick={nextDay}>Next &nbsp;<i className="fi fi-ss-angle-circle-right"></i></button>
+            <button className='btn btn-light rounded-0 col-sm-2 float-start mt-3' onClick={nextDay}>&nbsp;<i className="fi fi-ss-angle-circle-right"></i></button>
           </Row>          
         </Col>
-        <Col xs={3}></Col>
+        <Col xs={4}></Col>
         <Col xs={5} className="float-end">
           <SearchFilter 
             filterColumns={filter}

@@ -1,16 +1,18 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Table, Button } from 'react-bootstrap';
+import { Table, Button, Row, Col, Dropdown, Form, Container } from 'react-bootstrap';
 import { useRouter } from 'next/router';
+import ENDPOINTS from '@/utils/constants/endpoints';
 import styles from './_style.module.css';
 import { execute_axios_post } from '@/utils/services/httpService';
 import { ColDef, RowClickedEvent, RowDoubleClickedEvent } from 'ag-grid-community';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faEdit, faPrint, faSave, faClose, faSearch, faCheck } from '@fortawesome/free-solid-svg-icons';
 
 import AccountLayout from '@/components/layout/AccountLayout';
 import ModalPopUp from '@/components/core-components/ModalPopUp';
+import Datalist from '@/components/core-components/Datalist';
+import SearchFilter from '@/components/core-components/SearchFilter';
 import AgGridComponent from '@/components/core-components/AgGridComponent';
 import DynamicForm, { DynamicFormHandle } from '@/components/core-components/DynamicForm';
+import ToastNotification from '@/components/core-components/ToastNotification';
 
 import { InvoiceFormElements } from '@/data/InvoiceFormElements';
 import { ProcedureTable, sampleProcedureTable } from '@/types/procedure';
@@ -26,6 +28,8 @@ import { useTranslation } from 'next-i18next';
 import { getI18nStaticProps } from '@/utils/services/getI18nStaticProps';
 import { useLoading } from '@/context/LoadingContext';
 
+let pageLimit: number = 8;
+let selectedID: number = 0;
 
 export const getStaticProps: GetStaticProps = getI18nStaticProps();
 // Translation logic - end
@@ -53,6 +57,26 @@ const Invoice: React.FC = () => {
     taxAmount: 0,
     netTotal: 0,
   };
+
+  const columns: { name: string; class: string; field: string; format: string; }[] = [
+    { name: t('ACCOUNT.INVOICE.SNO'), class: "col-sm-1", field: "sno", format:''},
+    { name: t('ACCOUNT.INVOICE.DATE'), class: "col-sm-2", field: "date", format:''},
+    { name: t('ACCOUNT.INVOICE.BILL_TO'), class: "col-sm-4", field: "bill_to", format:''},
+    { name: t('ACCOUNT.INVOICE.DOCTOR'), class: "col-sm-3", field: "doctor.name", format:''},
+    { name: t('ACCOUNT.INVOICE.AMOUNT'), class: "col-sm-2", field: "net_total", format:''},  
+  ];
+
+  const filter: { name: string; field: string; }[] = [
+    { name: t('ACCOUNT.INVOICE.DATE'), field: 'date' }
+  ];
+
+  const [page, setPage] = useState<number>(1);
+  const [total, setTotal] = useState<number>(0);
+  const [mode, setMode] = useState<boolean>(false);
+  const [clear, setClear] = useState<boolean>(false);
+  const [list, setList] = useState<any>([]);
+  const [searchFilter, setsearchFilter] = useState<any>([]);
+
   const dynamicFormRef = useRef<DynamicFormHandle>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [selectedInvoice, setSelectedInvoice] = useState<AccountTable | null>(null);
@@ -67,6 +91,9 @@ const Invoice: React.FC = () => {
   const [procedureIndex, setProcedureIndex] = useState<number | null>(null);
   const [formData, setFormData] = useState<InvoiceModel>(initialFormData);
   const [invoiceFormConfig, setInvoiceFormConfig] = useState<any>(InvoiceFormElements);
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');  
+  const [toastColor, setToastColor] = useState<'primary' | 'success' | 'danger' | 'warning' | 'info' | 'light' | 'dark'>('primary');
 
   const [patientList, setPatientList] = useState<{ [key: number]: any }>({});
   const [error, setError] = useState<string | null>(null);
@@ -77,24 +104,77 @@ const Invoice: React.FC = () => {
   };
 
   useEffect(() => {
-    const fetchAccountData = async () => {
-      const rowDataFromApi: AccountTable[] = sampleAccountRecords;
-      const columnDefsFromApi: ColDef[] = [
-        { headerName: 'Inv.No', field: 'inv_no', sortable: true, filter: true, resizable: true, width: 250  },
-        { headerName: 'Date', field: 'inv_date', valueFormatter: (params) => params.value.toLocaleDateString() },
-        { headerName: 'Doctor', field: 'doctor_name', sortable: true, filter: true, resizable: true, width: 120 },
-        { headerName: 'Patient', field: 'patient_name', sortable: true, filter: true, resizable: true, width: 300 },
-        { headerName: 'Bill To', field: 'bill_to' },
-        { headerName: 'Amount', field: 'amount' },
-        { headerName: 'Balance', field: 'balance' },
-      ];
-
-      setRowData(rowDataFromApi);
-      setColumnDefs(columnDefsFromApi);
-    };
-
-    fetchAccountData();
+    fetchInvoiceList(page);
   }, []);
+
+  const fetchInvoiceList = async (page: number, sFilter?: { field: string; text: string }) => {
+    showLoading();
+    try {
+      let passData: string = JSON.stringify({ page: page, limit: pageLimit, sort: null, search: sFilter });
+      const response = await execute_axios_post(ENDPOINTS.POST_INVOICE_LIST, passData);
+      setList(response.data.list);
+      setTotal(response.data.total);
+    } catch (err) {
+      setError('Failed to load doctor data.');
+    } finally {
+      hideLoading();
+    }
+  };
+
+  const handleSearch = () => {
+    const searchTextElement = document.getElementById('searchText') as HTMLInputElement;
+    if (searchTextElement.value) {
+        const sFilter = {
+            field: (document.getElementById('searchType') as HTMLSelectElement).value,
+            text: searchTextElement.value
+        }
+        setPage(1);
+        setsearchFilter(sFilter);
+        fetchInvoiceList(1,sFilter);
+        setClear(true);
+    }
+  }
+  
+  const clearSearch = () => {
+    (document.getElementById('searchText') as HTMLInputElement).value = '';
+    setsearchFilter([]);
+    fetchInvoiceList(1);
+    setClear(false);
+  }
+  
+  const patientDblClick = (event: any) => {
+    let x = document.getElementsByClassName("selected");
+    if(x.length > 0) { x[0].classList.remove("selected"); }
+
+    if(event.target.parentNode.getAttribute('custom-id')) {
+      selectedID = event.target.parentNode.getAttribute('custom-id');
+      event.target.parentElement.setAttribute('class', 'row selected');
+      uuid = idToUuid(selectedID).toString();
+      router.push(`/patient/${uuid}/patient-details`);
+    }
+  }
+  
+  const patientClick = (event: any) => {
+    let x = document.getElementsByClassName("selected");
+    if(x.length > 0) { x[0].classList.remove("selected"); }
+
+    if(event.target.parentNode.getAttribute('custom-id')) {
+      selectedID = event.target.parentNode.getAttribute('custom-id');
+      event.target.parentElement.setAttribute('class', 'row selected');
+    }
+    setSelectedInvoice(selectedID);
+  }
+
+  const refreshData = (currentPage: number) => {
+    var listRows = document.querySelectorAll('.row');
+    listRows.forEach(function(row) {
+      row.classList.remove('selected');
+    })
+    setSelectedInvoice(0);
+    setPage(currentPage);
+    fetchInvoiceList(currentPage, searchFilter);
+  }
+
 
   useEffect(() => {
     const fetchProcedureData = async () => {
@@ -130,14 +210,27 @@ const Invoice: React.FC = () => {
 
   const handleShow = () => {
     setShowModal(true);
-    setFormReset(true);
-    setFormData(initialFormData);
+    setFormReset(true);    
   };
   const handleClose = () => {
     setShowModal(false);
     setFormReset(false);
     setFormData(initialFormData);
   };
+
+  const createInvoice = () => {
+    handleShow();
+    setFormData(initialFormData);
+  }
+
+   // Edit action call
+   const handleEdit = () => {
+    if(selectedInvoice === 0) {
+      handleShowToast(t('SETTING.MESSAGES.SELECT_RECORD'), 'danger');
+      return false;
+    }
+    // getSurgeryById('edit');
+  }
 
   const onInvoiceDoubleClicked = (event: RowDoubleClickedEvent<AccountTable>): void => {
     if (event.data) {
@@ -320,26 +413,44 @@ const Invoice: React.FC = () => {
       <AccountLayout>
         <div className="container-fluid mt-2">
           <div className="d-flex justify-content-between align-items-center">
-            <h1 className={`${styles.title} mb-3`}>Invoice</h1>
-            <div className={styles.buttonGroup}>
-              <button className={`${styles.btn} btn btn-success`} onClick={handleShow}>
-                <FontAwesomeIcon icon={faPlus} /> Add New</button>
-              <button className={`${styles.btn} btn btn-primary`}>
-                <FontAwesomeIcon icon={faEdit} /> Edit</button>
-              <button className="btn btn-info">
-                <FontAwesomeIcon icon={faPrint} /> Print</button>
-            </div>
+            <h1 className="mb-3">{t('ACCOUNT.SIDE_MENU.INVOICE')}</h1>
           </div>
-        <div>
-          <AgGridComponent<AccountTable>
-            rowData={rowData}
-            columnDefs={columnDefs}
-            onRowDoubleClicked={onInvoiceDoubleClicked}
-            onRowClicked={onInvoiceClicked}
-            customGridOptions={{ suppressCellSelection: true }}
-          />
+          <Row className="white-bg p-1 m-0 top-bottom-shadow">
+            <Col xs={7} className="mt-3 action">
+              <Button variant='primary' className='btn rounded-0' onClick={createInvoice}><i className="fi fi-ss-add"></i> {t('ACTIONS.ADDNEW')}</Button>
+              <Dropdown >
+                <Dropdown.Toggle variant="secondary" id="dropdown-basic"  className="btn rounded-0 ms-2">
+                  {t('ACTIONS.ACTIONS')}
+                </Dropdown.Toggle>
+                <Dropdown.Menu>
+                  <Dropdown.Item onClick={handleEdit}><i className="fi fi-sr-pencil"></i> {t('ACTIONS.EDIT')}</Dropdown.Item>
+                </Dropdown.Menu>
+              </Dropdown>
+            </Col>
+            <Col xs={5} className="float-end">
+              <SearchFilter 
+                filterColumns={filter}
+                handleSearch={handleSearch}
+                clearSearch={clearSearch}
+                clear={clear}
+                showFilter={true}
+              />
+            </Col>
+          </Row>
+          <div>
+            <Datalist
+              columns={columns}
+              list={list}
+              onRowDblClick={patientDblClick}
+              onRowClick={patientClick}
+              page={page}
+              total={total}
+              pageLimit={pageLimit}
+              refreshData={refreshData}
+              showPagination={true}
+              />
+          </div>        
         </div>
-      </div>
       </AccountLayout>
 
       {/* ModalPopUp component with custom content */}
@@ -351,11 +462,11 @@ const Invoice: React.FC = () => {
         footer={
           <>
             <button type="button" style={{ marginRight: '.5rem' }} onClick={() => handleSave('savePay')} className={`btn btn-success`}>
-              <FontAwesomeIcon icon={faSave} /> Save & Pay</button>
+              Save & Pay</button>
             <button type="button" style={{ marginRight: '.5rem' }} onClick={() => handleSave('save')} className={`btn btn-success`}>
-              <FontAwesomeIcon icon={faSave} /> Save</button>
+              Save</button>
             <button type="button" className={`btn btn-warning`} onClick={handleClose}>
-              <FontAwesomeIcon icon={faClose} /> Cancel</button>
+              Cancel</button>
           </>
         }
       >
@@ -422,7 +533,7 @@ const Invoice: React.FC = () => {
                           disabled />
                         <div className="input-group-append">
                           <span className={`input-group-text ${styles.searchClass}`} onClick={() => handleShowProcedure(index)}>
-                            <FontAwesomeIcon icon={faSearch} />
+                            Search
                           </span>
                         </div>
                       </div>
@@ -524,9 +635,9 @@ const Invoice: React.FC = () => {
         footer={
           <>
             <button type="button" style={{ marginRight: '.5rem' }} className={`btn btn-success`}  onClick={handleOkProcedure}>
-              <FontAwesomeIcon icon={faCheck} /> Ok</button>
+              Ok</button>
             <button type="button" className={`btn btn-warning`} onClick={handleCloseProcedure}>
-              <FontAwesomeIcon icon={faClose} /> Cancel</button>
+              Cancel</button>
           </>
         }
       >
@@ -538,6 +649,13 @@ const Invoice: React.FC = () => {
           customGridOptions={{ suppressCellSelection: true, paginationPageSize: 7 }}
         />
       </ModalPopUp>
+      <ToastNotification
+        show={showToast}
+        message={toastMessage}
+        position='top-end'
+        color={toastColor}
+        onClose={() => setShowToast(false)}
+      />
     </>
   );
 };

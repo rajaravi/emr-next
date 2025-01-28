@@ -24,34 +24,34 @@ const AccountSidebar: React.FC = () => {
         <li className="nav-item">
           <Link href={`/accounts/invoice`}
             className={`nav-link ${activeLink === `/accounts/invoice` ? 'active' : ''}`} aria-current="page">
-            {t('ACCOUNT.SIDE_MENU.INVOICE')}
+            <i className="fi fi-rr-file-invoice"></i> {t('ACCOUNT.SIDE_MENU.INVOICE')}
           </Link>
         </li>
         <li className="nav-item">
           <Link href={`/accounts/receipt`}
             className={`nav-link ${activeLink === `/accounts/receipt` ? 'active' : ''}`}>
-            {t('ACCOUNT.SIDE_MENU.RECEIPT')}
+            <i className="fi fi-rr-receipt"></i> {t('ACCOUNT.SIDE_MENU.RECEIPT')}
           </Link>
         </li>
-        <li className="nav-item">
+        <li className="nav-item d-none">
           <Link href={`/accounts/expenses`}
             className={`nav-link ${activeLink === `/accounts/expenses` ? 'active' : ''}`}>
             {t('ACCOUNT.SIDE_MENU.EXPENSES')}
           </Link>
         </li>
-        <li className="nav-item">
+        <li className="nav-item d-none">
           <Link href={`/accounts/claim`}
             className={`nav-link ${activeLink === `/accounts/claim` ? 'active' : ''}`}>
             {t('ACCOUNT.SIDE_MENU.CLAIM')}
           </Link>
         </li>
-        <li className="nav-item">
+        <li className="nav-item d-none">
           <Link href={`/accounts/editor`}
             className={`nav-link ${activeLink === `/accounts/editor` ? 'active' : ''}`}>
             {t('ACCOUNT.SIDE_MENU.EDITOR')}
           </Link>
         </li>
-        <li className="nav-item">
+        <li className="nav-item d-none">
           <Link href={`/accounts/documents`}
             className={`nav-link ${activeLink === `/accounts/documents` ? 'active' : ''}`}>
             {t('ACCOUNT.SIDE_MENU.DOCUMENTS')}

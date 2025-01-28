@@ -4,7 +4,7 @@
 .navbar {
   background-color: #fff;
   /* box-shadow: 0 0 10px #E9EDF3; */
-  border-bottom: 1px solid #004eff;
+  border-bottom: 1px solid #eaeaea;
   height: 60px;
   width: 100%;
   z-index: 100;
@@ -38,7 +38,7 @@ ul.navbar-nav li.nav-item a.nav-link {
 }
 
 .navbar .nav-link.active {
-  color: #0056b3 !important; /* Highlight active menu text */
+  color: #004eff !important; /* Highlight active menu text */
   position: relative; /* For positioning the underline */
 }
 

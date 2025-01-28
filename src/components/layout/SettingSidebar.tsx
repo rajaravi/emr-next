@@ -63,6 +63,18 @@ const SettingSidebar : React.FC = () => {
             <i className="fi fi-rr-calendar-clock"></i> {t('SETTING.SIDE_MENU.CONSULTANT_HOURS')}
           </Link>
         </li>
+        <li className="nav-item">
+          <Link href={`/settings/income-category`}
+            className={`nav-link ${activeLink === `/settings/income-category` ? 'active' : ''}`}>
+            <i className="fi fi-rs-category-alt"></i> {t('SETTING.SIDE_MENU.INCOME_CATEGORY')}
+          </Link>
+        </li>
+        <li className="nav-item">
+          <Link href={`/settings/tax`}
+            className={`nav-link ${activeLink === `/settings/tax` ? 'active' : ''}`}>
+            <i className="fi fi-rr-calculator-math-tax"></i> {t('SETTING.SIDE_MENU.TAX')}
+          </Link>
+        </li>
         <hr />
         <li className="nav-item">
           <Link href={`/settings/speciality`}
@@ -92,12 +104,6 @@ const SettingSidebar : React.FC = () => {
           <Link href={`/settings/user`}
             className={`nav-link ${activeLink === `/settings/user` ? 'active' : ''}`}>
             <i className="fi fi-rr-users"></i> {t('SETTING.SIDE_MENU.USER')}
-          </Link>
-        </li>
-        <li className="nav-item">
-          <Link href={`/settings/auto`}
-            className={`nav-link ${activeLink === `/settings/auto` ? 'active' : ''}`}>
-            <i className="fi fi-rr-users"></i> Auto Suggest
           </Link>
         </li>
       </ul>
