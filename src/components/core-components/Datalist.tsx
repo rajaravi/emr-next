@@ -20,9 +20,10 @@ interface DatalistProps {
     refreshData: (event: any) => void;
     showPagination: boolean;
     archiveRecord?: (event: any) => void;
+    defaultRecord?: (event: any) => void;
 }
 
-const Datalist: FC<DatalistProps> = ({columns, list, page, total, pageLimit, onRowClick, onRowDblClick, refreshData, showPagination, archiveRecord }) => {
+const Datalist: FC<DatalistProps> = ({columns, list, page, total, pageLimit, onRowClick, onRowDblClick, refreshData, showPagination, archiveRecord, defaultRecord }) => {
     let emptyRowsCount:number = pageLimit - ((list?.length) ? list?.length : 0);
     let emptyRows = Array();
     let lastNo = 0;
@@ -62,7 +63,15 @@ const Datalist: FC<DatalistProps> = ({columns, list, page, total, pageLimit, onR
                                         if(data[f] === false) {
                                             data[f] = <Form.Check cur-id={data?.id} type="switch" name={'unarchive'+data?.id} id={'unarchive'+data?.id} onChange={archiveRecord} checked = {false} className='pt-12' role="button"/>;
                                         }                    
-                                    }                                    
+                                    }
+                                    if(f === 'is_default') {
+                                        if(data[f] === true) {
+                                            data[f] = <Form.Check cur-id={data?.id} type="switch" name={'default'+data?.id} id={'default'+data?.id} onChange={defaultRecord} checked = {true} className='pt-12' role="button"/>;
+                                        }
+                                        if(data[f] === false) {
+                                            data[f] = <Form.Check cur-id={data?.id} type="switch" name={'undefault'+data?.id} id={'undefault'+data?.id} onChange={defaultRecord} checked = {false} className='pt-12' role="button"/>;
+                                        }                    
+                                    }
                                     if(cols.format === 'date') { // date format change                              
                                         let splitDate = data[f].split("-");
                                         if(splitDate[0].length === 4) {

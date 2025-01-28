@@ -1,4 +1,3 @@
-
 import React, { FC, useEffect, useRef, useState, ChangeEvent } from 'react';
 import { execute_axios_post } from '@/utils/services/httpService';
 import { Table, Button, Row, Col, Dropdown, Form, Container } from 'react-bootstrap';
@@ -17,7 +16,7 @@ import { typeaheadColumnConfig } from '@/types/patient';
 
 export const getStaticProps: GetStaticProps = getI18nStaticProps();
 
-interface SurgeryProps {
+interface InvoiceProps {
   formLabels: [];
   editID: number;
   show: boolean;
@@ -52,19 +51,14 @@ const initialValue = {
   ]    
 };
 
-const SurgeryForm: React.FC<SurgeryProps> = ({formLabels, editID, show, mode, procedureList, formCurData, handleClose, refreshForm, createPurchaser, deleteProcedure, handleTypeaheadInputChange, handleInputChange, formReset, handleSave}) => {
+const InvoiceForm: React.FC<InvoiceProps> = ({formLabels, editID, show, mode, procedureList, formCurData, handleClose, refreshForm, createPurchaser, deleteProcedure, handleTypeaheadInputChange, handleInputChange, formReset, handleSave}) => {
   const dynamicFormRef = useRef<DynamicFormHandle>(null);  
-  const { showLoading, hideLoading } = useLoading();
   const { t } = useTranslation('common');
   const [initialValues, setInitialValues] = useState<any>(initialValue);
-  
-  const [patientID, setPatientID] = useState<number>(0);
-  const [error, setError] = useState<string | null>(null);
-  
-  return (
+  return(
     <OffcanvasComponent
       show={show}
-      title={ (mode) ? t('PATIENT.SURGERY.EDIT_TITLE') : t('PATIENT.SURGERY.CREATE_TITLE') }
+      title={ (mode) ? t('ACCOUNT.INVOICE.EDIT_TITLE') : t('ACCOUNT.INVOICE.CREATE_TITLE') }
       handleClose={handleClose}
       onSave={handleSave}
       size="75%">
@@ -121,4 +115,5 @@ const SurgeryForm: React.FC<SurgeryProps> = ({formLabels, editID, show, mode, pr
     </OffcanvasComponent>
   )
 };
-export default SurgeryForm;
+
+export default InvoiceForm;

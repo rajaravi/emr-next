@@ -53,6 +53,19 @@ h6 {
   top: 2px;
   right: 2px;
 }
+.navbar .nav-link.active {
+  color: #004eff !important; /* Highlight active menu text */
+  position: relative; /* For positioning the underline */
+}
+.navbar .nav-link.active::before {
+  content: '';
+  height: 2px;
+  width: 100%;
+  background-color: #004EFF;
+  position: absolute;
+  bottom: -10px;
+  left: 0;
+}
 .navbar-brand {
   width: 230px;
   margin-left: -10px;
@@ -92,6 +105,18 @@ h6 {
   top: 2px;
   right: 2px;
 }
+.sidebar .nav-link span {
+  float: right;
+  font-size: 0.65rem;
+  background-color: #004EFF;
+  color: #fff;
+  width: 30px;
+  padding: 1px 0;
+  text-align: center;
+  border-radius: 15px;
+  margin-top: 2px;
+  display: none;
+}
 .sidebar-h {
   background-color: #004eff;
   height: 46px;
@@ -117,7 +142,7 @@ h6 {
   width: calc(100% - 225px);
   position: absolute;
   right: 0;
-  top: 60px;
+  top: 55px;
 }
 #page-content-wrapper1 {
   width: 100%;
@@ -363,11 +388,11 @@ ul.pagination {
 
 .search-button {
   position: absolute;
-  right: 13px;
+  right: 12.5px;
   z-index: 1;
-  top: 1px;
+  top: .5px;
   margin: 1px;
-  height: 35px;
+  height: 37px;
   width: 36px;
   padding: 0;
   text-align: center;
@@ -530,6 +555,16 @@ ul.timeSlots li {
 .autoCompleteTable tbody tr:hover td {
   background: #ffe1ea;
 }
+.fc-timegrid-event-harness-inset .fc-timegrid-event, .fc-timegrid-event.fc-event-mirror, .fc-timegrid-more-link {
+  box-shadow: none;
+}
+.fc-v-event {
+  background-color: transparent;
+  border: 0;  
+}
+.fc-v-event .fc-event-main {
+  content: '';
+}
 /* .fc-header-toolbar .fc-toolbar-chunk {
   position: absolute;
   left: 15px;
@@ -559,4 +594,57 @@ ul.timeSlots li {
 }
 .cal-actions .dropdown {
   float: left;
+}
+.tabType button {
+  background-color: #fff;
+  border: 0px solid #ddd;
+  border-bottom: 2px solid #0046e9;
+  color: #0046e9;
+}
+.patient-info-header {  
+  background: repeating-linear-gradient(45deg, #e4edff, #dde8ff 3px, #d0deff 3px, #d8e4ff 6px);
+  border: 1px solid #c0d3ff;  
+}
+.patient-info-header p.card-text {
+  text-transform: uppercase;
+  font-size: 0.85rem;
+}
+.patient-info-header h6.card-title {
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+.login-bg {
+  background-image: url(../../public/vard-emr-login.png);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+.fc-toolbar-chunk [type=button] {
+  text-transform: capitalize;
+}
+.notify {
+  background-color: #ffdedb;
+  width: 40px;
+  height: 40px;
+  text-align: center;
+  padding: 12px;
+  border-radius: 50%;
+}
+.notify i {
+  animation: bell .7s linear infinite;
+}
+@keyframes bell {
+  50% {
+    opacity: 0;
+  }
+}
+.patient-form .container-fluid {
+  height: 540px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.formActions {
+  position: absolute;
+  right: 5px;
+  top: 10px;
 }

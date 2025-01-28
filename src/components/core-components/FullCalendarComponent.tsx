@@ -31,7 +31,25 @@ const MyFullCalendar: React.FC<CalendarProps> = ({viewType, resources, events, h
     lastClick = now;
   };
 
-  return (    
+  return (
+    <>   
+      <style>
+        {`
+          /* Optional: Add a border to make the hour line more visible */
+          .fc-timegrid-slots table tbody tr td:nth-child(1) {
+            font-size: 0.6rem;
+          }
+          .fc-timegrid-slots table tbody tr:nth-child(1) td {
+            border-top: 1px solid #000;
+          }
+          .fc-timegrid-slots table tbody tr:nth-child(4n + 1) td {
+            border-top: 1px solid #000;
+          }
+          .fc .fc-timegrid-slot {
+            height: 30px; /* Adjust this value as needed */
+          }
+        `}
+      </style> 
       <div className={`${_styles.calendarApp} mt-2`}>      
         <div className={`${_styles.calendarAppMain} p-0`}>
           <FullCalendar
@@ -70,13 +88,29 @@ const MyFullCalendar: React.FC<CalendarProps> = ({viewType, resources, events, h
               );
             }}
             allDaySlot={false}
+            firstDay={1}
             slotDuration="00:15:00"
-            slotLabelFormat={{
-              hour: '2-digit',
-              minute: '2-digit',
-              hour12: false, // Use 24-hour format; set to true for 12-hour format
-            }}
-            slotLabelInterval="00:15:00" // Show labels every 15 minutes
+            // slotLabelFormat={{
+            //   hour: '2-digit', // Show hours for full hour slots
+            //   minute: '2-digit', // Show two-digit minutes
+            //   omitZeroMinute: false, // Always show minutes
+            //   hour12: false, // Use 24-hour format; set to `true` for 12-hour format
+            // }}
+            slotLabelFormat={(info) => {
+              console.log(info);
+              const { date } = info;
+              const minutes = date.minute;//date.getMinutes();
+      
+              // If minutes are 0, show the full hour (e.g., 08:00)
+              if (minutes === 0) {
+                const hours = date.hour;
+                return `${hours.toString().padStart(2, '0')}:00`;
+              }
+      
+              // Otherwise, show just the two-digit minutes
+              return `${minutes.toString().padStart(2, '0')}`;
+            }}            
+            slotLabelInterval="00:15:00" // Show labels every hour
             slotMinTime="07:00:00" // Start time for the day (optional)
             slotMaxTime="20:00:00" // End time for the day (optional)
             height="580px" 
@@ -91,6 +125,7 @@ const MyFullCalendar: React.FC<CalendarProps> = ({viewType, resources, events, h
           />
         </div>
       </div>
+    </>
   );
 };
 export default MyFullCalendar;

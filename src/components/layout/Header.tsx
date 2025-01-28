@@ -24,36 +24,36 @@ const Header: React.FC = () => {
         <a className={`navbar-brand ${styles.navbarBrand}`} href="#"><img src='https://acumensoftwares.com/img/vard-logo.png' alt="VARD" height="50" /></a>
         <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
           <span className="navbar-toggler-icon"></span>
-        </button>
+        </button>        
         <div className="collapse navbar-collapse" id="navbarNav">
           <ul className="navbar-nav ms-auto mb-2 mb-lg-0">
             <li className="nav-item">
-              <Link href="/patient" className={`nav-link ${isActive('/patient') ? styles.active : ''} `}>
+              <Link href="/patient" className={`nav-link ${isActive('/patient') ? 'active' : ''} `}>
                 <i className="fi fi-bs-user-injured"></i> {t('MENU.MENU_PATIENT')}
               </Link>
             </li>
             <li className="nav-item">
-              <Link href="/calendar" className={`nav-link ${isActive('/calendar') ? styles.active : ''} `}>
+              <Link href="/calendar" className={`nav-link ${isActive('/calendar') ? 'active' : ''} `}>
                 <i className="fi fi-rr-calendar-day"></i> {t('MENU.MENU_CALENDAR')}
               </Link>
             </li>
             <li className="nav-item">
-              <Link href="/accounts/invoice" className={`nav-link ${isActive('/accounts') ? styles.active : ''} `}>
-                <i className="fi fi-rr-calculator-math-tax"></i> {t('MENU.MENU_ACCOUNT')}
+              <Link href="/accounts/invoice" className={`nav-link ${isActive('/accounts') ? 'active' : ''} `}>
+                <i className="fi fi-rs-calculator-money"></i> {t('MENU.MENU_ACCOUNT')}
               </Link>
             </li>
-            <li className="nav-item">
-              <Link href="/tray" className={`nav-link ${isActive('/tray') ? styles.active : ''} `}>
+            <li className="nav-item d-none">
+              <Link href="/tray" className={`nav-link ${isActive('/tray') ? 'active' : ''} `}>
                 <i className="fi fi-rr-drawer-empty"></i> {t('MENU.MENU_TRAY')}
               </Link>
             </li>
             <li className="nav-item">
-              <Link href="/settings/doctor" className={`nav-link ${isActive('/settings') ? styles.active : ''} `}>
+              <Link href="/settings/doctor" className={`nav-link ${isActive('/settings') ? 'active' : ''} `}>
                 <i className="fi fi-rr-settings"></i> {t('MENU.MENU_SETTING')}
               </Link>
             </li>
-            <li className="nav-item">
-              <Link href="/reports" className={`nav-link ${isActive('/reports') ? styles.active : ''} `}>
+            <li className="nav-item d-none">
+              <Link href="/reports" className={`nav-link ${isActive('/reports') ? 'active' : ''} `}>
                 <i className="fi fi-rs-newspaper"></i> {t('MENU.MENU_REPORT')}
               </Link>
             </li>
@@ -80,6 +80,7 @@ const Header: React.FC = () => {
             
           </ul>
         </div>
+        <div className='text-danger notify'><i className="fi fi-rs-bell-notification-social-media"></i></div>
       </div>
     </nav>
   );

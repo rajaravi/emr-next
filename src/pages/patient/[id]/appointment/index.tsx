@@ -128,7 +128,7 @@ const [formData, setFormData] = useState<AppointmentModel>(initialFormData);
   const fetchAppointmentList = async (page: number, sFilter?: { field: string; text: string }) => {
     showLoading();
     try {
-      let passData: string = JSON.stringify({ page: page, limit: pageLimit, sort: null, search: sFilter });
+      let passData: string = JSON.stringify({ page: page, limit: pageLimit, sort: null, search: sFilter, patient_id: uuidToId(id) });
       const response = await execute_axios_post(ENDPOINTS.POST_APPOINTMENT_LIST, passData);
       setList(response.data.list);
       setTotal(response.data.total);

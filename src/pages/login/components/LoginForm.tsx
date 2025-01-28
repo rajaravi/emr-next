@@ -20,56 +20,56 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmit, errVal }) => {
   };
 
   return (
-    <Container className="d-flex justify-content-center align-items-center vh-100">
+    <Container fluid className="d-flex vh-100 login-bg">
       <div className={`${styles.loginContainer} w-100`} style={{ maxWidth: '400px' }}>
-        <div className={`${styles.header} text-center mb-4`}>
-          <h2 className={`${styles.heading} text-center text-primary mb-0`}>EMR</h2>
+        <div className={`${styles.header} mb-4`}>
+          <img src='https://acumensoftwares.com/img/vard-logo.png' alt="VARD" height="50" />
         </div>
         {errVal && <Alert variant="danger" className="mb-3">{errVal}</Alert>}
         <form className={styles.form} onSubmit={handleSubmit}>
-          <div className="mb-3 mt-2">
+          <div className="mb-2 mt-2">
             <label htmlFor="practice" className="form-label">Practice</label>
             <div className="input-group">
               <input
                 id="practice"
                 type="practice"
-                className="form-control"
-                placeholder="Practice name"
+                className="form-control p-2"
+                placeholder="John"
                 value={practice}
                 onChange={(e) => setPractice(e.target.value)}
                 required
               />
             </div>
           </div>
-          <div className="mb-3 mt-2">
+          <div className="mb-2 mt-1">
             <label htmlFor="username" className="form-label">Username</label>
             <div className="input-group">
               <input
                 id="username"
                 type="username"
-                className="form-control"
-                placeholder="Enter your username"
+                className="form-control p-2"
+                placeholder="johnson"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 required
               />
             </div>
           </div>
-          <div className="mb-3 mt-2">
+          <div className="mb-2 mt-1">
             <label htmlFor="password" className="form-label">Password</label>
             <div className="input-group">
               <input
                 id="password"
                 type="password"
-                className="form-control"
-                placeholder="Enter your password"
+                className="form-control p-2"
+                placeholder="**************"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
             </div>
           </div>
-          <div className="mb-3 mt-2">
+          <div className="mt-1">
             <button type="submit" className={`${styles.button} w-100 `}>
               Login
             </button>

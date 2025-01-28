@@ -15,17 +15,24 @@
   "PATIENT": {
     "PATIENT_DASHBOARD": "Patient Dashboard",
     "CREATE_HEADER": "Create Patient",
-    "EDIT_HEADER": "Edit Patient",
+    "EDIT_HEADER": "Demographics",
     "SIDE_MENU": {
-      "PATIENT_DETAILS": "Patient Details",
+      "PATIENT_DETAILS": "Demographics",
       "PATIENT_HISTORY": "Patient History",
       "EXAMINATION": "Examination",
       "APPOINTMENT": "Appointment",
       "SURGERY": "Surgery",
-      "NOTES": "Notes"
+      "PRESCRIPTION": "Prescription",
+      "INVOICE": "Invoice",
+      "RECEIPT": "Receipt",
+      "SCAN_DOCS": "Scan Doc's",
+      "LETTERS": "Letters",
+      "NOTES": "Notes",
+      "FORMS": "Forms"
     },
     "DETAILS": {
       "SNO": "S.No",
+      "ID": "ID",
       "DESIGNATION": "Designation",
       "FIRSTNAME": "First name",
       "SURNAME": "Surname",
@@ -102,6 +109,31 @@
       "CLAIM": "Claim",
       "EDITOR": "Document Editor",
       "DOCUMENTS": "CK Editor"
+    },
+    "INVOICE": {
+      "SNO": "S.No",
+      "PATIENT": "Patient Name",
+      "DATE": "Date",
+      "DOCTOR": "Doctor",
+      "INCOME_CATEGORY": "Income Category",
+      "BILL_TO": "Bill To",
+      "TAX": "Tax",
+      "PURCHASER": "Purchaser",
+      "PURCHASER_PLAN": "Purchaser Plan",
+      "DISCOUNT": "Discount",
+      "TAX_PERCENTAGE": "Tax Percentage",
+      "TAX_RATE": "Tax Rate",
+      "WAIVED_RATE": "Wavied Rate",
+      "GRAND_TOTAL": "Grand Total",
+      "NET_TOTAL": "Net Total",
+      "BALANCE": "Balance",
+      "NOTES": "Notes",
+      "DESCRIPTION": "Description",
+      "PROCEDURE_CODE": "Procedure Code",
+      "PROCEDURE_NAME": "Procedure Name",
+      "QUANTITY": "Quantity",
+      "AMOUNT": "Amount",
+      "TOTAL": "Total"
     }
   },
   "SETTING": {
@@ -121,7 +153,9 @@
       "PROCEDURE": "Procedure",
       "APPOINTMENT_SERVICE": "Appointment Service",
       "TEMPLATE": "Template",
-      "CONSULTANT_HOURS": "Consultant Hours"
+      "CONSULTANT_HOURS": "Consultant Hours",
+      "INCOME_CATEGORY": "Income Category",
+      "TAX": "Tax"
     },
     "DOCTOR": {
       "CREATE_TITLE": "Create Doctor",
@@ -318,12 +352,37 @@
         "SAVE_SUCCESS": "Consultant Hours saved successfully!"
       }
     },    
+    "INCOME_CATEGORY": {
+      "CREATE_TITLE": "Create Income category",
+      "EDIT_TITLE": "Edit Income category",
+      "SNO": "S.No",
+      "NAME": "Name",
+      "ARCHIVE": "Archive",
+      "DEFAULT": "Default",
+      "MESSAGES": {
+        "SAVE_SUCCESS": "Income category saved successfully!"
+      }
+    },
+    "TAX": {
+      "CREATE_TITLE": "Create Tax",
+      "EDIT_TITLE": "Edit Tax",
+      "SNO": "S.No",
+      "NAME": "Name",
+      "PERCENTAGE": "Percentage",
+      "ARCHIVE": "Archive",
+      "DEFAULT": "Default",
+      "MESSAGES": {
+        "SAVE_SUCCESS": "Tax saved successfully!"
+      }
+    },
     "MESSAGES": {
       "SELECT_RECORD": "Select a record!",
       "ARCHIVE": "Archived successfully!",
       "UNARCHIVE": "Unarchived successfully!",
       "ACTIVE": "Active successfully!",
-      "INACTIVE": "Inactive successfully!"
+      "INACTIVE": "Inactive successfully!",
+      "SET_DEFAULT": "Record set as default successfully!",
+      "REMOVE_DEFAULT": "Record removed as default successfully!"
     }
   },
   "ACTIONS": {

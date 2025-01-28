@@ -69,6 +69,17 @@ const ENDPOINTS = {
     POST_CONSULTANT_HOURS_FORMDATA: `${BASE_API_URL}/consultant-work-hour/form-data`,
     POST_CONSULTANT_HOURS_ARCHIVE: `${BASE_API_URL}/consultant-work-hour/archive`,
     POST_CONSULTANT_HOURS_STORE: `${BASE_API_URL}/consultant-work-hour/store`,
+    POST_INCOME_CATEGORY_LIST: `${BASE_API_URL}/category/index`,
+    POST_INCOME_CATEGORY_FORMDATA: `${BASE_API_URL}/category/form-data`,
+    POST_INCOME_CATEGORY_ARCHIVE: `${BASE_API_URL}/category/archive`,
+    POST_INCOME_CATEGORY_STORE: `${BASE_API_URL}/category/store`,
+    POST_INCOME_CATEGORY_DEFAULT: `${BASE_API_URL}/category/default`,
+    POST_TAX_LIST: `${BASE_API_URL}/tax/index`,
+    POST_TAX_FORMDATA: `${BASE_API_URL}/tax/form-data`,
+    POST_TAX_ARCHIVE: `${BASE_API_URL}/tax/archive`,
+    POST_TAX_STORE: `${BASE_API_URL}/tax/store`,
+    POST_TAX_DEFAULT: `${BASE_API_URL}/tax/default`,
+    
 
 
     POST_PATIENT_LIST: `${BASE_API_URL}/patient/index`,
@@ -83,12 +94,18 @@ const ENDPOINTS = {
     POST_APPOINTMENT_STORE: `${BASE_API_URL}/appointment/store`,
     POST_AVAILABLE_SLOTS: `${BASE_API_URL}/consultant-work-hour/available-slots`,
     POST_DAY_SLOTS: `${BASE_API_URL}/consultant-work-hour/day-slots`,
-    POST_MONTH_SLOTS: `${BASE_API_URL}/appointment/month`,   
+    POST_WEEK_SLOTS: `${BASE_API_URL}/consultant-work-hour/week-slots`,
+    POST_MONTH_SLOTS: `${BASE_API_URL}/appointment/month`, 
 
     POST_SURGERY_LIST: `${BASE_API_URL}/surgery/index`,
     POST_SURGERY_FORMDATA: `${BASE_API_URL}/surgery/form-data`,
     POST_SURGERY_ARCHIVE: `${BASE_API_URL}/surgery/archive`,
     POST_SURGERY_STORE: `${BASE_API_URL}/surgery/store`,
+
+    POST_INVOICE_LIST: `${BASE_API_URL}/invoice/index`,
+    POST_INVOICE_FORMDATA: `${BASE_API_URL}/invoice/form-data`,
+    POST_INVOICE_ARCHIVE: `${BASE_API_URL}/invoice/archive`,
+    POST_INVOICE_STORE: `${BASE_API_URL}/invoice/store`,
 
     
     // PATCH METHODS

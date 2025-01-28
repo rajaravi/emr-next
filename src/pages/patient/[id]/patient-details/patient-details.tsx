@@ -170,7 +170,7 @@ const PatientDetails: React.FC<PatientDetailsProps> = ({ patientId }) => {
 
   return (
     <>
-      <div className="p-0">
+      <div className="p-0 patient-form">
         <h1 className={`${styles.title} my-3`}>{t('PATIENT.EDIT_HEADER')}</h1>        
         <DynamicForm
           formData={translatedElements}

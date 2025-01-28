@@ -201,7 +201,7 @@ const DynamicForm = forwardRef<DynamicFormHandle, DynamicFormProps> (({
                 onInputChange={modelFormTypeahead} />;
             case 'submit':
               return (
-                <div key={index} className="col-12">
+                <div key={index} className="col-12 formActions">
                   <div className="d-flex justify-content-end mt-4">
                     <button type="button" className="btn btn-sm btn-secondary rounded-0 me-2" onClick={handleCancel}>
                     Cancel
