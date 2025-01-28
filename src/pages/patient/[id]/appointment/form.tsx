@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { forwardRef, useRef, useImperativeHandle } from 'react';
 import { useRouter } from 'next/router';
 import { Row, Col } from 'react-bootstrap';
 
@@ -19,23 +19,32 @@ interface AppointmentProps {
   editID: number;
   show: boolean;
   mode: boolean;
-  handleClose: (event: any) => void;
+  handleClose: () => void;
+  handleSave: () => void;
   refreshForm: (event: any) => void;
-  handleTypeaheadInputChange: (event: any) => void;
+  handleTypeaheadInputChange: (name: string, selected: any, label: string) => void;
   handleInputChange: (event: any) => void;
-  handleSave: (event: any) => void;  
   handleItemClick: (start: any, end: any, index: any) => void;
   formReset: boolean;
   activeIndex: number;
 }
 
 const MIN_CHARACTERS = 3;
+const AppointmentForm = forwardRef<DynamicFormHandle, AppointmentProps>(
+// const AppointmentForm: React.FC<AppointmentProps> = 
 
-const AppointmentForm: React.FC<AppointmentProps> = ({formLabels, initialValues, slotsList, editID, show, mode, handleClose, refreshForm, handleTypeaheadInputChange, handleInputChange, handleSave, handleItemClick, formReset, activeIndex}) => {
+({formLabels, initialValues, slotsList, editID, show, mode,
+    refreshForm, handleTypeaheadInputChange, handleInputChange, handleItemClick, formReset, activeIndex,
+    handleSave, handleClose}, ref) => {
+
   const { t } = useTranslation('common');
   const router = useRouter();
-  const { id } = router.query;  
+  const { id } = router.query;
+
   const dynamicFormRef = useRef<DynamicFormHandle>(null);
+  useImperativeHandle(ref, () => ({
+    validateModelForm: () => dynamicFormRef.current?.validateModelForm(),
+  }));
 
   return (
   <>
@@ -52,7 +61,7 @@ const AppointmentForm: React.FC<AppointmentProps> = ({formLabels, initialValues,
             formData={formLabels}
             initialValues={initialValues}
             formReset={formReset}
-            onSubmit={handleSave}
+            // onSubmit={handleSave}
             isEditMode={mode}
             modelFormTypeahead={handleTypeaheadInputChange}
             columHeaderTypeahead={typeaheadColumnConfig}
@@ -77,9 +86,9 @@ const AppointmentForm: React.FC<AppointmentProps> = ({formLabels, initialValues,
           </ul>
         </Col>
       </Row>
-    </OffcanvasComponent>      
+    </OffcanvasComponent>
   </>
   )
-};
+});
 
 export default AppointmentForm;

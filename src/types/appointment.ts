@@ -1,6 +1,7 @@
 export interface AppointmentModel {
     id?: number | null;
     patient_id: number;
+    patient: [ { value: number, label: string}];
     encounter_id: number;
     doctor_id: number;
     location_id: number;

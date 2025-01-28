@@ -11,13 +11,16 @@ import Datalist from '@/components/core-components/Datalist';
 import SearchFilter from '@/components/core-components/SearchFilter';
 import { useLoading } from '@/context/LoadingContext';
 
-import DynamicForm, { DynamicFormHandle } from '@/components/core-components/DynamicForm';
+import { DynamicFormHandle } from '@/components/core-components/DynamicForm';
 import AppointmentForm from './form';
 import ToastNotification from '@/components/core-components/ToastNotification';
 // Translation logic - start
 import { GetStaticPaths, GetStaticProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { getI18nStaticProps } from '@/utils/services/getI18nStaticProps';
+import { AppointmentFormElements } from '@/data/AppointmentFormElements';
+import { AppointmentModel } from '@/types/appointment';
+
 export const getStaticPaths: GetStaticPaths = async () => {
   // Hardcode some IDs
   const paths = [
@@ -31,8 +34,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
     fallback: true, // or 'blocking'
   };
 };
-import { AppointmentFormElements } from '@/data/AppointmentFormElements';
-import { AppointmentModel } from '@/types/appointment';
+export const getStaticProps: GetStaticProps = getI18nStaticProps();
 
 let pageLimit: number = 6;
 let selectedID: number = 0;
@@ -40,10 +42,9 @@ let archiveID: number = 0;
 
 const MIN_CHARACTERS = 3;
 
-export const getStaticProps: GetStaticProps = getI18nStaticProps();
-
 const initialValue = {
   patient_id: 0,
+  patient: [{value: 0, label: ''}],
   encounter_id: 0,
   doctor_id: 0,
   location_id: 0,
@@ -61,13 +62,14 @@ const Appointment: React.FC = () => {
   const { t } = useTranslation('common');
   const router = useRouter();
   const { id } = router.query;
+  const patientId = uuidToId(id);
   const columns: { name: string; class: string; field: string; format?: string }[] = [
     { name: t('PATIENT.APPOINTMENT.SNO'), class: "col-sm-1", field: "sno"},
     { name: t('PATIENT.APPOINTMENT.DATE'), class: "col-sm-2", field: "date", format:'date'},
-    { name: t('PATIENT.APPOINTMENT.APPOINTMENT_TYPE'), class: "col-sm-2", field: "appointment_type.name"},
-    { name: t('PATIENT.APPOINTMENT.DOCTOR'), class: "col-sm-2", field: "doctor.name"},
-    { name: t('PATIENT.APPOINTMENT.LOCATION'), class: "col-sm-3", field: "location.name"},
-    { name: t('PATIENT.APPOINTMENT.STATUS'), class: "col-sm-2", field: "status.description"}
+    { name: t('PATIENT.APPOINTMENT.APPOINTMENT_TYPE'), class: "col-sm-2", field: "appointment_type_id"},
+    { name: t('PATIENT.APPOINTMENT.DOCTOR'), class: "col-sm-2", field: "doctor_id"},
+    { name: t('PATIENT.APPOINTMENT.LOCATION'), class: "col-sm-3", field: "location_id"},
+    { name: t('PATIENT.APPOINTMENT.STATUS'), class: "col-sm-2", field: "status_id"}
   ];
   const filter: { name: string; field: string; }[] = [
     { name: t('PATIENT.APPOINTMENT.PATIENT'), field: 'patient' }
@@ -100,6 +102,10 @@ const Appointment: React.FC = () => {
   const initialFormData: AppointmentModel = { 
     "id": null,
     "patient_id": 0,
+    "patient": [{
+      value: 0,
+      label: ''
+    }],
     "encounter_id": 0,
     "doctor_id": 0,
     "location_id": 0,
@@ -252,13 +258,21 @@ const [formData, setFormData] = useState<AppointmentModel>(initialFormData);
       let editID = 0;
       if(type == 'edit') editID = selectedAppointment;
       let passData: string = JSON.stringify({ id: editID });
+      console.log("🚀 ~ getAppointmentId ~ passData:", passData)
+      showLoading();
       const response = await execute_axios_post(ENDPOINTS.POST_APPOINTMENT_FORMDATA, passData);
-      if(response.success) {        
+      if(response.success) {
         handleShow();
-        if(response.data?.data?.id) {          
-          setInitialValues(response.data.data);              
-        }
-        else {
+        if(response.data?.data?.id) {
+          console.log("🚀 ~ getAppointmentId ~ response.data?.data:", response.data?.data)
+          const formData = response.data?.data;
+          const patientData = {value: formData.patient.id, label: formData.patient.full_name,
+            full_name: formData.patient.full_name, mrn_no: formData.patient.mrn_no, dob: formData.patient.dob}
+          const updatedData = Object.assign({}, formData, { patient: [patientData] });
+          // console.log("🚀 ~ formData ~ formData:", formData, updatedData)
+          setInitialValues(updatedData);
+          setMode(true)
+        } else {
           setFormData(initialFormData);
         }
         let doctor = new Array;
@@ -306,10 +320,12 @@ const [formData, setFormData] = useState<AppointmentModel>(initialFormData);
             elements.options = [];
             elements.options = appType;
           }
-        })        
+        })    
+        hideLoading();
       }
     } catch (error: any) {
         console.error('Error on fetching doctor details:', error);
+        hideLoading();
     }
     
   }
@@ -324,16 +340,23 @@ const [formData, setFormData] = useState<AppointmentModel>(initialFormData);
   // Save button handler
   const handleSave = async () => {
     showLoading();
-    console.log(formData);
+    // Update patient ID
+    console.log("🚀 ~ handleSave ~ formData:", formData)
+    // return
     // Implement your save logic here
     if (dynamicFormRef.current?.validateModelForm()) {
       try {
+        if (formData.patient[0]?.value) {
+          formData.patient_id = formData.patient[0].value
+        }
+        console.log("🚀 ~ handleSave ~ handleSave:", formData, dynamicFormRef.current?.validateModelForm())
         const response = await execute_axios_post(ENDPOINTS.POST_APPOINTMENT_STORE, formData);
         if(response.success) {
           handleShowToast(t('PATIENT.APPOINTMENT.MESSAGES.SAVE_SUCCESS'), 'success');
+          handleClose();
         }
       } catch (error) {
-        console.error('Error updating notes:', error);
+        console.error('Error creating an appointment:', error);
       } finally {
           hideLoading();
           refreshForm();
@@ -346,6 +369,7 @@ const [formData, setFormData] = useState<AppointmentModel>(initialFormData);
   };
   
   const handleTypeaheadInputChange = async (name: string, selected: any, label: string, isClicked: any = false) => {
+    console.log("🚀 ~ handleTypeaheadInputChange ~ isClicked:", name, selected,isClicked)
     if ( ! isClicked) {
       if (name.length >= 3) {
         showLoading();
@@ -359,7 +383,7 @@ const [formData, setFormData] = useState<AppointmentModel>(initialFormData);
             mrn_no: patient.mrn_no,
             dob: patient.dob            
           }))          
-          updateTypeaheadOptions(formData, selected);          
+          // updateTypeaheadOptions(formData, selected);
         } catch (err) {
           setError('Failed to load patient data.');
         } finally {
@@ -370,6 +394,7 @@ const [formData, setFormData] = useState<AppointmentModel>(initialFormData);
         }
 
       } else {
+        console.log("🚀 ~ handleTypeaheadInputChange ~ formData:", formData)
         updateTypeaheadOptions([], ''); // reset the values
       }
     } else {
@@ -380,6 +405,7 @@ const [formData, setFormData] = useState<AppointmentModel>(initialFormData);
 
   // Function to update options in form config
   const updateTypeaheadOptions = (apiData: Option[], appliedString: string) => {
+    console.log("🚀 ~ updateTypeaheadOptions ~ apiData:", apiData, appliedString)
     const updatedConfig = translatedElements.map((field: { type: string; name: string }) => {
       if (["typeahead", "typeaheadDynamic"].includes(field.type) && field.name === appliedString) {
         return {
@@ -389,7 +415,7 @@ const [formData, setFormData] = useState<AppointmentModel>(initialFormData);
       }      
       return field;
     });
-    // console.log("🚀 ~ updatedConfig ~ updatedConfig:", updatedConfig)
+    console.log("🚀 ~ updatedConfig ~ updatedConfig:", updatedConfig)
     setTranslatedElements(updatedConfig);
     getEncounterList();
   };
@@ -435,7 +461,7 @@ const [formData, setFormData] = useState<AppointmentModel>(initialFormData);
   // Fetch encounter records from the API
   const getEncounterList = async () => {
     try {
-      let passData: string = JSON.stringify({ patient_id: patientID });
+      let passData: string = JSON.stringify({ patient_id: patientId });
       const result = await execute_axios_post(ENDPOINTS.GET_ENCOUNTER_LIST, passData);
       let encounter = new Array;
       if(result.data) {
@@ -499,8 +525,10 @@ const [formData, setFormData] = useState<AppointmentModel>(initialFormData);
           refreshData={refreshData}
           showPagination={true}
           archiveRecord={handleArchive}/>
-      </div>      
+      </div>
+
       <AppointmentForm 
+        ref={dynamicFormRef} // Pass ref to AppointmentForm
         formLabels={translatedElements}
         initialValues={initialValues}
         slotsList={slotsList}
