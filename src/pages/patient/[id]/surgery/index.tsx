@@ -50,9 +50,9 @@ const Surgery: React.FC = () => {
   const columns: { name: string; class: string; field: string; format: string; }[] = [
     { name: t('PATIENT.SURGERY.SNO'), class: "col-sm-1", field: "sno", format:''},
     { name: t('PATIENT.SURGERY.DATE'), class: "col-sm-2", field: "date", format:'date'},
-    { name: t('PATIENT.SURGERY.DOCTOR'), class: "col-sm-3", field: "doctor.name", format:''},
-    { name: t('PATIENT.SURGERY.LOCATION'), class: "col-sm-4", field: "location.name", format:''},
-    { name: t('PATIENT.SURGERY.STATUS'), class: "col-sm-2", field: "status.description", format:''},    
+    { name: t('PATIENT.SURGERY.DOCTOR'), class: "col-sm-3", field: "doctor_id", format:''},
+    { name: t('PATIENT.SURGERY.LOCATION'), class: "col-sm-4", field: "location_id", format:''},
+    { name: t('PATIENT.SURGERY.STATUS'), class: "col-sm-2", field: "status_id", format:''},    
   ];
   const filter: { name: string; field: string; }[] = [
     { name: t('PATIENT.SURGERY.DATE'), field: 'date' }
@@ -78,6 +78,10 @@ const Surgery: React.FC = () => {
   const initialFormData: SurgeryModel = {
     "id": null,
     "patient_id": 0,
+    "patient": [{
+      value: 0,
+      label: ''
+    }],
     "episode_id": 0,
     "doctor_id": 0,
     "location_id": 0,
@@ -249,16 +253,24 @@ const Surgery: React.FC = () => {
     
     // Implement your save logic here
     if (dynamicFormRef.current?.validateModelForm()) {
-      console.log('id', formData.patient_name);
+
       try {
+          // Update patient ID
+        if (formData.patient[0].value) {
+          formData.patient_id = formData.patient[0].value
+        }
         const response = await execute_axios_post(ENDPOINTS.POST_SURGERY_STORE, formData);
-        // handleShowToast(t('SETTING.PROCEDURE.MESSAGES.SAVE_SUCCESS'), 'success');
+        if(response.success) {
+          handleShowToast(t('PATIENT.SURGERY.MESSAGES.SAVE_SUCCESS'), 'success');
+          handleClose();
+        }
       } catch (error) {
-        console.error('Error updating notes:', error);
+        console.error('Error creating surgery:', error);
       } finally {
           hideLoading();
+          refreshForm();
       }
-      // setFormData(initialFormData);
+      setFormData(initialFormData);
     } else {
       console.log('Form is invalid', dynamicFormRef);
       hideLoading();
@@ -447,6 +459,7 @@ const Surgery: React.FC = () => {
           />
       </div>
       <SurgeryForm
+        ref={dynamicFormRef} // Pass ref to SurgeryForm
         formLabels={translatedElements}
         formCurData={formData}
         editID = {selectedSurgery}
