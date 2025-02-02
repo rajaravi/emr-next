@@ -10,15 +10,17 @@ import interactionPlugin from '@fullcalendar/interaction';
 import _styles from './_style.module.css';
 
 interface CalendarProps {
+  key: number;
   viewType: string;
   resources: [];
   events: [],
   handleViewChange: (event: any) => void;
-  selectDate: (event: any) => void;
+  handleEventClick: (event: any) => void;
 }
 
-const MyFullCalendar: React.FC<CalendarProps> = ({viewType, resources, events, handleViewChange, selectDate}) => {
+const MyFullCalendar: React.FC<CalendarProps> = ({key, viewType, resources, events, handleViewChange, handleEventClick}) => {
   const calendarRef = useRef<FullCalendar | null>(null);
+  const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
 
   // Month to day view double click
   let lastClick = 0;
@@ -29,6 +31,12 @@ const MyFullCalendar: React.FC<CalendarProps> = ({viewType, resources, events, h
       calendarRef.current?.getApi().changeView('resourceTimeGridDay', selectedDate);
     }
     lastClick = now;
+  };
+
+  const handleSelect = (selectInfo: any) => {
+    const startTime = selectInfo.startStr;
+    const endTime = selectInfo.endStr;
+    setSelectedSlot(startTime);
   };
 
   return (
@@ -48,16 +56,25 @@ const MyFullCalendar: React.FC<CalendarProps> = ({viewType, resources, events, h
           .fc .fc-timegrid-slot {
             height: 30px; /* Adjust this value as needed */
           }
+          /* Custom CSS to highlight selected slot */
+          .fc-timegrid-slot.highlighted {
+            border: 2px solid red !important;
+            background-color: rgba(255, 0, 0, 0.1) !important;
+          }        
         `}
       </style> 
       <div className={`${_styles.calendarApp} mt-2`}>      
         <div className={`${_styles.calendarAppMain} p-0`}>
           <FullCalendar
+            key={key}
             plugins={[resourceTimeGridPlugin, dayGridPlugin, timeGridPlugin, interactionPlugin]}
             initialView="dayGridMonth"
             ref={calendarRef}
             resources={resources}
             events={events}
+            eventClick={handleEventClick} // Handle event selection
+            selectable={true}
+            select={handleSelect}
             headerToolbar={{
               left: 'prev,next today',
               center: 'title',
@@ -87,6 +104,12 @@ const MyFullCalendar: React.FC<CalendarProps> = ({viewType, resources, events, h
                 </div>
               );
             }}
+            dayCellDidMount={(info) => {
+              // Add a class to highlight the selected slot
+              if (info.date.toISOString() === selectedSlot) {
+                info.el.classList.add('highlighted');
+              }
+            }}
             allDaySlot={false}
             firstDay={1}
             slotDuration="00:15:00"
@@ -96,8 +119,7 @@ const MyFullCalendar: React.FC<CalendarProps> = ({viewType, resources, events, h
             //   omitZeroMinute: false, // Always show minutes
             //   hour12: false, // Use 24-hour format; set to `true` for 12-hour format
             // }}
-            slotLabelFormat={(info) => {
-              console.log(info);
+            slotLabelFormat={(info) => {              
               const { date } = info;
               const minutes = date.minute;//date.getMinutes();
       

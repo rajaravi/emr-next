@@ -3,7 +3,7 @@ import { FormField } from "@/types/form";
 export const AppointmentFormElements: FormField[] = [
   {
     "type": 'typeaheadDynamic',
-    "name": 'patient',
+    "name": 'patients',
     "label": 'PATIENT',
     "options": [],
     "required": true,
@@ -57,8 +57,8 @@ export const AppointmentFormElements: FormField[] = [
     "required": true,
     "disablePrevDate": true,
     "disableFutureDate": false,
-    "dateSelection": false, 
-    "colClass": "col-sm-6",
+    "dateSelection": true, 
+    "colClass": "col-sm-3",
     "order": 6
   },
   {
@@ -67,8 +67,8 @@ export const AppointmentFormElements: FormField[] = [
     "label": "NOTES",
     "placeholder": "",
     "required": true,
-    "rows": 6,
-    "order": 8
+    "rows": 4,
+    "order": 9
   },
   {
     "type": "dropdown",
@@ -78,6 +78,6 @@ export const AppointmentFormElements: FormField[] = [
     "required": true,
     "multiple": false,
     "colClass": "col-sm-6",
-    "order": 9
+    "order": 10
   }
 ];
