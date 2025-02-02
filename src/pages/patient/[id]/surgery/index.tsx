@@ -39,6 +39,25 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
 export const getStaticProps: GetStaticProps = getI18nStaticProps();
 
+const initialValue = {  
+  patient_id: 0,
+  patients: [{value: 0, label: ''}],
+  episode_id: 0,
+  doctor_id: 0,
+  location_id: 0,
+  date: '',
+  from_time: '',
+  to_time: '',
+  admission_date: '',
+  discharge_date: '',
+  discharge_time: '',
+  notes: '',
+  status_id: 0,    
+  surgery_details: [
+    { procedure_id: '' },
+  ]    
+};
+
 const Surgery: React.FC = () => {
   const { showLoading, hideLoading } = useLoading();
   const [show, setShow] = useState(false);
@@ -46,29 +65,29 @@ const Surgery: React.FC = () => {
   const { t } = useTranslation('common');
   const router = useRouter();
   const { id } = router.query;
+  const patientId = uuidToId(id);
 
   const columns: { name: string; class: string; field: string; format: string; }[] = [
     { name: t('PATIENT.SURGERY.SNO'), class: "col-sm-1", field: "sno", format:''},
     { name: t('PATIENT.SURGERY.DATE'), class: "col-sm-2", field: "date", format:'date'},
-    { name: t('PATIENT.SURGERY.DOCTOR'), class: "col-sm-3", field: "doctor_id", format:''},
-    { name: t('PATIENT.SURGERY.LOCATION'), class: "col-sm-4", field: "location_id", format:''},
-    { name: t('PATIENT.SURGERY.STATUS'), class: "col-sm-2", field: "status_id", format:''},    
+    { name: t('PATIENT.SURGERY.DOCTOR'), class: "col-sm-3", field: "doctor.name", format:''},
+    { name: t('PATIENT.SURGERY.LOCATION'), class: "col-sm-4", field: "location.name", format:''},
+    { name: t('PATIENT.SURGERY.STATUS'), class: "col-sm-2", field: "status.description", format:''},    
   ];
   const filter: { name: string; field: string; }[] = [
     { name: t('PATIENT.SURGERY.DATE'), field: 'date' }
   ];
 
-  const dynamicFormRef = useRef<DynamicFormHandle>(null);  
+  const dynamicFormRefSurg = useRef<DynamicFormHandle>(null);  
   const [page, setPage] = useState<number>(1);
   const [total, setTotal] = useState<number>(0);
   const [clear, setClear] = useState<boolean>(false);
   const [list, setList] = useState<any>([]);
   const [searchFilter, setsearchFilter] = useState<any>([]);
+  const [initialValues, setInitialValues] = useState<any>(initialValue);
   const [selectedSurgery, setSelectedSurgery] = useState<number>(0);
-  const [encounterList, setEncounterList] = useState<any>([]);  
   const [procedureList, setProcedureList] = useState<any>([]);
   const [translatedElements, setTranslatedElements] = useState<any>([]);
-  const [patientID, setPatientID] = useState<number>(0);
   const [error, setError] = useState<string | null>(null);
   const [formReset, setFormReset] = useState(false);
   const [showToast, setShowToast] = useState(false);
@@ -78,7 +97,7 @@ const Surgery: React.FC = () => {
   const initialFormData: SurgeryModel = {
     "id": null,
     "patient_id": 0,
-    "patient": [{
+    "patients": [{
       value: 0,
       label: ''
     }],
@@ -200,7 +219,22 @@ const Surgery: React.FC = () => {
       if(response.success) {        
           handleShow();
           if(response.data?.data?.id) {
-            setFormData(response.data.data);                  
+            setFormData(response.data.data);
+            if(response.data?.data?.id) {          
+              const formData = response.data?.data;
+              let fromTime = getTimeFromDateTime(formData.from_time);
+              let toTime = getTimeFromDateTime(formData.to_time);
+              const patientData = {value: formData.patient.id, label: formData.patient.full_name,
+                full_name: formData.patient.full_name, mrn_no: formData.patient.mrn_no, dob: formData.patient.dob}
+              const updatedData = Object.assign({}, formData, { patients: [patientData], from_time: fromTime, to_time: toTime });
+
+              console.log('updatedData',updatedData, fromTime, toTime);
+              setInitialValues(updatedData);
+              setFormData(updatedData);
+              setMode(true);              
+            } else {
+              setFormData(initialFormData);
+            }          
           }
           else {
             setFormData(initialFormData);
@@ -251,12 +285,12 @@ const Surgery: React.FC = () => {
     showLoading();
     
     // Implement your save logic here
-    if (dynamicFormRef.current?.validateModelForm()) {
+    if (dynamicFormRefSurg.current?.validateModelForm()) {
 
       try {
           // Update patient ID
-        if (formData.patient[0].value) {
-          formData.patient_id = formData.patient[0].value
+        if (formData.patients[0].value) {
+          formData.patient_id = formData.patients[0].value
         }
         const response = await execute_axios_post(ENDPOINTS.POST_SURGERY_STORE, formData);
         if(response.success) {
@@ -271,7 +305,7 @@ const Surgery: React.FC = () => {
       }
       setFormData(initialFormData);
     } else {
-      console.log('Form is invalid', dynamicFormRef);
+      console.log('Form is invalid', dynamicFormRefSurg);
       hideLoading();
     }
   };
@@ -316,55 +350,74 @@ const Surgery: React.FC = () => {
     if ( ! isClicked) {
       if (name.length >= 3) {
         showLoading();
+        const typeahead = translatedElements.map((field: { type: string; name: string }) => {
+          if (["typeahead", "typeaheadDynamic"].includes(field.type) && field.name === selected) {
+            return field;
+          }
+        })[0];
         try {
           let passData: string = JSON.stringify({ search: name, search_type: 1 });
           const response = await execute_axios_post('/patient/get-list', passData); // Replace with your actual API endpoint
-          const formData = response.data.map((patient: { id: any; full_name: string; dob: string, mrn_no: string }) => ({
-            value: patient.id, // default mandatory typeahead property: value
-            label: patient.full_name, // default mandatory typeahead property: label            
-            full_name: patient.full_name,
-            mrn_no: patient.mrn_no,
-            dob: patient.dob            
-          }))          
-          updateTypeaheadOptions(formData, selected);          
+          const formData = response.data.map((patients: { id: any; full_name: string; dob: string, mrn_no: string }) => ({
+            value: patients.id, // default mandatory typeahead property: value
+            label: patients.full_name, // default mandatory typeahead property: label            
+            full_name: patients.full_name,
+            mrn_no: patients.mrn_no,
+            dob: patients.dob            
+          }))  
+          updateTypeaheadOptions(formData, selected, name);
         } catch (err) {
           setError('Failed to load patient data.');
-        } finally {
-          // setLoading(false);
+        } finally {          
           setTimeout(() => {
             hideLoading();
           }, 1000);
         }
-
       } else {
-        updateTypeaheadOptions([], ''); // reset the values
+        // setFormData({ ...formData, [name]: name });
       }
     } else {
-      setFormReset(false); // block form reset
-      setFormData({ ...formData, [name]: selected });
-    }  
+      setFormReset(false); // block form reset      
+      setFormData({ ...formData, ['patients']: selected });
+    }
   };
 
   // Function to update options in form config
-  const updateTypeaheadOptions = (apiData: Option[], appliedString: string) => {
+  const updateTypeaheadOptions = (apiData: Option[], appliedString: string, search_text: string|null = null, isClicked: any = false) => {    
     const updatedConfig = translatedElements.map((field: { type: string; name: string }) => {
-      if (["typeahead", "typeaheadDynamic"].includes(field.type) && field.name === appliedString) {
-        return {
-          ...field,
-          options: apiData,
-        };
-      }
+      if (["typeahead", "typeaheadDynamic"].includes(field.type) && field.name === appliedString) {        
+        if (initialValues.id > 0 && search_text) {
+          if (!isClicked) {
+            return {
+              ...field,
+              value: {},
+              name: search_text,
+              options: apiData,
+            };
+          } else {
+            return {
+              ...field,
+              value: apiData,
+              options: apiData,
+            };
+          }
+        } else {
+          return {
+            ...field,
+            options: apiData,
+          };
+        }
+      } 
       return field;
     });
-    // console.log("🚀 ~ updatedConfig ~ updatedConfig:", updatedConfig)
-    setTranslatedElements(updatedConfig);
+    setTranslatedElements(updatedConfig);    
     getEncounterList();
   };
 
   // Fetch encounter records from the API
   const getEncounterList = async () => {
     try {
-        let passData: string = JSON.stringify({ patient_id: patientID });
+        let passData: string = JSON.stringify({ patient_id: patientId });
         const result = await execute_axios_post(ENDPOINTS.GET_ENCOUNTER_LIST, passData);
         let encounter = new Array;
         if(result.data) {
@@ -377,8 +430,7 @@ const Surgery: React.FC = () => {
             elements.options = [];
             elements.options = encounter;
           }          
-        })        
-        setEncounterList(result.data);            
+        })          
     } catch (error) {
         console.error("Error fetching records:", error);
     }
@@ -415,6 +467,14 @@ const Surgery: React.FC = () => {
     setToastMessage(message);
     setToastColor(color);
     setShowToast(true);
+  };
+
+  // get time from start and end time of surgery
+  const getTimeFromDateTime = (dateTime: string): string => {
+    const date = new Date(dateTime.replace(" ", "T")); // Convert to valid Date format
+    const hours = date.getHours().toString().padStart(2, "0"); // Get hours (HH)
+    const minutes = date.getMinutes().toString().padStart(2, "0"); // Get minutes (mm)
+    return `${hours}:${minutes}`; // Format as HH:mm
   };
   
   return (
@@ -458,8 +518,9 @@ const Surgery: React.FC = () => {
           />
       </div>
       <SurgeryForm
-        ref={dynamicFormRef} // Pass ref to SurgeryForm
+        ref={dynamicFormRefSurg} // Pass ref to SurgeryForm
         formLabels={translatedElements}
+        initialValues={initialValues}
         formCurData={formData}
         editID = {selectedSurgery}
         refreshForm={refreshForm}
@@ -473,6 +534,7 @@ const Surgery: React.FC = () => {
         handleInputChange={handleInputChange}
         handleSave={handleSave}
         formReset={formReset}
+        fromSource={'Patients'}
       />
       <ToastNotification
         show={showToast}

@@ -1,23 +1,21 @@
-import React, { useEffect, useRef, useState, ChangeEvent } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
 import { execute_axios_post } from '@/utils/services/httpService';
-import { Table, Button, Row, Col, Dropdown, Form, Container } from 'react-bootstrap';
+import { Button, Row, Col, Dropdown } from 'react-bootstrap';
 import ENDPOINTS from '@/utils/constants/endpoints';
 import styles from './_style.module.css';
-import { uuidToId } from '@/utils/helpers/uuid';
-
+import { GetStaticPaths, GetStaticProps } from 'next';
+import { useTranslation } from 'next-i18next';
+import { getI18nStaticProps } from '@/utils/services/getI18nStaticProps';
 import PatientLayout from '@/components/layout/PatientLayout';
 import Datalist from '@/components/core-components/Datalist';
 import SearchFilter from '@/components/core-components/SearchFilter';
 import { useLoading } from '@/context/LoadingContext';
-
 import { DynamicFormHandle } from '@/components/core-components/DynamicForm';
-import AppointmentForm from './form';
 import ToastNotification from '@/components/core-components/ToastNotification';
-// Translation logic - start
-import { GetStaticPaths, GetStaticProps } from 'next';
-import { useTranslation } from 'next-i18next';
-import { getI18nStaticProps } from '@/utils/services/getI18nStaticProps';
+
+import { uuidToId } from '@/utils/helpers/uuid';
+import AppointmentForm from './form';
 import { AppointmentFormElements } from '@/data/AppointmentFormElements';
 import { AppointmentModel } from '@/types/appointment';
 
@@ -28,23 +26,21 @@ export const getStaticPaths: GetStaticPaths = async () => {
     { params: { id: '2' } },
     { params: { id: '3' } },
   ];
-
   return {
     paths,
     fallback: true, // or 'blocking'
   };
 };
+
 export const getStaticProps: GetStaticProps = getI18nStaticProps();
 
 let pageLimit: number = 6;
 let selectedID: number = 0;
 let archiveID: number = 0;
 
-const MIN_CHARACTERS = 3;
-
 const initialValue = {
   patient_id: 0,
-  patient: [{value: 0, label: ''}],
+  patients: [{value: 0, label: ''}],
   encounter_id: 0,
   doctor_id: 0,
   location_id: 0,
@@ -58,43 +54,44 @@ const initialValue = {
 
 const Appointment: React.FC = () => {
   const { showLoading, hideLoading } = useLoading();
-  const [show, setShow] = useState(false);
   const { t } = useTranslation('common');
   const router = useRouter();
   const { id } = router.query;
   const patientId = uuidToId(id);
+  
   const columns: { name: string; class: string; field: string; format?: string }[] = [
     { name: t('PATIENT.APPOINTMENT.SNO'), class: "col-sm-1", field: "sno"},
     { name: t('PATIENT.APPOINTMENT.DATE'), class: "col-sm-2", field: "date", format:'date'},
-    { name: t('PATIENT.APPOINTMENT.APPOINTMENT_TYPE'), class: "col-sm-2", field: "appointment_type_id"},
-    { name: t('PATIENT.APPOINTMENT.DOCTOR'), class: "col-sm-2", field: "doctor_id"},
-    { name: t('PATIENT.APPOINTMENT.LOCATION'), class: "col-sm-3", field: "location_id"},
-    { name: t('PATIENT.APPOINTMENT.STATUS'), class: "col-sm-2", field: "status_id"}
-  ];
-  const filter: { name: string; field: string; }[] = [
-    { name: t('PATIENT.APPOINTMENT.PATIENT'), field: 'patient' }
+    { name: t('PATIENT.APPOINTMENT.APPOINTMENT_TYPE'), class: "col-sm-2", field: "appointment_type.name"},
+    { name: t('PATIENT.APPOINTMENT.DOCTOR'), class: "col-sm-2", field: "doctor.name"},
+    { name: t('PATIENT.APPOINTMENT.LOCATION'), class: "col-sm-3", field: "location.name"},
+    { name: t('PATIENT.APPOINTMENT.STATUS'), class: "col-sm-2", field: "status.description"}
   ];
 
-  const dynamicFormRef = useRef<DynamicFormHandle>(null);
+  const filter: { name: string; field: string; }[] = [
+    { name: t('PATIENT.APPOINTMENT.DATE'), field: 'date' }
+  ];
+
+  const [show, setShow] = useState(false);
+  const dynamicFormRefApp = useRef<DynamicFormHandle>(null);
   const [page, setPage] = useState<number>(1);  
-  const [total, setTotal] = useState<number>(0);
-  const [selectedAppointment, setSelectedAppointment] = useState<number>(0);
+  const [total, setTotal] = useState<number>(0);  
   const [mode, setMode] = useState<boolean>(false);
   const [clear, setClear] = useState<boolean>(false);  
   const [list, setList] = useState<any>([]); 
   const [slotsList, setSlotsList] = useState<any>([]);
-  const [slotBookedTime, setSlotBookedTime] = useState<string | null>(null);     
+  const [slotBookedTime, setSlotBookedTime] = useState<string>('');
+  const [selectedAppointment, setSelectedAppointment] = useState<number>(0);
   const [searchFilter, setsearchFilter] = useState<any>([]);
   const [translatedElements, setTranslatedElements] = useState<any>([]);
   const [initialValues, setInitialValues] = useState<any>(initialValue);
   const [error, setError] = useState<string | null>(null);
   const [formReset, setFormReset] = useState(false);
-  const [field1, setField1] = useState<string | null>(null); // First field
-  const [field2, setField2] = useState<string | null>(null); // Second field
-  const [field3, setField3] = useState<string | null>(null); // Third field
-  const [field4, setField4] = useState<string | null>(null); // Third field
-  const [activeIndex, setActiveIndex] = useState<number>(0);
-  const [selectedFromTime, setSelectedFromTime] = useState<string | null>("");
+  const [doctor, setDoctor] = useState<number>(0);
+  const [location, setLocation] = useState<number>(0);
+  const [apptype, setApptype] = useState<number>(0);
+  const [appdate, setAppdate] = useState<string | null>(null);
+  const [activeIndex, setActiveIndex] = useState<number>(-1);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [toastColor, setToastColor] = useState<'primary' | 'success' | 'danger' | 'warning' | 'info' | 'light' | 'dark'>('primary');
@@ -102,7 +99,7 @@ const Appointment: React.FC = () => {
   const initialFormData: AppointmentModel = { 
     "id": null,
     "patient_id": 0,
-    "patient": [{
+    "patients": [{
       value: 0,
       label: ''
     }],
@@ -128,7 +125,13 @@ const [formData, setFormData] = useState<AppointmentModel>(initialFormData);
     }));
     setTranslatedElements(translatedFormElements);
     fetchAppointmentList(page);
+    var today = new Date();
+    var dd = String(today.getDate()).padStart(2, '0');
+    var mm = String(today.getMonth() + 1).padStart(2, '0');
+    var yyyy = today.getFullYear();  
+    setAppdate(yyyy+'-'+mm+'-'+dd);
   }, []);
+
 
   // Get doctor list
   const fetchAppointmentList = async (page: number, sFilter?: { field: string; text: string }) => {
@@ -149,14 +152,14 @@ const [formData, setFormData] = useState<AppointmentModel>(initialFormData);
   const handleSearch = () => {
     const searchTextElement = document.getElementById('searchText') as HTMLInputElement;
     if (searchTextElement.value) {
-        const sFilter = {
-            field: (document.getElementById('searchType') as HTMLSelectElement).value,
-            text: searchTextElement.value
-        }
-        setPage(1);
-        setsearchFilter(sFilter);
-        fetchAppointmentList(1,sFilter);
-        setClear(true);
+      const sFilter = {
+        field: (document.getElementById('searchType') as HTMLSelectElement).value,
+        text: searchTextElement.value
+      }
+      setPage(1);
+      setsearchFilter(sFilter);
+      fetchAppointmentList(1,sFilter);
+      setClear(true);
     }
   }
 
@@ -201,7 +204,7 @@ const [formData, setFormData] = useState<AppointmentModel>(initialFormData);
   // Edit action call
   const handleEdit = () => {
     if(selectedAppointment == 0) {
-      handleShowToast(t('PATIENT.MESSAGES.SELECT_RECORD'), 'danger');
+      handleShowToast(t('SETTING.MESSAGES.SELECT_RECORD'), 'danger');
       return false;
     }
     getAppointmentId('edit');
@@ -257,21 +260,26 @@ const [formData, setFormData] = useState<AppointmentModel>(initialFormData);
     try {
       let editID = 0;
       if(type == 'edit') editID = selectedAppointment;
-      let passData: string = JSON.stringify({ id: editID });
-      console.log("🚀 ~ getAppointmentId ~ passData:", passData)
+      let passData: string = JSON.stringify({ id: editID });      
       showLoading();
       const response = await execute_axios_post(ENDPOINTS.POST_APPOINTMENT_FORMDATA, passData);
       if(response.success) {
         handleShow();
-        if(response.data?.data?.id) {
-          console.log("🚀 ~ getAppointmentId ~ response.data?.data:", response.data?.data)
+        if(response.data?.data?.id) {          
           const formData = response.data?.data;
-          const patientData = {value: formData.patient.id, label: formData.patient.full_name,
-            full_name: formData.patient.full_name, mrn_no: formData.patient.mrn_no, dob: formData.patient.dob}
-          const updatedData = Object.assign({}, formData, { patient: [patientData] });
-          // console.log("🚀 ~ formData ~ formData:", formData, updatedData)
+          let fromTime = getTimeFromDateTime(formData.from_time);
+          let toTime = getTimeFromDateTime(formData.to_time);
+          const patientData = {value: formData.patient.id, label: formData.patient.full_name, full_name: formData.patient.full_name, mrn_no: formData.patient.mrn_no, dob: formData.patient.dob}
+          const updatedData = Object.assign({}, formData, { patients: [patientData] });
+          setSlotBookedTime(fromTime+' - '+toTime);
           setInitialValues(updatedData);
-          setMode(true)
+          setFormData(updatedData);
+          setMode(true);
+          setDoctor(formData.doctor_id);
+          setLocation(formData.location_id);
+          setApptype(formData.appointment_type_id);
+          setAppdate(formData.date);
+          getAvailableSlots(formData.doctor_id, formData.location_id, formData.appointment_type_id, formData.date);
         } else {
           setFormData(initialFormData);
         }
@@ -326,8 +334,7 @@ const [formData, setFormData] = useState<AppointmentModel>(initialFormData);
     } catch (error: any) {
         console.error('Error on fetching doctor details:', error);
         hideLoading();
-    }
-    
+    }    
   }
   const handleShow = () => {
     setShow(true);   
@@ -335,21 +342,24 @@ const [formData, setFormData] = useState<AppointmentModel>(initialFormData);
   const handleClose = () => {
       setShow(false);
       setMode(false);
+      setActiveIndex(-1);
+      setSlotsList([]);
   }
 
   // Save button handler
   const handleSave = async () => {
     showLoading();
-    // Update patient ID
-    console.log("🚀 ~ handleSave ~ formData:", formData)
-    // return
     // Implement your save logic here
-    if (dynamicFormRef.current?.validateModelForm()) {
+    if (dynamicFormRefApp.current?.validateModelForm()) {
       try {
-        if (formData.patient[0]?.value) {
-          formData.patient_id = formData.patient[0].value
+        if(patientId) {
+          formData.patient_id = patientId;
         }
-        console.log("🚀 ~ handleSave ~ handleSave:", formData, dynamicFormRef.current?.validateModelForm())
+        else {
+          if (formData.patients[0]?.value) {
+            formData.patient_id = formData.patients[0].value
+          }
+        }        
         const response = await execute_axios_post(ENDPOINTS.POST_APPOINTMENT_STORE, formData);
         if(response.success) {
           handleShowToast(t('PATIENT.APPOINTMENT.MESSAGES.SAVE_SUCCESS'), 'success');
@@ -363,98 +373,117 @@ const [formData, setFormData] = useState<AppointmentModel>(initialFormData);
       }
       setFormData(initialFormData);
     } else {
-      console.log('Form is invalid', dynamicFormRef);
+      console.log('Form is invalid', dynamicFormRefApp);
       hideLoading();
     }
   };
   
   const handleTypeaheadInputChange = async (name: string, selected: any, label: string, isClicked: any = false) => {
-    console.log("🚀 ~ handleTypeaheadInputChange ~ isClicked:", name, selected,isClicked)
+    // console.log("🚀 ~ handleTypeaheadInputChange ~ isClicked:", name, selected,isClicked);
     if ( ! isClicked) {
       if (name.length >= 3) {
         showLoading();
+        const typeahead = translatedElements.map((field: { type: string; name: string }) => {
+          if (["typeahead", "typeaheadDynamic"].includes(field.type) && field.name === selected) {
+            return field;
+          }
+        })[0];
         try {
           let passData: string = JSON.stringify({ search: name, search_type: 1 });
           const response = await execute_axios_post('/patient/get-list', passData); // Replace with your actual API endpoint
-          const formData = response.data.map((patient: { id: any; full_name: string; dob: string, mrn_no: string }) => ({
-            value: patient.id, // default mandatory typeahead property: value
-            label: patient.full_name, // default mandatory typeahead property: label            
-            full_name: patient.full_name,
-            mrn_no: patient.mrn_no,
-            dob: patient.dob            
-          }))          
-          // updateTypeaheadOptions(formData, selected);
+          const formData = response.data.map((patients: { id: any; full_name: string; dob: string, mrn_no: string }) => ({
+            value: patients.id, // default mandatory typeahead property: value
+            label: patients.full_name, // default mandatory typeahead property: label            
+            full_name: patients.full_name,
+            mrn_no: patients.mrn_no,
+            dob: patients.dob            
+          }))  
+          updateTypeaheadOptions(formData, selected, name);
         } catch (err) {
           setError('Failed to load patient data.');
         } finally {
-          // setLoading(false);
           setTimeout(() => {
             hideLoading();
           }, 1000);
         }
 
       } else {
-        console.log("🚀 ~ handleTypeaheadInputChange ~ formData:", formData)
-        updateTypeaheadOptions([], ''); // reset the values
+        // setFormData({ ...formData, [name]: name });
       }
     } else {
       setFormReset(false); // block form reset
-      setFormData({ ...formData, [name]: selected });
+      setFormData({ ...formData, ['patients']: selected });
     }  
   };
 
   // Function to update options in form config
-  const updateTypeaheadOptions = (apiData: Option[], appliedString: string) => {
-    console.log("🚀 ~ updateTypeaheadOptions ~ apiData:", apiData, appliedString)
+  const updateTypeaheadOptions = (apiData: Option[], appliedString: string, search_text: string|null = null, isClicked: any = false) => {
     const updatedConfig = translatedElements.map((field: { type: string; name: string }) => {
       if (["typeahead", "typeaheadDynamic"].includes(field.type) && field.name === appliedString) {
-        return {
-          ...field,
-          options: apiData,
-        };
-      }      
+        if (initialValues.id > 0 && search_text) {
+          if (!isClicked) {
+            return {
+              ...field,
+              value: {},
+              name: search_text,
+              options: apiData,
+            };
+          } else {
+            return {
+            ...field,
+            value: apiData,
+            options: apiData,
+          };
+          }
+        } else {
+          return {
+            ...field,
+            options: apiData,
+          };
+        }
+      } 
       return field;
     });
-    console.log("🚀 ~ updatedConfig ~ updatedConfig:", updatedConfig)
-    setTranslatedElements(updatedConfig);
+    setTranslatedElements(updatedConfig);    
     getEncounterList();
   };
 
   // Function to handle form field changes
   const handleInputChange = (e:any) => {
     setFormReset(false); // block form reset
-    const { name, value } = e.target;
+    const { name, value } = e.target;    
     if(name == 'doctor_id') {
-        setField1(value);
-        getAvailableSlots(value, field2, field3, field4);
+        setDoctor(value);
+        getAvailableSlots(value, location, apptype, appdate);
     }
     if(name == 'location_id') {
-        setField2(value);
-        getAvailableSlots(field1, value, field3, field4);
+        setLocation(value);
+        getAvailableSlots(doctor, value, apptype, appdate);
     }
     if(name == 'appointment_type_id') {
-        setField3(value);
-        getAvailableSlots(field1, field2, value, field4);
+        setApptype(value);
+        getAvailableSlots(doctor, location, value, appdate);
     }
     if(name == 'date') {
-        setField4(value);
-        getAvailableSlots(field1, field2, field3, value);    
+        setAppdate(value);
+        getAvailableSlots(doctor, location, apptype, value);    
     }
       setFormData({ ...formData, [name]: value });
   }; 
 
   // Fetch available slots records from the API
-  const getAvailableSlots = async (val1: string | null, val2: string | null, val3: string | null, val4: string | null) => {   
-    if (val1 && val2 && val3 && val4) {
+  const getAvailableSlots = async (doctor: number, location: number, appType: number, appDate: string | null) => {   
+    if (doctor && location && appType && appDate) {
       setSlotsList([]);
-      setSelectedFromTime('');
     try {
-        let passData: string = JSON.stringify({ consultant_id: val1, location_id: val2, appointment_type_id: val3, date: val4 });
+        let passData: string = JSON.stringify({ consultant_id: doctor, location_id: location, appointment_type_id: appType, date: appDate });
         const result = await execute_axios_post(ENDPOINTS.POST_AVAILABLE_SLOTS, passData);
-        setSlotsList(result.data);        
+        setSlotsList(result.data);
       } catch (error) {
         console.error("Error fetching records:", error);
       }
+    } else {
+      setSlotsList([]);
     }
   }; 
 
@@ -484,6 +513,14 @@ const [formData, setFormData] = useState<AppointmentModel>(initialFormData);
   const handleItemClick = (fromTime: string, toTime: string, index: number) => {
     setFormData({ ...formData, ['from_time']: fromTime, ['to_time']: toTime });
     setActiveIndex(index); // Update the active index
+  };
+
+  // get time from start and end time of surgery
+  const getTimeFromDateTime = (dateTime: string): string => {
+    const date = new Date(dateTime.replace(" ", "T")); // Convert to valid Date format
+    const hours = date.getHours().toString().padStart(2, "0"); // Get hours (HH)
+    const minutes = date.getMinutes().toString().padStart(2, "0"); // Get minutes (mm)
+    return `${hours}:${minutes}`; // Format as HH:mm
   };
 
   return (
@@ -528,7 +565,7 @@ const [formData, setFormData] = useState<AppointmentModel>(initialFormData);
       </div>
 
       <AppointmentForm 
-        ref={dynamicFormRef} // Pass ref to AppointmentForm
+        ref={dynamicFormRefApp} // Pass ref to AppointmentForm
         formLabels={translatedElements}
         initialValues={initialValues}
         slotsList={slotsList}
@@ -543,6 +580,8 @@ const [formData, setFormData] = useState<AppointmentModel>(initialFormData);
         handleItemClick={handleItemClick}
         formReset={formReset}
         activeIndex={activeIndex}
+        fromSource={'Patients'}
+        booked_slot_time={slotBookedTime}
       />
       <ToastNotification
         show={showToast}

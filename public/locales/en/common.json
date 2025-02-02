@@ -79,7 +79,12 @@
       "START_TIME": "Start time",
       "END_TIME": "End time",
       "NOTES": "Notes",
-      "STATUS": "Status"      
+      "STATUS": "Status",
+      "BOOKED_TIME_SLOT": "Booked Time Slot",
+      "AVAILABLE_TIME_SLOTS": "Available Time Slots",
+      "MESSAGES": {
+        "SAVE_SUCCESS": "Appointment saved successfully!"
+      }   
     },
     "SURGERY":{
       "CREATE_TITLE": "Create Surgery",
@@ -97,7 +102,10 @@
       "DISCHARGE_DATE": "Discharge Date",
       "DISCHARGE_TIME": "Discharge Time",
       "NOTES": "Notes",
-      "STATUS": "Status"      
+      "STATUS": "Status",
+      "MESSAGES": {
+        "SAVE_SUCCESS": "Surgery saved successfully!"
+      }    
     }
   },
   "ACCOUNT": {

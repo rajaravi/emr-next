@@ -1,9 +1,6 @@
 import React, { forwardRef, useRef, useImperativeHandle } from 'react';
-import { useRouter } from 'next/router';
 import { Row, Col } from 'react-bootstrap';
-
-// Translation logic - start
-import { GetStaticPaths, GetStaticProps } from 'next';
+import { GetStaticProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { getI18nStaticProps } from '@/utils/services/getI18nStaticProps';
 import DynamicForm, { DynamicFormHandle } from '@/components/core-components/DynamicForm';
@@ -27,23 +24,18 @@ interface AppointmentProps {
   handleItemClick: (start: any, end: any, index: any) => void;
   formReset: boolean;
   activeIndex: number;
+  fromSource: string;
+  booked_slot_time: string;
 }
 
-const MIN_CHARACTERS = 3;
-const AppointmentForm = forwardRef<DynamicFormHandle, AppointmentProps>(
-// const AppointmentForm: React.FC<AppointmentProps> = 
-
-({formLabels, initialValues, slotsList, editID, show, mode,
-    refreshForm, handleTypeaheadInputChange, handleInputChange, handleItemClick, formReset, activeIndex,
-    handleSave, handleClose}, ref) => {
+const AppointmentForm = forwardRef<DynamicFormHandle, AppointmentProps>(({formLabels, initialValues, slotsList, editID, show, mode,
+  refreshForm, handleTypeaheadInputChange, handleInputChange, handleItemClick, formReset, activeIndex, handleSave, handleClose, fromSource, booked_slot_time}, ref) => {
 
   const { t } = useTranslation('common');
-  const router = useRouter();
-  const { id } = router.query;
 
-  const dynamicFormRef = useRef<DynamicFormHandle>(null);
+  const dynamicFormRefApp = useRef<DynamicFormHandle>(null);
   useImperativeHandle(ref, () => ({
-    validateModelForm: () => dynamicFormRef.current?.validateModelForm(),
+    validateModelForm: () => dynamicFormRefApp.current?.validateModelForm(),
   }));
 
   return (
@@ -54,35 +46,43 @@ const AppointmentForm = forwardRef<DynamicFormHandle, AppointmentProps>(
       handleClose={handleClose}
       onSave={handleSave}
       size="75%">
-          
+
       <Row>
         <Col className='col-sm-8'>
-          <DynamicForm ref={dynamicFormRef}
+          <DynamicForm ref={dynamicFormRefApp}
             formData={formLabels}
             initialValues={initialValues}
             formReset={formReset}
-            // onSubmit={handleSave}
             isEditMode={mode}
             modelFormTypeahead={handleTypeaheadInputChange}
             columHeaderTypeahead={typeaheadColumnConfig}
             modelFormInputs={handleInputChange} />
         </Col>
-        <Col className='col-sm-4'> 
+        <Col className='col-sm-4'>
+          <div className={(mode === true) ? 'mb-4' : 'd-none'} >
+            <h5>{t('PATIENT.APPOINTMENT.BOOKED_TIME_SLOT')}</h5>
+            <button className='btn btn-sm btn-success rounded-0 py-2'>{ booked_slot_time }</button>
+          </div>
+          <h5>{t('PATIENT.APPOINTMENT.AVAILABLE_TIME_SLOTS')}</h5>
+          
           <ul className='timeSlots'>
-            {slotsList.map((record:any, index:number) => (
+            { 
+              (slotsList.length > 0) ? slotsList.map((record:any, index:number) => (
               <li
                 key={index}
                 onClick={() => handleItemClick(record.start, record.end, index)}
                 style={{
                   marginBottom: "5px",
                   cursor: "pointer",
-                  backgroundColor: activeIndex === index ? "#007BFF" : "#f4f4f4", // Change background for active <li>
-                  color: activeIndex === index ? "#fff" : "#000", // Change text color for active <li>
+                  backgroundColor: activeIndex === index ? "#007BFF" : "#baff97",
+                  color: activeIndex === index ? "#fff" : "#000",
+                  borderColor: activeIndex === index ? "#005abb" : "#6bd933",
                 }}
               >
                 {record.start.substr(11, 5)} - {record.end.substr(11, 5)}
               </li>
-            ))}
+              )) : <span className='text-danger'>No slots found</span>
+            }
           </ul>
         </Col>
       </Row>

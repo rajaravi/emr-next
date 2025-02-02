@@ -3,7 +3,7 @@ import { FormField } from "@/types/form";
 export const SurgeryFormElements: FormField[] = [
   {
     "type": 'typeaheadDynamic',
-    "name": 'patient',
+    "name": 'patients',
     "label": 'PATIENT',
     "options": [],
     "required": true,
