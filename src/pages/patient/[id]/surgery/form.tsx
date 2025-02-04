@@ -41,9 +41,7 @@ const SurgeryForm = forwardRef<DynamicFormHandle, SurgeryProps>(({formLabels, in
   useImperativeHandle(ref, () => ({
     validateModelForm: () => dynamicFormRefSurg.current?.validateModelForm(),
   }));
-  console.log('fromSource',fromSource);
   const { t } = useTranslation('common');  
-  
   return (
     <OffcanvasComponent
       show={show}

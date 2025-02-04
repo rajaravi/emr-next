@@ -217,63 +217,76 @@ const Surgery: React.FC = () => {
       let passData: string = JSON.stringify({ id: editID });
       const response = await execute_axios_post(ENDPOINTS.POST_SURGERY_FORMDATA, passData);
       if(response.success) {        
-          handleShow();
-          if(response.data?.data?.id) {
-            setFormData(response.data.data);
-            if(response.data?.data?.id) {          
-              const formData = response.data?.data;
-              let fromTime = getTimeFromDateTime(formData.from_time);
-              let toTime = getTimeFromDateTime(formData.to_time);
-              const patientData = {value: formData.patient.id, label: formData.patient.full_name,
-                full_name: formData.patient.full_name, mrn_no: formData.patient.mrn_no, dob: formData.patient.dob}
-              const updatedData = Object.assign({}, formData, { patients: [patientData], from_time: fromTime, to_time: toTime });
+        handleShow();
+        if(response.data?.data?.id) {
+          const formData = response.data?.data;
+          const patientData = {value: formData.patient.id, label: formData.patient.full_name,
+            full_name: formData.patient.full_name, mrn_no: formData.patient.mrn_no, dob: formData.patient.dob}
+          const updatedData = Object.assign({}, formData, { patients: [patientData] });
+          setInitialValues(updatedData);
+          setFormData(updatedData);
+          setMode(true);
+        }
+        else {
+          let passData: any = { id: uuidToId(id) };
+          const response = await execute_axios_post(ENDPOINTS.POST_PATIENT_FORMDATA, passData);
+          const bindData = {value: response.data.data.id, label: response.data.data.full_name, full_name: response.data.data.full_name, mrn_no: response.data.data.mrn_no, dob: response.data.data.dob} 
+          const updatedData = Object.assign({}, initialFormData, { patients: [bindData] });
+          setInitialValues(updatedData);
+          setFormData(updatedData);
+        }
+        let doctor = new Array;
+        if(response.data.doctors) {
+          response.data.doctors.map((doc: any, d: number) => {
+            doctor.push({'label':doc.name, 'value': doc.id});
+          })
+        }        
+        let location = new Array;
+        if(response.data.locations) {
+          response.data.locations.map((loc: any, l: number) => {
+            location.push({'label':loc.name, 'value': loc.id});
+          })
+        }
+        let status = new Array;
+        if(response.data.status_list) {
+          response.data.status_list.map((stat: any, s: number) => {
+            status.push({'label':stat.description, 'value': stat.id});
+          })
+        }
+        let encounter = new Array;
+        if(response.data.encounters) {
+          response.data.encounters.map((enc: any, a: number) => {
+            if(enc.patient_id === patientId ) {
+              encounter.push({'label':enc.name, 'value': enc.id});
+            }
+          })
+        }
 
-              console.log('updatedData',updatedData, fromTime, toTime);
-              setInitialValues(updatedData);
-              setFormData(updatedData);
-              setMode(true);              
-            } else {
-              setFormData(initialFormData);
-            }          
+        // Dynamic values options format
+        translatedElements.map((elements: any, k: number) => {
+          if(elements.name == 'doctor_id') {
+            elements.options = [];
+            elements.options = doctor;
           }
-          else {
-            setFormData(initialFormData);
+          else if(elements.name == 'location_id') {
+            elements.options = [];
+            elements.options = location;
           }
-          let doctor = new Array;
-          if(response.data.doctors) {
-            response.data.doctors.map((doc: any, d: number) => {
-              doctor.push({'label':doc.name, 'value': doc.id});
-            })
-          }        
-          let location = new Array;
-          if(response.data.locations) {
-            response.data.locations.map((loc: any, l: number) => {
-              location.push({'label':loc.name, 'value': loc.id});
-            })
+          else if(elements.name == 'status_id') {
+            elements.options = [];
+            elements.options = status;
           }
-          let status = new Array;
-          if(response.data.status_list) {
-            response.data.status_list.map((stat: any, s: number) => {
-              status.push({'label':stat.description, 'value': stat.id});
-            })
+          else if(elements.name == 'encounter_id') {
+            elements.options = [];
+            elements.options = encounter;
           }
-          // setProcedureList(response.data.procedures);
-
-          // Dynamic values options format
-          translatedElements.map((elements: any, k: number) => {
-            if(elements.name == 'doctor_id') {
-              elements.options = [];
-              elements.options = doctor;
-            }
-            else if(elements.name == 'location_id') {
-              elements.options = [];
-              elements.options = location;
-            }
-            else if(elements.name == 'status_id') {
-              elements.options = [];
-              elements.options = status;
-            }
-          })        
+        })  
+        setTimeout(() => {          
+          const patientElement = document.querySelector(".patientName");
+          if (patientElement) {            
+            patientElement.classList.add("d-none");            
+          }
+        }, 100);      
       }
     } catch (error: any) {
         console.error('Error on fetching doctor details:', error);
@@ -282,11 +295,9 @@ const Surgery: React.FC = () => {
 
   // Save button handler
   const handleSave = async () => {
-    showLoading();
-    
+    showLoading();    
     // Implement your save logic here
     if (dynamicFormRefSurg.current?.validateModelForm()) {
-
       try {
           // Update patient ID
         if (formData.patients[0].value) {
@@ -411,29 +422,6 @@ const Surgery: React.FC = () => {
       return field;
     });
     setTranslatedElements(updatedConfig);    
-    getEncounterList();
-  };
-
-  // Fetch encounter records from the API
-  const getEncounterList = async () => {
-    try {
-        let passData: string = JSON.stringify({ patient_id: patientId });
-        const result = await execute_axios_post(ENDPOINTS.GET_ENCOUNTER_LIST, passData);
-        let encounter = new Array;
-        if(result.data) {
-          result.data.map((enc: any, e: number) => {
-            encounter.push({'label':enc.name, 'value': enc.id});
-          })
-        }
-        translatedElements.map((elements: any, k: number) => {
-          if(elements.name == 'episode_id') {
-            elements.options = [];
-            elements.options = encounter;
-          }          
-        })          
-    } catch (error) {
-        console.error("Error fetching records:", error);
-    }
   };
 
   // Get procedure list
@@ -467,14 +455,6 @@ const Surgery: React.FC = () => {
     setToastMessage(message);
     setToastColor(color);
     setShowToast(true);
-  };
-
-  // get time from start and end time of surgery
-  const getTimeFromDateTime = (dateTime: string): string => {
-    const date = new Date(dateTime.replace(" ", "T")); // Convert to valid Date format
-    const hours = date.getHours().toString().padStart(2, "0"); // Get hours (HH)
-    const minutes = date.getMinutes().toString().padStart(2, "0"); // Get minutes (mm)
-    return `${hours}:${minutes}`; // Format as HH:mm
   };
   
   return (

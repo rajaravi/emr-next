@@ -95,7 +95,6 @@ const Calendar = () => {
   const [resources, setResources] = useState<Resource[]>([]);
   const [viewType, setViewType] = useState<string>('d-none');
   const [moduleType, setModuleType] = useState<number>(1);  
-  const [key, setKey] = useState(0);
 
   // Appointment block
   const dynamicFormRefApp = useRef<DynamicFormHandle>(null);
@@ -142,9 +141,10 @@ const Calendar = () => {
   const [selectedDate, setSelectedDate] = useState<Date | string>('');
   const columns: { name: string; class: string; field: string; format: string; }[] = [
     { name: t('PATIENT.SURGERY.SNO'), class: "col-sm-1", field: "sno", format:''},
-    { name: t('PATIENT.SURGERY.DATE'), class: "col-sm-2", field: "date", format:'date'},
-    { name: t('PATIENT.SURGERY.DOCTOR'), class: "col-sm-3", field: "doctor.name", format:''},
-    { name: t('PATIENT.SURGERY.LOCATION'), class: "col-sm-4", field: "location.name", format:''},
+    { name: t('PATIENT.SURGERY.DATE'), class: "col-sm-1", field: "date", format:'date'},
+    { name: t('PATIENT.SURGERY.PATIENT'), class: "col-sm-3", field: "patient.full_name", format:''},
+    { name: t('PATIENT.SURGERY.DOCTOR'), class: "col-sm-2", field: "doctor.name", format:''},
+    { name: t('PATIENT.SURGERY.LOCATION'), class: "col-sm-3", field: "location.name", format:''},
     { name: t('PATIENT.SURGERY.STATUS'), class: "col-sm-2", field: "status.description", format:''},    
   ];
   const filter: { name: string; field: string; }[] = [
@@ -331,7 +331,6 @@ const Calendar = () => {
   // Day view events API
   const fetchDayViewEvents = async(sDate: string, eDate: string) => {
     try {
-      alert(eDate);
       let passData: string = JSON.stringify({ date: eDate.split('T')[0] });
       const response = await execute_axios_post(ENDPOINTS.POST_DAY_SLOTS, passData);
       setEvents(response.data.events);
@@ -392,7 +391,6 @@ const Calendar = () => {
   }
 
   /****** Appointment function *******/
-
   const handleTypeaheadInputChangeApp = async (name: string, selected: any, label: string, isClicked: any = false) => {    
     if ( ! isClicked) {
       if (name.length >= 3) {
@@ -431,7 +429,7 @@ const Calendar = () => {
     }  
   };
 
-  const updateTypeaheadOptionsApp = (apiData: Option[], appliedString: string, search_text: string|null = null, isClicked: any = false) => {
+  const updateTypeaheadOptionsApp = (apiData: any, appliedString: string, search_text: string|null = null, isClicked: any = false) => {
     const updatedConfig = translatedElementsApp.map((field: { type: string; name: string }) => {
       if (["typeahead", "typeaheadDynamic"].includes(field.type) && field.name === appliedString) {
         if (initialValuesApp.id > 0 && search_text) {
@@ -467,6 +465,7 @@ const Calendar = () => {
     try {
       let editID = 0;
       if(type == 'edit') editID = selectedAppointment;
+      if(type == 'dblClick') editID = selectedID;      
       let passData: string = JSON.stringify({ id: editID });      
       showLoading();
       const response = await execute_axios_post(ENDPOINTS.POST_APPOINTMENT_FORMDATA, passData);
@@ -474,12 +473,10 @@ const Calendar = () => {
         handleShow();
         if(response.data?.data?.id) {          
           const formDataApp = response.data?.data;
-          let fromTime = getTimeFromDateTime(formDataApp.from_time);
-          let toTime = getTimeFromDateTime(formDataApp.to_time);
           const patientData = {value: formDataApp.patient.id, label: formDataApp.patient.full_name,
             full_name: formDataApp.patient.full_name, mrn_no: formDataApp.patient.mrn_no, dob: formDataApp.patient.dob}
           const updatedData = Object.assign({}, formDataApp, { patients: [patientData] });
-          setSlotBookedTime(fromTime+' - '+toTime);     
+          setSlotBookedTime(formDataApp.from_time+' - '+formDataApp.to_time);     
           setInitialValuesApp(updatedData);
           setFormDataApp(updatedData);
           setMode(true);
@@ -534,7 +531,7 @@ const Calendar = () => {
             elements.options = [];
             elements.options = appType;
           }
-        })    
+        })        
         hideLoading();
       }
     } catch (error: any) {
@@ -551,7 +548,8 @@ const Calendar = () => {
       try {
         if (formDataApp.patients[0]?.value) {
           formDataApp.patient_id = formDataApp.patients[0].value
-        }        
+        }
+        console.log('formDataApp', formDataApp);
         const response = await execute_axios_post(ENDPOINTS.POST_APPOINTMENT_STORE, formDataApp);
         if(response.success) {
           handleShowToast(t('PATIENT.APPOINTMENT.MESSAGES.SAVE_SUCCESS'), 'success');
@@ -582,14 +580,13 @@ const Calendar = () => {
   const handleEventClick = (clickInfo:any) => {
     const event = clickInfo.event;
     clickCount++;
-    let appt_id = event.extendedProps.appt_id ? event.extendedProps.appt_id : 0;
+    selectedID = event.extendedProps.appt_id ? event.extendedProps.appt_id : 0;    
     setTimeout(() => {
       if (clickCount === 1) {
-        setSelectedAppointment(appt_id);  
+          
       } else if (clickCount === 2) {
-        if(appt_id !== 0) {          
-          setSelectedAppointment(appt_id);
-          getAppointmentId('edit');
+        if(selectedID !== 0) {        
+          getAppointmentId('dblClick');
         }
         else {
           handleShowToast(t('SETTING.MESSAGES.SELECT_RECORD'), 'danger');
@@ -598,12 +595,11 @@ const Calendar = () => {
       }
       clickCount = 0;
     }, 300);    
-  }
-  
+  }  
 
   // Handle click on an <li> element
-  const handleItemClick = (fromTime: string, toTime: string, index: number) => {
-    setFormDataApp({ ...formDataApp, ['from_time']: fromTime, ['to_time']: toTime });
+  const handleItemClick = (fromTime: string, toTime: string, index: number) => {    
+    setFormDataApp({ ...formDataApp, ['from_time']: getTimeFromDateTime(fromTime), ['to_time']: getTimeFromDateTime(toTime) });
     setActiveIndex(index); // Update the active index
   };
 
@@ -612,22 +608,22 @@ const Calendar = () => {
     setFormReset(false); // block form reset
     const { name, value } = e.target;
     if(name == 'doctor_id') {
-        setDoctor(value);
-        getAvailableSlots(value, location, apptype, appdate);
+      setDoctor(value);
+      getAvailableSlots(value, location, apptype, appdate);
     }
     if(name == 'location_id') {
-        setLocation(value);
-        getAvailableSlots(doctor, value, apptype, appdate);
+      setLocation(value);
+      getAvailableSlots(doctor, value, apptype, appdate);
     }
     if(name == 'appointment_type_id') {
-        setApptype(value);
-        getAvailableSlots(doctor, location, value, appdate);
+      setApptype(value);
+      getAvailableSlots(doctor, location, value, appdate);
     }
     if(name == 'date') {
-        setAppdate(value);
-        getAvailableSlots(doctor, location, apptype, value);    
+      setAppdate(value);
+      getAvailableSlots(doctor, location, apptype, value);    
     }
-      setFormDataApp({ ...formDataApp, [name]: value });
+    setFormDataApp({ ...formDataApp, [name]: value });
   }; 
 
   // Fetch available slots records from the API
@@ -637,7 +633,9 @@ const Calendar = () => {
     try {
         let passData: string = JSON.stringify({ consultant_id: doctor, location_id: location, appointment_type_id: apptype, date: appdate });
         const result = await execute_axios_post(ENDPOINTS.POST_AVAILABLE_SLOTS, passData);
-        setSlotsList(result.data);
+        if(result.success) {
+          setSlotsList(result.data);
+        }
       } catch (error) {
         console.error("Error fetching records:", error);
       }
@@ -649,8 +647,8 @@ const Calendar = () => {
 
   // Callback function form save to list refresh
   const refreshCalendar = async() => {
-    let currentDate = selectedDate.toLocaleString()
-    fetchDayViewEvents(currentDate, currentDate);    
+    // let currentDate = selectedDate.toLocaleString()
+    // fetchDayViewEvents(currentDate, currentDate);    
   } 
 
   /****** Surgery function *******/
@@ -719,7 +717,6 @@ const Calendar = () => {
       updateProcedure[index] = {
         ...updateProcedure[index], [name]: value
       };
-
       const updatedFormData = { ...formDataSurg, surgery_details: updateProcedure };
       setFormDataSurg(updatedFormData);
     } else {
@@ -765,7 +762,7 @@ const Calendar = () => {
   };
   
   // Function to update options in form config
-  const updateTypeaheadOptionsSurg = (apiData: Option[], appliedString: string, search_text: string|null = null, isClicked: any = false) => {    
+  const updateTypeaheadOptionsSurg = (apiData: any, appliedString: string, search_text: string|null = null, isClicked: any = false) => {    
     const updatedConfig = translatedElementsSurg.map((field: { type: string; name: string }) => {
       if (["typeahead", "typeaheadDynamic"].includes(field.type) && field.name === appliedString) {        
         if (initialValuesSurg.id > 0 && search_text) {
@@ -817,55 +814,53 @@ const Calendar = () => {
       let passData: string = JSON.stringify({ id: editID });
       const response = await execute_axios_post(ENDPOINTS.POST_SURGERY_FORMDATA, passData);
       if(response.success) {        
-          handleShow();
-          if(response.data?.data?.id) {
-            const formData = response.data?.data;
-            let fromTime = getTimeFromDateTime(formData.from_time);
-            let toTime = getTimeFromDateTime(formData.to_time);
-            const patientData = {value: formData.patient.id, label: formData.patient.full_name,
-              full_name: formData.patient.full_name, mrn_no: formData.patient.mrn_no, dob: formData.patient.dob}
-            const updatedData = Object.assign({}, formData, { patients: [patientData], from_time: fromTime, to_time: toTime });
-            setInitialValuesSurg(updatedData);
-            setFormDataSurg(updatedData);
-            setMode(true);          
+        handleShow();
+        if(response.data?.data?.id) {
+          const formData = response.data?.data;
+          const patientData = {value: formData.patient.id, label: formData.patient.full_name,
+            full_name: formData.patient.full_name, mrn_no: formData.patient.mrn_no, dob: formData.patient.dob}
+          const updatedData = Object.assign({}, formData, { patients: [patientData] });
+          setInitialValuesSurg(updatedData);
+          setFormDataSurg(updatedData);
+          setMode(true);          
+        }
+        else {
+          setFormDataSurg(initialFormDataSurg);
+        }
+        let doctor = new Array;
+        if(response.data.doctors) {
+          response.data.doctors.map((doc: any, d: number) => {
+            doctor.push({'label':doc.name, 'value': doc.id});
+          })
+        }        
+        let location = new Array;
+        if(response.data.locations) {
+          response.data.locations.map((loc: any, l: number) => {
+            location.push({'label':loc.name, 'value': loc.id});
+          })
+        }
+        let status = new Array;
+        if(response.data.status_list) {
+          response.data.status_list.map((stat: any, s: number) => {
+            status.push({'label':stat.description, 'value': stat.id});
+          })
+        }          
+        fetchProcedureList();          
+        // Dynamic values options format
+        translatedElementsSurg.map((elements: any, k: number) => {
+          if(elements.name == 'doctor_id') {
+            elements.options = [];
+            elements.options = doctor;
           }
-          else {
-            setFormDataSurg(initialFormDataSurg);
+          else if(elements.name == 'location_id') {
+            elements.options = [];
+            elements.options = location;
           }
-          let doctor = new Array;
-          if(response.data.doctors) {
-            response.data.doctors.map((doc: any, d: number) => {
-              doctor.push({'label':doc.name, 'value': doc.id});
-            })
-          }        
-          let location = new Array;
-          if(response.data.locations) {
-            response.data.locations.map((loc: any, l: number) => {
-              location.push({'label':loc.name, 'value': loc.id});
-            })
+          else if(elements.name == 'status_id') {
+            elements.options = [];
+            elements.options = status;
           }
-          let status = new Array;
-          if(response.data.status_list) {
-            response.data.status_list.map((stat: any, s: number) => {
-              status.push({'label':stat.description, 'value': stat.id});
-            })
-          }          
-          fetchProcedureList();          
-          // Dynamic values options format
-          translatedElementsSurg.map((elements: any, k: number) => {
-            if(elements.name == 'doctor_id') {
-              elements.options = [];
-              elements.options = doctor;
-            }
-            else if(elements.name == 'location_id') {
-              elements.options = [];
-              elements.options = location;
-            }
-            else if(elements.name == 'status_id') {
-              elements.options = [];
-              elements.options = status;
-            }
-          })        
+        })
       }
     } catch (error: any) {
         console.error('Error on fetching doctor details:', error);
@@ -966,7 +961,6 @@ const Calendar = () => {
       </div> 
       <div className={(moduleType === 1) ? '' : 'd-none'}>
         <MyFullCalendar 
-          key={key}
           viewType={viewType}
           resources={resources}
           events={events}
