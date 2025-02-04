@@ -25,9 +25,7 @@ export const getStaticProps: GetStaticProps = getI18nStaticProps();
 
 const initialValue = {    
     name: '',
-    purchaser_type: 
-      { id: 0, description: '' }
-    ,
+    purchaser_type_id: 0,
     is_active: 0,
     is_archive: 0
 };
@@ -65,9 +63,7 @@ const Doctor: React.FC = () => {
   const initialFormData: PurchaserModel = {
     "id": null,
     "name": "",    
-    "purchaser_type": 
-        { "id": 0, "description": "" }
-    ,
+    "purchaser_type_id": 0,
     "is_active": false,
     "is_archive": false
   };
@@ -172,16 +168,7 @@ const Doctor: React.FC = () => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>, index?: number) => {
     setFormReset(false); // block form reset
     const { name, value } = e.target;
-    if (index !== undefined) {
-      const updatePurchaser = {...formData.purchaser_type};    
-      const updatedFormData = { ...formData, purchaser_type: {
-        ...updatePurchaser, [name]: value
-      } };
-      setFormData(updatedFormData);
-    }
-    else {
-      setFormData({ ...formData, [name]: value });
-    }
+    setFormData({ ...formData, [name]: value });
   };  
 
   // Get form data
@@ -198,7 +185,19 @@ const Doctor: React.FC = () => {
           setInitialValues(response.data.data);
           setFormData(response.data.data);
         }
-        setProcedureTypeList(response.data.purchaser_types);
+        let pTypes = new Array;
+        if(response.data.purchaser_types) {
+          response.data.purchaser_types.map((pt: any, d: number) => {
+            pTypes.push({'label':pt.description, 'value': pt.id});
+          })
+        }  
+         // Dynamic values options format
+         translatedElements.map((elements: any, k: number) => {
+          if(elements.name == 'purchaser_type_id') {
+            elements.options = [];
+            elements.options = pTypes;
+          }
+        })
       }
     } catch (error: any) {
         console.error('Error on fetching procedure details:', error);
@@ -329,22 +328,6 @@ const Doctor: React.FC = () => {
           onSubmit={handleSave}
           isEditMode={mode}
           modelFormInputs={handleInputChange}/>
-
-        <label className='form-label'>{t('SETTING.PURCHASER.PURCHASER_TYPE')}</label>
-
-        <Form.Select
-          name="id"
-          id={`id`}
-          className="rounded-0"          
-          onChange={(e) => handleInputChange(e)}>
-            <option value="">Select...</option>
-            {purchaserTypeList?.map((option: any, index: number) => (
-              <>
-              <option key={index} value={option.id}>{option.description}</option>
-              <input type="text" name="description" value={option.description} />
-              </>
-            ))}
-        </Form.Select>
       </OffcanvasComponent>
       <ToastNotification
         show={showToast}

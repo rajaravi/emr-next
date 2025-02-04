@@ -78,7 +78,7 @@ const Appointment: React.FC = () => {
   const [total, setTotal] = useState<number>(0);  
   const [mode, setMode] = useState<boolean>(false);
   const [clear, setClear] = useState<boolean>(false);  
-  const [list, setList] = useState<any>([]); 
+  const [list, setList] = useState<any>([]);
   const [slotsList, setSlotsList] = useState<any>([]);
   const [slotBookedTime, setSlotBookedTime] = useState<string>('');
   const [selectedAppointment, setSelectedAppointment] = useState<number>(0);
@@ -112,24 +112,36 @@ const Appointment: React.FC = () => {
     "to_time": "",
     "notes": "",
     "status_id": 0
-};
+  };
 
-const [formData, setFormData] = useState<AppointmentModel>(initialFormData);
-
+  const [formData, setFormData] = useState<AppointmentModel>(initialFormData);
   // Onload function
-  useEffect(() => {    
+  useEffect(() => {
     // Language apply for form label
-    const translatedFormElements = AppointmentFormElements.map((element) => ({
-      ...element,
-      label: t('PATIENT.APPOINTMENT.'+element.label)
-    }));
+    // const translatedFormElements = AppointmentFormElements.map(elements => elements.filter(element => element.name !== 'patients'))
+ 
+    const translatedFormElements = AppointmentFormElements.map((element) => {
+      // Ensure element exists and has a label before applying translation
+      console.log('c Name', element.type);
+      if (element.type !== "typeaheadDynamic") {
+        return {
+          ...element,
+          label: t(`PATIENT.APPOINTMENT.${element.label}`),
+        };
+      }
+      console.log('return element', element);
+      // Return element as is if condition is not met
+      return element;
+    });
+
+    // console.log('translatedFormElements Raj', translatedFormElements, 'subhu', AppointmentFormElements);
     setTranslatedElements(translatedFormElements);
     fetchAppointmentList(page);
     var today = new Date();
     var dd = String(today.getDate()).padStart(2, '0');
     var mm = String(today.getMonth() + 1).padStart(2, '0');
     var yyyy = today.getFullYear();  
-    setAppdate(yyyy+'-'+mm+'-'+dd);
+    setAppdate(yyyy+'-'+mm+'-'+dd);  
   }, []);
 
 
@@ -267,11 +279,9 @@ const [formData, setFormData] = useState<AppointmentModel>(initialFormData);
         handleShow();
         if(response.data?.data?.id) {          
           const formData = response.data?.data;
-          let fromTime = getTimeFromDateTime(formData.from_time);
-          let toTime = getTimeFromDateTime(formData.to_time);
           const patientData = {value: formData.patient.id, label: formData.patient.full_name, full_name: formData.patient.full_name, mrn_no: formData.patient.mrn_no, dob: formData.patient.dob}
           const updatedData = Object.assign({}, formData, { patients: [patientData] });
-          setSlotBookedTime(fromTime+' - '+toTime);
+          setSlotBookedTime(formData.from_time+' - '+formData.to_time);
           setInitialValues(updatedData);
           setFormData(updatedData);
           setMode(true);
@@ -281,7 +291,11 @@ const [formData, setFormData] = useState<AppointmentModel>(initialFormData);
           setAppdate(formData.date);
           getAvailableSlots(formData.doctor_id, formData.location_id, formData.appointment_type_id, formData.date);
         } else {
-          setFormData(initialFormData);
+          let passData: any = { id: uuidToId(id) };
+          const response = await execute_axios_post(ENDPOINTS.POST_PATIENT_FORMDATA, passData);
+          const bindData = {value: response.data.data.id, label: response.data.data.full_name, full_name: response.data.data.full_name, mrn_no: response.data.data.mrn_no, dob: response.data.data.dob} 
+          const updatedData = Object.assign({}, initialFormData, { patients: [bindData] });
+          setFormData(updatedData);
         }
         let doctor = new Array;
         if(response.data.doctors) {
@@ -307,6 +321,14 @@ const [formData, setFormData] = useState<AppointmentModel>(initialFormData);
             appType.push({'label':app.name, 'value': app.id});
           })
         }
+        let encounter = new Array;
+        if(response.data.encounters) {
+          response.data.encounters.map((enc: any, a: number) => {
+            if(enc.patient_id === patientId ) {
+              encounter.push({'label':enc.name, 'value': enc.id});
+            }
+          })
+        }
         
         // setProcedureList(response.data.procedures);
 
@@ -328,7 +350,17 @@ const [formData, setFormData] = useState<AppointmentModel>(initialFormData);
             elements.options = [];
             elements.options = appType;
           }
-        })    
+          else if(elements.name == 'encounter_id') {
+            elements.options = [];
+            elements.options = encounter;
+          }
+        })   
+        setTimeout(() => {          
+          const patientElement = document.querySelector(".patientName");
+          if (patientElement) {            
+            // patientElement.classList.add("d-none");            
+          }
+        }, 100);
         hideLoading();
       }
     } catch (error: any) {
@@ -349,17 +381,13 @@ const [formData, setFormData] = useState<AppointmentModel>(initialFormData);
   // Save button handler
   const handleSave = async () => {
     showLoading();
+    console.log('formData', formData)
     // Implement your save logic here
     if (dynamicFormRefApp.current?.validateModelForm()) {
       try {
-        if(patientId) {
-          formData.patient_id = patientId;
+        if (formData.patients[0]?.value) {
+          formData.patient_id = formData.patients[0].value
         }
-        else {
-          if (formData.patients[0]?.value) {
-            formData.patient_id = formData.patients[0].value
-          }
-        }        
         const response = await execute_axios_post(ENDPOINTS.POST_APPOINTMENT_STORE, formData);
         if(response.success) {
           handleShowToast(t('PATIENT.APPOINTMENT.MESSAGES.SAVE_SUCCESS'), 'success');
@@ -445,7 +473,6 @@ const [formData, setFormData] = useState<AppointmentModel>(initialFormData);
       return field;
     });
     setTranslatedElements(updatedConfig);    
-    getEncounterList();
   };
 
   // Function to handle form field changes
@@ -488,30 +515,20 @@ const [formData, setFormData] = useState<AppointmentModel>(initialFormData);
   }; 
 
   // Fetch encounter records from the API
-  const getEncounterList = async () => {
+  const getPatientList = async () => {
     try {
-      let passData: string = JSON.stringify({ patient_id: patientId });
-      const result = await execute_axios_post(ENDPOINTS.GET_ENCOUNTER_LIST, passData);
-      let encounter = new Array;
-      if(result.data) {
-        result.data.map((enc: any, e: number) => {
-          encounter.push({'label':enc.name, 'value': enc.id});
-        })
-      }
-      translatedElements.map((elements: any, k: number) => {
-        if(elements.name == 'episode_id') {
-          elements.options = [];
-          elements.options = encounter;
-        }          
-      })        
+      let passData: any = { id: uuidToId(id) };
+      const response = await execute_axios_post(ENDPOINTS.POST_PATIENT_FORMDATA, passData);
+      const bindData = {value: response.data.data.id, label: response.data.data.full_name, full_name: response.data.data.full_name, mrn_no: response.data.data.mrn_no, dob: response.data.data.dob}          
+      return bindData;
     } catch (error) {
-      console.error("Error fetching records:", error);
+      setError('Error fetching patient data:');
     }
   };
 
   // Handle click on an <li> element
   const handleItemClick = (fromTime: string, toTime: string, index: number) => {
-    setFormData({ ...formData, ['from_time']: fromTime, ['to_time']: toTime });
+    setFormData({ ...formData, ['from_time']: getTimeFromDateTime(fromTime), ['to_time']: getTimeFromDateTime(toTime) });
     setActiveIndex(index); // Update the active index
   };
 

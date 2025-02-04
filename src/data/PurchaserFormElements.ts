@@ -12,6 +12,16 @@ export const PurchaserFormElements: FormField[] = [
     "order": 1
   },
   {
+    "type": "dropdown",
+    "name": "purchaser_type_id",
+    "label": "PURCHASER_TYPE",
+    "options": [],
+    "required": true,
+    "multiple": false,
+    "colClass": "col-sm-12",
+    "order": 2
+  },  
+  {
     "type": "switch",
     "name": "is_active",
     "label": "STATUS",
@@ -20,7 +30,7 @@ export const PurchaserFormElements: FormField[] = [
     ],
     "required": false,
     "colClass": "col-sm-6",
-    "order": 2
+    "order": 3
   },
   {
     "type": "switch",
@@ -31,6 +41,6 @@ export const PurchaserFormElements: FormField[] = [
     ],
     "required": false,
     "colClass": "col-sm-6",
-    "order": 3
+    "order": 4
   }
 ];

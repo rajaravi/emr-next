@@ -10,7 +10,6 @@ import interactionPlugin from '@fullcalendar/interaction';
 import _styles from './_style.module.css';
 
 interface CalendarProps {
-  key: number;
   viewType: string;
   resources: [];
   events: [],
@@ -18,7 +17,7 @@ interface CalendarProps {
   handleEventClick: (event: any) => void;
 }
 
-const MyFullCalendar: React.FC<CalendarProps> = ({key, viewType, resources, events, handleViewChange, handleEventClick}) => {
+const MyFullCalendar: React.FC<CalendarProps> = ({viewType, resources, events, handleViewChange, handleEventClick}) => {
   const calendarRef = useRef<FullCalendar | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
 
@@ -66,7 +65,6 @@ const MyFullCalendar: React.FC<CalendarProps> = ({key, viewType, resources, even
       <div className={`${_styles.calendarApp} mt-2`}>      
         <div className={`${_styles.calendarAppMain} p-0`}>
           <FullCalendar
-            key={key}
             plugins={[resourceTimeGridPlugin, dayGridPlugin, timeGridPlugin, interactionPlugin]}
             initialView="dayGridMonth"
             ref={calendarRef}
