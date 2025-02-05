@@ -162,7 +162,6 @@ const Invoice: React.FC = () => {
       selectedID = event.target.parentNode.getAttribute('custom-id');
       event.target.parentElement.setAttribute('class', 'row selected');
     }
-    setSelectedInvoice(selectedID);
   }
 
   const refreshData = (currentPage: number) => {
@@ -170,7 +169,6 @@ const Invoice: React.FC = () => {
     listRows.forEach(function(row) {
       row.classList.remove('selected');
     })
-    setSelectedInvoice(0);
     setPage(currentPage);
     fetchInvoiceList(currentPage, searchFilter);
   }
@@ -223,13 +221,9 @@ const Invoice: React.FC = () => {
     setFormData(initialFormData);
   }
 
-   // Edit action call
-   const handleEdit = () => {
-    if(selectedInvoice === 0) {
-      handleShowToast(t('SETTING.MESSAGES.SELECT_RECORD'), 'danger');
-      return false;
-    }
-    // getSurgeryById('edit');
+  // Edit action call
+  const handleEdit = () => {
+    
   }
 
   const onInvoiceDoubleClicked = (event: RowDoubleClickedEvent<AccountTable>): void => {

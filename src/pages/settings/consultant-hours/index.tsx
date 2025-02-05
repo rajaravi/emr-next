@@ -331,13 +331,19 @@ const ConsultantHours: React.FC = () => {
 
   // Function to add a new reference row
   const handleAddPurchaser = () => {  
-    var table = document.getElementById("tblSlots");
-    var tbodyRowCount = table?.tBodies[0].rows.length;
-    const newProcedure = { id: 0, description: '', location_id: 0, occurence_type_id: 0, occurence_value: 0, work_week_days: '', rowId: (tbodyRowCount+1), from_time: '', to_time: '' };
-    setFormData({
-      ...formData,
-      consultant_work_hour_details: [...formData.consultant_work_hour_details, newProcedure],
-    });
+    // var table = document.getElementById("tblSlots");
+    const table = document.getElementById('tblSlots') as HTMLTableElement;
+
+    if (table) {
+      const tBodies = table.tBodies;
+      // You can now work with tBodies
+      var tbodyRowCount = tBodies[0].rows.length;
+      const newProcedure = { id: 0, description: '', location_id: 0, occurence_type_id: 0, occurence_value: 0, work_week_days: '', rowId: (tbodyRowCount+1), from_time: '', to_time: '' };
+      setFormData({
+        ...formData,
+        consultant_work_hour_details: [...formData.consultant_work_hour_details, newProcedure],
+      });
+    }
   };
 
   // Function to remove a reference row

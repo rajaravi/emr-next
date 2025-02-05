@@ -21,7 +21,7 @@ interface SurgeryProps {
   show: boolean;
   mode: boolean;
   procedureList: [];
-  formCurData: [];
+  formCurData: any;
   refreshForm: (event: any) => void;
   createPurchaser: (event: any) => void;
   deleteProcedure: (event: any) => void;
@@ -68,7 +68,7 @@ const SurgeryForm = forwardRef<DynamicFormHandle, SurgeryProps>(({formLabels, in
               </tr>
             </thead>
             <tbody>            
-              {formCurData?.surgery_details.map((surgery, index) => (
+              {formCurData?.surgery_details.map((surgery: any, index: number) => (
                 <tr key={index} style={{borderStyle: 'hidden'}}>
                   <td>
                     <Form.Select
@@ -76,7 +76,7 @@ const SurgeryForm = forwardRef<DynamicFormHandle, SurgeryProps>(({formLabels, in
                       id={`procedure_id-${index}`}
                       className="rounded-0"
                       value={surgery.procedure_id}
-                      onChange={(e) => handleInputChange(e, index)}>
+                      onChange={(e) => handleInputChange(e)}>
                         <option value="">Select...</option>
                         {procedureList?.map((option: any, index: number) => (
                           <option key={index} value={option.id}>{option.name}</option>

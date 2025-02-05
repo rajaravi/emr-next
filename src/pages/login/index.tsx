@@ -15,9 +15,9 @@ const LoginPage = () => {
   const handleLogin = async (practice: string, email: string, password: string) => {
     try {
       const response = await login(practice, email, password);
-      if (response.success) {
+      if (response.success) {     
         localStorage.setItem("authKey", response.data.token);
-        localStorage.setItem("user", response.data.name);
+        localStorage.setItem("user", response.data.username);
         // Redirect to a protected page or home
         router.push('/patient'); 
       } else {
