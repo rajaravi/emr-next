@@ -48,8 +48,8 @@ const WeekDays: FC<DaysProps> = ({selectedVal, handleToggleChange, rowIndex, dis
                 {["M", "T", "W", "T", "F", "S", "S"].map((item, i) => (
                 <li
                     key={(i+1)}
-                    onClick={() => handleClick(row.id, (i+1))}
-                    className={row.inputValue.includes((i+1)) ? styles.selected : ""}
+                    onClick={() => handleClick(row.id, String(i+1))}
+                    className={row.inputValue.includes(String(i+1)) ? styles.selected : ""}
                 >
                     {item}
                 </li>

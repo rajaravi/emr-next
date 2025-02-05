@@ -394,7 +394,7 @@ const Surgery: React.FC = () => {
   };
 
   // Function to update options in form config
-  const updateTypeaheadOptions = (apiData: Option[], appliedString: string, search_text: string|null = null, isClicked: any = false) => {    
+  const updateTypeaheadOptions = (apiData: any, appliedString: string, search_text: string|null = null, isClicked: any = false) => {    
     const updatedConfig = translatedElements.map((field: { type: string; name: string }) => {
       if (["typeahead", "typeaheadDynamic"].includes(field.type) && field.name === appliedString) {        
         if (initialValues.id > 0 && search_text) {

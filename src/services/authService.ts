@@ -1,7 +1,16 @@
 export interface LoginResponse {
-    success: boolean;
-    token?: string;
+    success: boolean;    
     error?: string;
+    data : {
+      email?: string;
+      id?: number;
+      is_active?: boolean;
+      name?: string;
+      token?: any;
+      refresh_token?: string;
+      role_id?: number;
+      username?: any;
+    }
   }
   
   export const login = async (practice: string, username: string, password: string): Promise<LoginResponse> => {
@@ -18,10 +27,10 @@ export interface LoginResponse {
         throw new Error('Network response was not ok');
       }
   
-      const data: LoginResponse = await response.json();
-      return data;
+      const result: LoginResponse = await response.json();
+      return result;
     } catch (error) {
       console.error('Login error:', error);
-      return { success: false, error: 'Login failed' };
+      return { success: false, error: 'Login failed', data: {} };
     }
 };

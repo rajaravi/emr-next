@@ -6,13 +6,13 @@ import styles from './LoginForm.module.css'; // Adjust path as necessary
 
 interface LoginFormProps {
   errVal: string,
-  onSubmit: (practice: string, username: string, password: string) => void;
+  onSubmit: (practice: any, username: any, password: any) => void;
 }
 
 const LoginForm: React.FC<LoginFormProps> = ({ onSubmit, errVal }) => {
-  const [username, setUsername] = useState();
-  const [password, setPassword] = useState();
-  const [practice, setPractice] = useState();
+  const [username, setUsername] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [practice, setPractice] = useState<string>('');
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,7 +35,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmit, errVal }) => {
                 type="practice"
                 className="form-control p-2"
                 placeholder="John"
-                value={practice}
+                value={String(practice)}
                 onChange={(e) => setPractice(e.target.value)}
                 required
               />
@@ -49,7 +49,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmit, errVal }) => {
                 type="username"
                 className="form-control p-2"
                 placeholder="johnson"
-                value={username}
+                value={String(username)}
                 onChange={(e) => setUsername(e.target.value)}
                 required
               />
@@ -63,7 +63,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmit, errVal }) => {
                 type="password"
                 className="form-control p-2"
                 placeholder="**************"
-                value={password}
+                value={String(password)}
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />

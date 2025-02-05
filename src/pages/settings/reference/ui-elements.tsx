@@ -61,19 +61,19 @@ const Reference: React.FC = () => {
             <label className="form-label">Prefer Communication</label>
             <div className="form-check">
               <input className="form-check-input" type="checkbox" value="" id="flexCheckDefault" checked />
-              <label className="form-check-label" For="flexCheckDefault">
+              <label className="form-check-label">
                 Email
               </label>
             </div>
             <div className="form-check">
               <input className="form-check-input" type="checkbox" value="" id="flexCheckChecked"  />
-              <label className="form-check-label" For="flexCheckChecked">
+              <label className="form-check-label">
               WhatsApp
               </label>
             </div>
             <div className="form-check">
               <input className="form-check-input" type="checkbox" value="" id="flexCheckIndeterminateDisabled" disabled />
-              <label className="form-check-label" For="flexCheckIndeterminateDisabled">
+              <label className="form-check-label">
                 Postal
               </label>
             </div>
@@ -82,21 +82,21 @@ const Reference: React.FC = () => {
             <label className="form-label">GDPR Guidelines</label>
             <div className="form-check form-switch">
               <input className="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault" />
-              <label className="form-check-label" For="flexSwitchCheckDefault">Agree </label>
+              <label className="form-check-label">Agree </label>
             </div>
           </div>
           <div className="mb-3">
             <h4 className='pt-3'>Range Selector</h4>
           </div>
           <div className="mb-3">
-            <label For="customRange1" className="form-label">Range</label>
+            <label className="form-label">Range</label>
             <input type="range" className="form-range" id="customRange1"></input>
           </div>   
           <div className="mb-3">
             <h4 className='pt-3'>Input Group</h4>
           </div>       
           <div className="mb-3">
-            <label For="customRange1" className="form-label">Email</label>
+            <label className="form-label">Email</label>
             <div className="input-group mb-3">
               <input type="text" className="form-control" aria-label="Recipient's username" aria-describedby="basic-addon2" />
               <span className="input-group-text" id="basic-addon2">@acumensoftwares.com</span>
@@ -108,13 +108,13 @@ const Reference: React.FC = () => {
           <div className="mb-3">
             <div className="form-floating mb-3">
               <input type="text" className="form-control" id="floatingInput" placeholder="cross road" />
-              <label For="floatingInput">Address</label>
+              <label>Address</label>
             </div>
           </div>
           <div className="mb-3">
             <div className="form-floating">
-              <textarea className="form-control" placeholder="Leave a comment here" id="floatingTextarea2" Rows="4" ></textarea>
-              <label For="floatingTextarea2">Comments</label>
+              <textarea className="form-control" placeholder="Leave a comment here" id="floatingTextarea2" ></textarea>
+              <label>Comments</label>
             </div>
           </div>
           <div className="mb-3">
@@ -208,15 +208,15 @@ const Reference: React.FC = () => {
             <div className="col-sm-8 pt-1">
               <div className="form-check form-check-inline">
                 <input className="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="option1" />
-                <label className="form-check-label" For="inlineRadio1">Member</label>
+                <label className="form-check-label">Member</label>
               </div>
               <div className="form-check form-check-inline">
                 <input className="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="option2" />
-                <label className="form-check-label" For="inlineRadio2">Accountant</label>
+                <label className="form-check-label">Accountant</label>
               </div>
               <div className="form-check form-check-inline">
                 <input className="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio3" value="option3" disabled />
-                <label className="form-check-label" For="inlineRadio3">Admin</label>
+                <label className="form-check-label">Admin</label>
               </div>
             </div>
             <div className="mb-3 row pt-1">

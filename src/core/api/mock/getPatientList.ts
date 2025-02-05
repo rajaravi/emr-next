@@ -11,9 +11,9 @@ type Data = {
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse<Data>) {
   if (req.method === 'GET') {
-    const formData = samplePatients.map((patient: { patient_id: any; display_name: any; }) => ({
-        value: patient.patient_id,
-        label: patient.display_name
+    const formData = samplePatients.map((patient) => ({
+      value: (patient as any).patient_id,
+      label: (patient as any).display_name
     }))
     res.status(200).json({ success: true, data: formData });
   } else {

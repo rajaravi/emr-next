@@ -91,8 +91,8 @@ const Calendar = () => {
   const [toastColor, setToastColor] = useState<'primary' | 'success' | 'danger' | 'warning' | 'info' | 'light' | 'dark'>('primary');
 
   // Calendar block
-  const [events, setEvents] = useState<Event[]>([]);
-  const [resources, setResources] = useState<Resource[]>([]);
+  const [events, setEvents] = useState<any>([]);
+  const [resources, setResources] = useState<any>([]);
   const [viewType, setViewType] = useState<string>('d-none');
   const [moduleType, setModuleType] = useState<number>(1);  
 
@@ -976,7 +976,7 @@ const Calendar = () => {
               <input 
                 type="date"
                 name="surgery_date"
-                value={selectedDate}   
+                value={String(selectedDate)}   
                 className="form-control rounded-0 mt-3 col-sm-8 float-start"
                 onChange={handleDateChange}
                 style={{ width: '40%' }}

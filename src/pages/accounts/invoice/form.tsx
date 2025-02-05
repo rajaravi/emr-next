@@ -23,13 +23,13 @@ interface InvoiceProps {
   mode: boolean;
   procedureList: [];
   formCurData: [];
-  handleClose: (event: any) => void;
+  handleClose: () => void;
   refreshForm: (event: any) => void;
   createPurchaser: (event: any) => void;
   deleteProcedure: (event: any) => void;
   handleTypeaheadInputChange: (event: any) => void;
   handleInputChange: (event: any) => void;
-  handleSave: (event: any) => void;  
+  handleSave: () => void;  
   formReset: boolean;
 }
 
@@ -78,40 +78,7 @@ const InvoiceForm: React.FC<InvoiceProps> = ({formLabels, editID, show, mode, pr
         name='patient_id'
         id='patient_id'
         readOnly
-      />
-      <Container className='p-0'>
-        <Button variant='primary' size='sm' className='rounded-0 float-end mb-2' onClick={createPurchaser}><i className="fi fi-bs-plus"></i> {t('ACTIONS.ADDROW')}</Button>
-        <Table>
-          <thead>
-            <tr>
-              <th className={`${styles.tableGridHead} col-sm-11`}>{t('SETTING.SIDE_MENU.PROCEDURE')}</th>
-              <th className={`${styles.tableGridHead} col-sm-1`}></th>
-            </tr>
-          </thead>
-          <tbody>            
-            {formCurData?.surgery_details.map((surgery, index) => (
-              <tr key={index} style={{borderStyle: 'hidden'}}>
-                <td>
-                  <Form.Select
-                    name="procedure_id"
-                    id={`procedure_id-${index}`}
-                    className="rounded-0"
-                    value={surgery.procedure_id}
-                    onChange={(e) => handleInputChange(e, index)}>
-                      <option value="">Select...</option>
-                      {procedureList?.map((option: any, index: number) => (
-                        <option key={index} value={option.id}>{option.name}</option>
-                      ))}
-                  </Form.Select>
-                </td>                  
-                <td>
-                  <Button className="text-danger rounded-0" variant="" onClick={() => deleteProcedure(index)}><i className="fi fi-br-trash"></i></Button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </Table>
-      </Container>        
+      />             
     </OffcanvasComponent>
   )
 };
