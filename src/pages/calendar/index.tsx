@@ -241,6 +241,7 @@ const Calendar = () => {
     setShow(false);    
     setMode(false);
     setActiveIndex(-1);
+    setSlotsList([]);
   }
 
   // Fetch encounter records from the API
@@ -553,11 +554,25 @@ const Calendar = () => {
         const response = await execute_axios_post(ENDPOINTS.POST_APPOINTMENT_STORE, formDataApp);
         if(response.success) {
           handleShowToast(t('PATIENT.APPOINTMENT.MESSAGES.SAVE_SUCCESS'), 'success');
+          if(selectedID === 0) {
+            const newEvent = {
+              "id": String(events.length + 1),
+              "title": response.data.appointment_type.name,
+              "start": response.data.date+' '+response.data.from_time+':00',
+              "end": response.data.date+' '+response.data.to_time+':00',
+              "resourceId": response.data.doctor.id,
+              "color": response.data.appointment_type.color_code,
+              "status": response.data.status.description,
+              "appt_id": response.data.id
+            }
+            setEvents([...events, newEvent]);
+          }
           handleClose();
         }
       } catch (error) {
         console.error('Error creating an appointment:', error);
       } finally {
+          selectedID = 0;
           hideLoading();
           refreshCalendar();
       }

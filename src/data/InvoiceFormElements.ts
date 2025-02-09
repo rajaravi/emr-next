@@ -3,62 +3,81 @@ import { FormField } from "@/types/form";
 export const InvoiceFormElements: FormField[] = [
   {
     "type": "date",
-    "name": "invDate",
-    "label": "Date",
+    "name": "date",
+    "label": "DATE",
     "required": true,
     "defaultValue": "",
     "disablePrevDate": true,
-    "colClass": "col-sm-6",
+    "colClass": "col-sm-4",
     "order": 1
   },
   {
-    "type": "dropdown",
-    "name": "doctor",
-    "label": "Doctor",
+    "type": 'typeaheadDynamic',
+    "name": 'patients',
+    "label": 'PATIENT',
     "options": [],
     "required": true,
-    "multiple": false,
-    "colClass": "col-sm-6",
+    "colClass": "col-sm-4",
     "order": 2
   },
   {
     "type": "dropdown",
-    "name": "incomeCategory",
-    "label": "Income Category",
+    "name": "doctor_id",
+    "label": "DOCTOR",
     "options": [],
     "required": true,
-    "colClass": "col-sm-6",
     "multiple": false,
+    "colClass": "col-sm-4",
     "order": 3
   },
   {
     "type": "dropdown",
-    "name": "billTo",
-    "label": "Bill To",
+    "name": "location_id",
+    "label": "LOCATION",
     "options": [],
     "required": true,
-    "colClass": "col-sm-6",
     "multiple": false,
+    "colClass": "col-sm-4",
     "order": 4
   },
   {
-    "type": 'typeaheadDynamic',
-    "name": 'patientName',
-    "label": 'Patient Name',
+    "type": "dropdown",
+    "name": "tags",
+    "label": "TAGS",
     "options": [],
-    "required": false,
-    "colClass": "col-sm-6",
+    "required": true,
+    "colClass": "col-sm-4",
+    "multiple": false,
     "order": 5
   },
   {
     "type": "dropdown",
-    "name": "tax",
-    "label": "Tax",
+    "name": "payee_id",
+    "label": "PAYEE",
     "options": [],
     "required": true,
-    "defaultValue": "tax1",
+    "colClass": "col-sm-4",
     "multiple": false,
-    "colClass": "col-sm-6",
     "order": 6
-  }
+  },
+  {
+    "type": "dropdown",
+    "name": "tax_id",
+    "label": "TAX",
+    "options": [],
+    "required": true,
+    "colClass": "col-sm-4",
+    "multiple": false,
+    "order": 7
+  },
+  {
+    "type": "dropdown",
+    "name": "contact_id",
+    "label": "THRID_PARTY",
+    "options": [],
+    "required": false,
+    "colClass": "col-sm-4",
+    "multiple": false,
+    "order": 8
+  }  
 ];

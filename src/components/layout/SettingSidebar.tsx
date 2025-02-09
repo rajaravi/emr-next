@@ -75,6 +75,12 @@ const SettingSidebar : React.FC = () => {
             <i className="fi fi-rr-calculator-math-tax"></i> {t('SETTING.SIDE_MENU.TAX')}
           </Link>
         </li>
+        <li className="nav-item">
+          <Link href={`/settings/rule`}
+            className={`nav-link ${activeLink === `/settings/rule` ? 'active' : ''}`}>
+            <i className="fi fi-rr-rules-alt"></i> {t('SETTING.SIDE_MENU.RULE')}
+          </Link>
+        </li>
         <hr />
         <li className="nav-item">
           <Link href={`/settings/speciality`}

@@ -5,12 +5,22 @@ import { Table, Button, Form, Container } from 'react-bootstrap';
 import styles from './_style.module.css';
 
 // Translation logic - start
-import { useTranslation } from 'next-i18next';
 import { GetStaticPaths, GetStaticProps } from 'next';
+import { useTranslation } from 'next-i18next';
 import { getI18nStaticProps } from '@/utils/services/getI18nStaticProps';
 import OffcanvasComponent from '@/components/core-components/OffcanvasComponent';
 import DynamicForm, { DynamicFormHandle } from '@/components/core-components/DynamicForm';
 import { typeaheadColumnConfig } from '@/types/patient';
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  const paths = [{
+    params: { id: '1' }
+  }];
+  return {
+    paths,
+    fallback: true, // or 'blocking'
+  };
+};
 
 export const getStaticProps: GetStaticProps = getI18nStaticProps();
 
