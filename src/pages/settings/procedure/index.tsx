@@ -34,7 +34,7 @@ const initialValue = {
     is_archive: 0
 };
 
-const Doctor: React.FC = () => {
+const Procedure: React.FC = () => {
   const { showLoading, hideLoading } = useLoading();
   const [show, setShow] = useState(false);
   const { t } = useTranslation('common');
@@ -418,4 +418,4 @@ const Doctor: React.FC = () => {
     </SettingLayout>
   );
 };
-export default Doctor;
+export default Procedure;

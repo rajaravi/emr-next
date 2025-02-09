@@ -79,8 +79,11 @@ const ENDPOINTS = {
     POST_TAX_ARCHIVE: `${BASE_API_URL}/tax/archive`,
     POST_TAX_STORE: `${BASE_API_URL}/tax/store`,
     POST_TAX_DEFAULT: `${BASE_API_URL}/tax/default`,
-    
-
+    POST_RULE_LIST: `${BASE_API_URL}/rule/index`,
+    POST_RULE_FORMDATA: `${BASE_API_URL}/rule/form-data`,
+    POST_RULE_DELETE: `${BASE_API_URL}/rule/delete`,
+    POST_RULE_STORE: `${BASE_API_URL}/rule/store`,
+    POST_RULE_GET_RULES: `${BASE_API_URL}/rule/get-rule-details`,
 
     POST_PATIENT_LIST: `${BASE_API_URL}/patient/index`,
     POST_PATIENT_FORMDATA: `${BASE_API_URL}/patient/form-data`,

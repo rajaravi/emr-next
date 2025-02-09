@@ -27,8 +27,6 @@ export const getStaticPaths: GetStaticPaths = async () => {
   // Hardcode some IDs
   const paths = [
     { params: { id: '1' } },
-    { params: { id: '2' } },
-    { params: { id: '3' } },
   ];
 
   return {
@@ -70,8 +68,9 @@ const Surgery: React.FC = () => {
   const columns: { name: string; class: string; field: string; format: string; }[] = [
     { name: t('PATIENT.SURGERY.SNO'), class: "col-sm-1", field: "sno", format:''},
     { name: t('PATIENT.SURGERY.DATE'), class: "col-sm-2", field: "date", format:'date'},
-    { name: t('PATIENT.SURGERY.DOCTOR'), class: "col-sm-3", field: "doctor.name", format:''},
-    { name: t('PATIENT.SURGERY.LOCATION'), class: "col-sm-4", field: "location.name", format:''},
+    { name: t('PATIENT.SURGERY.SLOT_TIME'), class: "col-sm-2", field: "from_time - to_time", format:''},
+    { name: t('PATIENT.SURGERY.DOCTOR'), class: "col-sm-2", field: "doctor.name", format:''},
+    { name: t('PATIENT.SURGERY.LOCATION'), class: "col-sm-3", field: "location.name", format:''},
     { name: t('PATIENT.SURGERY.STATUS'), class: "col-sm-2", field: "status.description", format:''},    
   ];
   const filter: { name: string; field: string; }[] = [
@@ -120,7 +119,8 @@ const Surgery: React.FC = () => {
 
   useEffect(() => {   
     // Language apply for form label
-    const translatedFormElements = SurgeryFormElements.map((element) => ({
+    const filteredElements = SurgeryFormElements.filter((element) => element.name !== "patients");
+    const translatedFormElements = filteredElements.map((element) => ({
       ...element,
       label: t('PATIENT.SURGERY.'+element.label)
     })); 
@@ -349,7 +349,6 @@ const Surgery: React.FC = () => {
       updateProcedure[index] = {
         ...updateProcedure[index], [name]: value
       };
-
       const updatedFormData = { ...formData, surgery_details: updateProcedure };
       setFormData(updatedFormData);
     } else {

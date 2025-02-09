@@ -2,30 +2,26 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
 import { execute_axios_post } from '@/utils/services/httpService';
 import { Button, Row, Col, Dropdown } from 'react-bootstrap';
-import ENDPOINTS from '@/utils/constants/endpoints';
-import styles from './_style.module.css';
 import { GetStaticPaths, GetStaticProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { getI18nStaticProps } from '@/utils/services/getI18nStaticProps';
+import ENDPOINTS from '@/utils/constants/endpoints';
+import styles from './_style.module.css';
 import PatientLayout from '@/components/layout/PatientLayout';
 import Datalist from '@/components/core-components/Datalist';
 import SearchFilter from '@/components/core-components/SearchFilter';
 import { useLoading } from '@/context/LoadingContext';
 import { DynamicFormHandle } from '@/components/core-components/DynamicForm';
 import ToastNotification from '@/components/core-components/ToastNotification';
-
 import { uuidToId } from '@/utils/helpers/uuid';
 import AppointmentForm from './form';
 import { AppointmentFormElements } from '@/data/AppointmentFormElements';
 import { AppointmentModel } from '@/types/appointment';
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  // Hardcode some IDs
-  const paths = [
-    { params: { id: '1' } },
-    { params: { id: '2' } },
-    { params: { id: '3' } },
-  ];
+  const paths = [{
+    params: { id: '1' }
+  }];
   return {
     paths,
     fallback: true, // or 'blocking'
@@ -57,14 +53,14 @@ const Appointment: React.FC = () => {
   const { t } = useTranslation('common');
   const router = useRouter();
   const { id } = router.query;
-  const patientId = uuidToId(id);
+  const patientId = id ? uuidToId(id) : 0;
   
   const columns: { name: string; class: string; field: string; format?: string }[] = [
     { name: t('PATIENT.APPOINTMENT.SNO'), class: "col-sm-1", field: "sno"},
     { name: t('PATIENT.APPOINTMENT.DATE'), class: "col-sm-2", field: "date", format:'date'},
+    { name: t('PATIENT.APPOINTMENT.SLOT_TIME'), class: "col-sm-2", field: "from_time - to_time", format:''},
     { name: t('PATIENT.APPOINTMENT.APPOINTMENT_TYPE'), class: "col-sm-2", field: "appointment_type.name"},
-    { name: t('PATIENT.APPOINTMENT.DOCTOR'), class: "col-sm-2", field: "doctor.name"},
-    { name: t('PATIENT.APPOINTMENT.LOCATION'), class: "col-sm-3", field: "location.name"},
+    { name: t('PATIENT.APPOINTMENT.DOCTOR'), class: "col-sm-3", field: "doctor.name"},
     { name: t('PATIENT.APPOINTMENT.STATUS'), class: "col-sm-2", field: "status.description"}
   ];
 
@@ -118,23 +114,13 @@ const Appointment: React.FC = () => {
   // Onload function
   useEffect(() => {
     // Language apply for form label
-    // const translatedFormElements = AppointmentFormElements.map(elements => elements.filter(element => element.name !== 'patients'))
- 
-    const translatedFormElements = AppointmentFormElements.map((element) => {
-      // Ensure element exists and has a label before applying translation
-      console.log('c Name', element.type);
-      if (element.type !== "typeaheadDynamic") {
-        return {
-          ...element,
-          label: t(`PATIENT.APPOINTMENT.${element.label}`),
-        };
-      }
-      console.log('return element', element);
-      // Return element as is if condition is not met
-      return element;
+    const filteredElements = AppointmentFormElements.filter((element) => element.name !== "patients");
+    const translatedFormElements = filteredElements.map((element) => {
+      return {
+        ...element,
+        label: t(`PATIENT.APPOINTMENT.${element.label}`),
+      };
     });
-
-    // console.log('translatedFormElements Raj', translatedFormElements, 'subhu', AppointmentFormElements);
     setTranslatedElements(translatedFormElements);
     fetchAppointmentList(page);
     var today = new Date();
@@ -143,7 +129,6 @@ const Appointment: React.FC = () => {
     var yyyy = today.getFullYear();  
     setAppdate(yyyy+'-'+mm+'-'+dd);  
   }, []);
-
 
   // Get doctor list
   const fetchAppointmentList = async (page: number, sFilter?: { field: string; text: string }) => {
@@ -379,9 +364,12 @@ const Appointment: React.FC = () => {
   }
 
   // Save button handler
-  const handleSave = async () => {
+  const handleSave = async () => {    
+    if(activeIndex === -1 && formData.id === null) {
+      handleShowToast(t('PATIENT.APPOINTMENT.MESSAGES.CHOOSE_SLOT'), 'danger');
+      return false;
+    }
     showLoading();
-    console.log('formData', formData)
     // Implement your save logic here
     if (dynamicFormRefApp.current?.validateModelForm()) {
       try {
@@ -407,7 +395,6 @@ const Appointment: React.FC = () => {
   };
   
   const handleTypeaheadInputChange = async (name: string, selected: any, label: string, isClicked: any = false) => {
-    // console.log("🚀 ~ handleTypeaheadInputChange ~ isClicked:", name, selected,isClicked);
     if ( ! isClicked) {
       if (name.length >= 3) {
         showLoading();

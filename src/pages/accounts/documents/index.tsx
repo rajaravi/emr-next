@@ -4,8 +4,6 @@ import { useRouter } from 'next/router';
 import dynamic from 'next/dynamic'
 import AccountLayout from '@/components/layout/AccountLayout';
 import ModalPopUp from '@/components/core-components/ModalPopUp';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCheck, faClose, faPlus } from '@fortawesome/free-solid-svg-icons';
 
 // Translation logic - start
 import { GetStaticPaths, GetStaticProps } from 'next';
@@ -15,8 +13,6 @@ import { useLoading } from '@/context/LoadingContext';
 
 export const getStaticProps: GetStaticProps = getI18nStaticProps();
 // Translation logic - end
-
-const CustomEditor3 = dynamic(() => import( '@/components/core-components/CKEditorComponent' ), { ssr: false } );
 
 const Documents: React.FC = () => {
   const { showLoading, hideLoading } = useLoading();
@@ -59,7 +55,7 @@ const Documents: React.FC = () => {
             </h1>
             <div className={styles.buttonGroup}>
               <button className={`${styles.btn} btn btn-success`} onClick={handleShow}>
-                <FontAwesomeIcon icon={faPlus} /> Open Editor</button>
+                Open Editor</button>
             </div>
           </div>
         </div>
@@ -73,9 +69,9 @@ const Documents: React.FC = () => {
           footer={
             <>
               <button type="button" style={{ marginRight: '.5rem' }} className={`btn btn-success`}  onClick={handleOkEditor}>
-                <FontAwesomeIcon icon={faCheck} /> Save</button>
+                Save</button>
               <button type="button" className={`btn btn-warning`} onClick={handleCloseEditor}>
-                <FontAwesomeIcon icon={faClose} /> Cancel</button>
+                Cancel</button>
             </>
           }
         >
@@ -83,7 +79,6 @@ const Documents: React.FC = () => {
         <div className="container">
           <div className="row">
             <div className="col-md-12">
-              <CustomEditor3 initialData={editorData} onChange={setEditContent}/>
               <div>
                 <h3>Live Output</h3>
                 <div dangerouslySetInnerHTML={{ __html: editorData }} />

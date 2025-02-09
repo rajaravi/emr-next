@@ -1,11 +1,21 @@
 import React, { forwardRef, useRef, useImperativeHandle } from 'react';
 import { Row, Col } from 'react-bootstrap';
-import { GetStaticProps } from 'next';
+import { GetStaticPaths, GetStaticProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { getI18nStaticProps } from '@/utils/services/getI18nStaticProps';
 import DynamicForm, { DynamicFormHandle } from '@/components/core-components/DynamicForm';
 import OffcanvasComponent from '@/components/core-components/OffcanvasComponent';
 import { typeaheadColumnConfig } from '@/types/patient';
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  const paths = [{
+    params: { id: '1' }
+  }];
+  return {
+    paths,
+    fallback: true, // or 'blocking'
+  };
+};
 
 export const getStaticProps: GetStaticProps = getI18nStaticProps();
 

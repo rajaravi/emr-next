@@ -80,10 +80,12 @@
       "END_TIME": "End time",
       "NOTES": "Notes",
       "STATUS": "Status",
+      "SLOT_TIME": "Slot Time",
       "BOOKED_TIME_SLOT": "Booked Time Slot",
       "AVAILABLE_TIME_SLOTS": "Available Time Slots",
       "MESSAGES": {
-        "SAVE_SUCCESS": "Appointment saved successfully!"
+        "SAVE_SUCCESS": "Appointment saved successfully!",
+        "CHOOSE_SLOT": "Please choose the Slot time"
       }   
     },
     "SURGERY":{
@@ -98,6 +100,7 @@
       "DATE": "Date",
       "FROM_TIME": "Start time",
       "TO_TIME": "End time",
+      "SLOT_TIME": "Slot Time",
       "ADMISSION_DATE": "Admission Date",
       "DISCHARGE_DATE": "Discharge Date",
       "DISCHARGE_TIME": "Discharge Time",
@@ -163,7 +166,8 @@
       "TEMPLATE": "Template",
       "CONSULTANT_HOURS": "Consultant Hours",
       "INCOME_CATEGORY": "Income Category",
-      "TAX": "Tax"
+      "TAX": "Tax",
+      "RULE": "Rule"
     },
     "DOCTOR": {
       "CREATE_TITLE": "Create Doctor",
@@ -381,6 +385,19 @@
       "DEFAULT": "Default",
       "MESSAGES": {
         "SAVE_SUCCESS": "Tax saved successfully!"
+      }
+    },
+    "RULE": {
+      "CREATE_TITLE": "Create Rule",
+      "EDIT_TITLE": "Edit Rule",
+      "SNO": "S.No",
+      "NAME": "Name",
+      "MODULE": "Module",
+      "ARCHIVE": "Archive",
+      "CONDITIONS": "Conditions",
+      "ACTIONS": "Actions",
+      "MESSAGES": {
+        "SAVE_SUCCESS": "Rule saved successfully!"
       }
     },
     "MESSAGES": {
