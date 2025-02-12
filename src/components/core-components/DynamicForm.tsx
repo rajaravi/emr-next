@@ -153,7 +153,7 @@ const DynamicForm = forwardRef<DynamicFormHandle, DynamicFormProps> (({
             name: field.name,
             required: field.required,
             // onChange: handleChange,
-            value: formValues[field.name] || '',
+            value: formValues?.[field.name] || '',
             error: formErrors[field.name],
           };
 

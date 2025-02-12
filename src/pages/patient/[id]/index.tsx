@@ -5,7 +5,7 @@ import { encrypt } from '@/utils/helpers/crypto';
 import { uuidToId } from '@/utils/helpers/uuid';
 
 // Translation logic - start
-import { GetStaticPaths, GetStaticProps } from 'next';
+import { GetServerSideProps, GetStaticPaths, GetStaticProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { getI18nStaticProps } from '@/utils/services/getI18nStaticProps';
 import { ParsedUrlQuery } from 'querystring';
@@ -13,55 +13,38 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 interface PatientProps {
   id: string;
 }
-interface Params extends ParsedUrlQuery {
-  id: string; // Define that id will always be a string
-}
 
-const validIds = ['1', '2', '3', '4', '5', '6'];
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const { id } = context.params as { id: string };
+  
+  // Convert UUID to numeric ID
+  const patientId = uuidToId(id)?.toString();
 
-// export const getStaticProps: GetStaticProps = getI18nStaticProps();
-export const getStaticPaths: GetStaticPaths = async () => {
-  const paths = validIds.map((id) => ({
-    params: { id },
-  }));
-
-  return {
-    paths,
-    fallback: 'blocking',
-  };
-};
-// Translation logic - end
-
-export const getStaticProps: GetStaticProps = async (context) => {
-  const { id } = context.params as Params;
-  const patientId = uuidToId(id);
-
-  // Check for valid ID
-  if (!validIds.includes(patientId+'')) {
-    // return {
-    //   notFound: true, // Return a 404 if the ID is invalid
-    // };
+  // Check if patient ID is valid
+  if (!patientId) {
     return {
-      redirect: {
-        destination: '/_error', // Replace with your specific page path
-        permanent: false, // Set to true if you want a permanent redirect (301)
-      },
+      notFound: true, // Show a 404 page
     };
   }
 
+  // Fetch patient data (Replace with real API/database call)
+  // const patientExists = await getPatientById(patientId); 
+
+  // if (!patientExists) {
+  //   return { notFound: true }; // Show 404 if patient doesn't exist
+  // }
+
   return {
     props: {
-      ...(await serverSideTranslations(context.locale || 'en', ['common'])), // Load translations for 'common'
+      ...(await serverSideTranslations(context.locale || 'en', ['common'])), // Load translations
       id,
+      patientId
     },
   };
 };
 
-const PatientIndex: React.FC<PatientProps> = () => {
-  const router = useRouter();
+const PatientIndex: React.FC<PatientProps & { patientId: string }> = ({ id, patientId }) => {
   const { t } = useTranslation('common');
-  const { id } = router.query;
-  const patientId = uuidToId(id);
 
   return (
     <PatientLayout patientId={id as string}>

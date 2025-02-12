@@ -7,33 +7,35 @@ import { useRouter } from 'next/router';
 import { uuidToId } from '@/utils/helpers/uuid';
 
 // Translation logic - start
-import { GetStaticPaths, GetStaticProps } from 'next';
-import { useTranslation } from 'next-i18next';
-import { getI18nStaticProps } from '@/utils/services/getI18nStaticProps';
+import { GetServerSideProps, GetStaticPaths, GetStaticProps } from 'next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
-export const getStaticProps: GetStaticProps = getI18nStaticProps();
-export const getStaticPaths: GetStaticPaths = async () => {
-  // get patient IDs
-  const paths = [
-    { params: { id: '1' } },
-    { params: { id: '2' } },
-    { params: { id: '3' } },
-  ];
+interface PatientDetailsProps {
+  id: string;
+}
 
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const { id } = context.params as { id: string };
+  console.log("🚀 ~ constgetServerSideProps:GetServerSideProps= ~ id:", id)
+  // const patientId = uuidToId(id)?.toString(); // Ensure it's always a string
+
+  if (!id) {
+    return {
+      notFound: true, // Show 404 if patient ID is invalid
+    };
+  }
+  
   return {
-    paths,
-    fallback: true, // or 'blocking'
+    props: {
+      ...(await serverSideTranslations(context.locale || 'en', ['common'])), // Ensure 'common' namespace exists
+      id: id, // Pass a valid string
+    },
   };
 };
-// Translation logic - end
 
 const PatientDetailsComponent = React.lazy(() => import('./patient-details'));
 
-const PatientDetailsIndex = () => {
-  const { t } = useTranslation('common');
-  const router = useRouter();
-  const { id } = router.query;
-  const patientId = uuidToId(id);
+const PatientDetailsIndex: React.FC<PatientDetailsProps> = ({ id }) => {
   
   return (
     // <Suspense fallback={<Skeleton />}>

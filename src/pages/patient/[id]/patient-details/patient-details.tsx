@@ -83,13 +83,14 @@ const PatientDetails: React.FC<PatientDetailsProps> = ({ patientId }) => {
   // };
 
   useEffect(() => {
+    if (!patientId) return;
      // Language apply for form label
     const translatedFormElements = PatientFormElements.map((element) => ({
       ...element,
       label: t('PATIENT.DETAILS.'+element.label)
     }));
     
-    const fetchInitialValues = async () => {
+    const fetchPatientDetails = async () => {
       try {
         let passData: any = { id: uuidToId(patientId) };
         const response = await execute_axios_post(ENDPOINTS.POST_PATIENT_FORMDATA, passData);
@@ -141,11 +142,12 @@ const PatientDetails: React.FC<PatientDetailsProps> = ({ patientId }) => {
         setLoading(false);
       }
     };
-    const timer = setTimeout(() => {
-      fetchInitialValues();
-    }, 1000); // Delay to demonstrate Suspense
-    return () => clearTimeout(timer);
-  }, []);  
+    fetchPatientDetails();
+    // const timer = setTimeout(() => {
+    //   fetchInitialValues();
+    // }, 1000); // Delay to demonstrate Suspense
+    // return () => clearTimeout(timer);
+  }, [patientId, t]);  
 
   const handleUpdate = async (formData: any) => {
     try {
