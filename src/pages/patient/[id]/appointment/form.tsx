@@ -1,23 +1,26 @@
 import React, { forwardRef, useRef, useImperativeHandle } from 'react';
 import { Row, Col } from 'react-bootstrap';
-import { GetStaticPaths, GetStaticProps } from 'next';
+import { GetServerSideProps } from 'next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useTranslation } from 'next-i18next';
-import { getI18nStaticProps } from '@/utils/services/getI18nStaticProps';
 import DynamicForm, { DynamicFormHandle } from '@/components/core-components/DynamicForm';
 import OffcanvasComponent from '@/components/core-components/OffcanvasComponent';
 import { typeaheadColumnConfig } from '@/types/patient';
 
-export const getStaticPaths: GetStaticPaths = async () => {
-  const paths = [{
-    params: { id: '1' }
-  }];
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const { id } = context.params as { id: string };
+  if (!id) {
+    return {
+      notFound: true, // Show 404 if patient ID is invalid
+    };
+  }
   return {
-    paths,
-    fallback: true, // or 'blocking'
+    props: {
+      ...(await serverSideTranslations(context.locale || 'en', ['common'])), // Ensure 'common' namespace exists
+      id: id, // Pass a valid string
+    },
   };
 };
-
-export const getStaticProps: GetStaticProps = getI18nStaticProps();
 
 interface AppointmentProps {
   formLabels: [];

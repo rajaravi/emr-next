@@ -6,9 +6,9 @@ import ENDPOINTS from '@/utils/constants/endpoints';
 import styles from './_style.module.css';
 
 // Translation logic - start
+import { GetServerSideProps } from 'next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useTranslation } from 'next-i18next';
-import { GetStaticPaths, GetStaticProps } from 'next';
-import { getI18nStaticProps } from '@/utils/services/getI18nStaticProps';
 import { uuidToId } from '@/utils/helpers/uuid';
 import PatientLayout from '@/components/layout/PatientLayout';
 import Datalist from '@/components/core-components/Datalist';
@@ -23,19 +23,20 @@ import SurgeryForm from './form';
 let pageLimit: number = 6;
 let selectedID: number = 0;
 
-export const getStaticPaths: GetStaticPaths = async () => {
-  // Hardcode some IDs
-  const paths = [
-    { params: { id: '1' } },
-  ];
-
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const { id } = context.params as { id: string };
+  if (!id) {
+    return {
+      notFound: true, // Show 404 if patient ID is invalid
+    };
+  }
   return {
-    paths,
-    fallback: true, // or 'blocking'
+    props: {
+      ...(await serverSideTranslations(context.locale || 'en', ['common'])), // Ensure 'common' namespace exists
+      id: id, // Pass a valid string
+    },
   };
 };
-
-export const getStaticProps: GetStaticProps = getI18nStaticProps();
 
 const initialValue = {  
   patient_id: 0,

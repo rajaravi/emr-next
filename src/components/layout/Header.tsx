@@ -21,7 +21,7 @@ const Header: React.FC = () => {
   return (
     <nav className={`navbar navbar-expand-lg ${styles.navbar} fixed-top`}>
       <div className="container-fluid">
-        <a className={`navbar-brand ${styles.navbarBrand}`} href="#"><img src='https://acumensoftwares.com/img/vard-logo.png' alt="VARD" height="50" /></a>
+        <a className={`navbar-brand ${styles.navbarBrand}`} href="#"><img src='https://acumensoftwares.com/img/emr-logo.png' alt="EMR" height="65" /></a>
         <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
           <span className="navbar-toggler-icon"></span>
         </button>        

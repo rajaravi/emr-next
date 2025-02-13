@@ -21,9 +21,9 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmit, errVal }) => {
 
   return (
     <Container fluid className="d-flex vh-100 login-bg">
-      <div className={`${styles.loginContainer} w-100`} style={{ maxWidth: '400px' }}>
+      <div className={`${styles.loginContainer} w-100`} style={{ maxWidth: '360px', padding: '15px' }}>
         <div className={`${styles.header} mb-4`}>
-          <img src='https://acumensoftwares.com/img/vard-logo.png' alt="VARD" height="50" />
+          <img src='https://acumensoftwares.com/img/emr-logo.png' alt="EMR" height="100" />
         </div>
         {errVal && <Alert variant="danger" className="mb-3">{errVal}</Alert>}
         <form className={styles.form} onSubmit={handleSubmit}>

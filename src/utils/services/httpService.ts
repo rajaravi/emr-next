@@ -2,7 +2,7 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 
 // Base URL for your API
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost/emr-backend-l11/public/api';
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://140.245.29.170/backend/public/api';
 let token = null;
 if (typeof window !== 'undefined') {
   token = localStorage.getItem('authKey');

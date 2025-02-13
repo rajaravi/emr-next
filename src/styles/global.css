@@ -90,7 +90,7 @@ h6 {
   background: #555; 
 }
 .sidebar .nav-item > .nav-link.active{
-  background-color: #E5FFFF;
+  background-color: #4ec100;
 }
 .sidebar .nav-link {
   color: #333;
@@ -167,7 +167,7 @@ h6 {
   padding: 0;
 }
 .nav-pills .nav-link.active, .nav-pills .show>.nav-link {  
-  color: #004EFF;
+  color: #fff;
 }
 html, body, #__next {
     height: 100%;
@@ -615,7 +615,7 @@ ul.timeSlots li {
   font-size: 1.1rem;
 }
 .login-bg {
-  background-image: url(../../public/vard-emr-login.png);
+  background-image: url(../../public/emr-login-bg.jpg);
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;

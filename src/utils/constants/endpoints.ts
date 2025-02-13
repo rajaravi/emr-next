@@ -1,4 +1,4 @@
-const BASE_API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost/emr-backend-l11/public/api';
+const BASE_API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://140.245.29.170/backend/public/api';
 
 const ENDPOINTS = {
     // GET METHODS
