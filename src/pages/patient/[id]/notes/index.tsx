@@ -20,27 +20,27 @@ import { idToUuid } from '@/utils/helpers/uuid';
 import { EMR_CONFIG } from '@/utils/constants/config'
 
 // Translation logic - start
-import { GetStaticPaths, GetStaticProps } from 'next';
+import { GetServerSideProps } from 'next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useTranslation } from 'next-i18next';
-import { getI18nStaticProps } from '@/utils/services/getI18nStaticProps';
 import OffcanvasComponent from '@/components/core-components/OffcanvasComponent';
 import { NotesFormElements } from '@/data/NotesFormElements';
 import ToastNotification from '@/components/core-components/ToastNotification';
 import { useLoading } from '@/context/LoadingContext';
 
 
-export const getStaticProps: GetStaticProps = getI18nStaticProps();
-export const getStaticPaths: GetStaticPaths = async () => {
-  // Hardcode some IDs
-  const paths = [
-    { params: { id: '1' } },
-    { params: { id: '2' } },
-    { params: { id: '3' } },
-  ];
-
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const { id } = context.params as { id: string };
+  if (!id) {
+    return {
+      notFound: true, // Show 404 if patient ID is invalid
+    };
+  }
   return {
-    paths,
-    fallback: true, // or 'blocking'
+    props: {
+      ...(await serverSideTranslations(context.locale || 'en', ['common'])), // Ensure 'common' namespace exists
+      id: id, // Pass a valid string
+    },
   };
 };
 // Translation logic - end

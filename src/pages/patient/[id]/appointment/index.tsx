@@ -2,9 +2,10 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
 import { execute_axios_post } from '@/utils/services/httpService';
 import { Button, Row, Col, Dropdown } from 'react-bootstrap';
-import { GetStaticPaths, GetStaticProps } from 'next';
+// Translation logic - start
+import { GetServerSideProps } from 'next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useTranslation } from 'next-i18next';
-import { getI18nStaticProps } from '@/utils/services/getI18nStaticProps';
 import ENDPOINTS from '@/utils/constants/endpoints';
 import styles from './_style.module.css';
 import PatientLayout from '@/components/layout/PatientLayout';
@@ -18,17 +19,20 @@ import AppointmentForm from './form';
 import { AppointmentFormElements } from '@/data/AppointmentFormElements';
 import { AppointmentModel } from '@/types/appointment';
 
-export const getStaticPaths: GetStaticPaths = async () => {
-  const paths = [{
-    params: { id: '1' }
-  }];
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const { id } = context.params as { id: string };
+  if (!id) {
+    return {
+      notFound: true, // Show 404 if patient ID is invalid
+    };
+  }
   return {
-    paths,
-    fallback: true, // or 'blocking'
+    props: {
+      ...(await serverSideTranslations(context.locale || 'en', ['common'])), // Ensure 'common' namespace exists
+      id: id, // Pass a valid string
+    },
   };
 };
-
-export const getStaticProps: GetStaticProps = getI18nStaticProps();
 
 let pageLimit: number = 6;
 let selectedID: number = 0;

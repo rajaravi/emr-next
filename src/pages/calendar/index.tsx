@@ -543,6 +543,10 @@ const Calendar = () => {
 
   // Save button handler
   const handleSaveAppointment = async () => {
+    if(activeIndex === -1 && formDataApp.id === null) {
+      handleShowToast(t('PATIENT.APPOINTMENT.MESSAGES.CHOOSE_SLOT'), 'danger');
+      return false;
+    }
     showLoading();
     // Implement your save logic here
     if (dynamicFormRefApp.current?.validateModelForm()) {
