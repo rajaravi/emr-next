@@ -18,6 +18,11 @@ import { uuidToId } from '@/utils/helpers/uuid';
 import AppointmentForm from './form';
 import { AppointmentFormElements } from '@/data/AppointmentFormElements';
 import { AppointmentModel } from '@/types/appointment';
+import useAppointments from '@/hooks/useAppointments';
+
+interface PatientDetailsProps {
+  id: string,
+}
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { id } = context.params as { id: string };
@@ -52,11 +57,11 @@ const initialValue = {
   status_id: 0
 };
 
-const Appointment: React.FC = () => {
+const Appointment: React.FC<PatientDetailsProps> = ({ id }) => {
   const { showLoading, hideLoading } = useLoading();
   const { t } = useTranslation('common');
-  const router = useRouter();
-  const { id } = router.query;
+  // const router = useRouter();
+  // const { id } = router.query;
   const patientId = id ? uuidToId(id) : 0;
   
   const columns: { name: string; class: string; field: string; format?: string }[] = [
@@ -74,8 +79,8 @@ const Appointment: React.FC = () => {
 
   const [show, setShow] = useState(false);
   const dynamicFormRefApp = useRef<DynamicFormHandle>(null);
-  const [page, setPage] = useState<number>(1);  
-  const [total, setTotal] = useState<number>(0);  
+  const [page, setPage] = useState<number>(1);
+  const [total, setTotal] = useState<number>(0);
   const [mode, setMode] = useState<boolean>(false);
   const [clear, setClear] = useState<boolean>(false);  
   const [list, setList] = useState<any>([]);
@@ -115,6 +120,26 @@ const Appointment: React.FC = () => {
   };
 
   const [formData, setFormData] = useState<AppointmentModel>(initialFormData);
+  
+  if (patientId) {
+    const { appointments, total, loading, setPage, setSearchFilter } = useAppointments(patientId);
+    console.log("🚀 ~ in line 126 -> patientId:", patientId, appointments, total, loading)
+
+    useEffect(() => {
+      if (appointments && appointments.length > 0) {
+        setList(appointments); 
+        setTotal(total);
+      }
+    }, [appointments]);
+
+    if (loading) {
+      showLoading();
+    } else {
+      hideLoading()
+    }
+  }
+
+
   // Onload function
   useEffect(() => {
     // Language apply for form label
@@ -126,7 +151,8 @@ const Appointment: React.FC = () => {
       };
     });
     setTranslatedElements(translatedFormElements);
-    fetchAppointmentList(page);
+
+    // fetchAppointmentList(page);
     var today = new Date();
     var dd = String(today.getDate()).padStart(2, '0');
     var mm = String(today.getMonth() + 1).padStart(2, '0');
@@ -140,8 +166,8 @@ const Appointment: React.FC = () => {
     try {
       let passData: string = JSON.stringify({ page: page, limit: pageLimit, sort: null, search: sFilter, patient_id: uuidToId(id) });
       const response = await execute_axios_post(ENDPOINTS.POST_APPOINTMENT_LIST, passData);
-      setList(response.data.list);
-      setTotal(response.data.total);
+      // setList(response.data.list);
+      // setTotal(response.data.total);
     } catch (err) {
       setError('Failed to load doctor data.');
     } finally {
@@ -157,9 +183,23 @@ const Appointment: React.FC = () => {
         field: (document.getElementById('searchType') as HTMLSelectElement).value,
         text: searchTextElement.value
       }
-      setPage(1);
-      setsearchFilter(sFilter);
-      fetchAppointmentList(1,sFilter);
+
+      // setPage(1);
+      // setsearchFilter(sFilter);
+      // fetchAppointmentList(1,sFilter);
+
+      if (patientId) {
+        const { appointments, total, loading, setPage, setSearchFilter } = useAppointments(patientId);
+        setSearchFilter(sFilter);
+        setPage(1);
+        if (loading) {
+          showLoading();
+        } else {
+          hideLoading()
+        }
+        setList(appointments);
+        setTotal(total);
+      }
       setClear(true);
     }
   }
@@ -167,8 +207,25 @@ const Appointment: React.FC = () => {
   // Clear button call
   const clearSearch = () => {
     (document.getElementById('searchText') as HTMLInputElement).value = '';
-    setsearchFilter([]);
-    fetchAppointmentList(1);
+    
+    // setsearchFilter([]);
+    // fetchAppointmentList(1);
+
+    if (patientId) {
+      const { appointments, total, loading, setPage, setSearchFilter } = useAppointments(patientId);
+      setSearchFilter({
+        field: (document.getElementById('searchType') as HTMLSelectElement).value,
+        text: ''
+      });
+      setPage(1);
+      if (loading) {
+        showLoading();
+      } else {
+        hideLoading()
+      }
+      setList(appointments);
+      setTotal(total);
+    }
     setClear(false);
   }
 
@@ -246,8 +303,25 @@ const Appointment: React.FC = () => {
       row.classList.remove('selected');
     })
     setSelectedAppointment(0);
-    setPage(currentPage);
-    fetchAppointmentList(currentPage, searchFilter);
+    
+    // setPage(currentPage);
+    // fetchAppointmentList(currentPage, searchFilter);
+
+    if (patientId) {
+      const { appointments, total, loading, setPage, setSearchFilter } = useAppointments(patientId);
+      setSearchFilter({
+        field: (document.getElementById('searchType') as HTMLSelectElement).value,
+        text: ''
+      });
+      if (loading) {
+        showLoading();
+      } else {
+        hideLoading()
+      }
+      setPage(currentPage);
+      setList(appointments);
+      setTotal(total);
+    }
   }
  
   // Toast message call
