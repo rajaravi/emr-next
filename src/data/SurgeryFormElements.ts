@@ -44,7 +44,7 @@ export const SurgeryFormElements: FormField[] = [
     "type": "date",
     "name": "date",
     "label": "DATE",
-    "required": true,
+    "required": false,
     "disablePrevDate": true,
     "disableFutureDate": false,
     "colClass": "col-sm-4",

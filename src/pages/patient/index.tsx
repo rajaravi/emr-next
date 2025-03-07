@@ -146,7 +146,7 @@ const PatientIndex: React.FC = () => {
     <>
     <div className="container-fluid pt-60">
       <div className="d-flex justify-content-between align-items-center">
-        <h1 className={`${styles.title} my-3`}>{t('MENU.MENU_PATIENT')}</h1>
+        <h1 className={`${styles.title} my-3 module-title`}><i className="fi fi-bs-user-injured"></i> {t('MENU.MENU_PATIENT')}</h1>
       </div>
       <Row className="white-bg p-1 m-0 top-bottom-shadow">
         <Col xs={8} className="mt-3 action">

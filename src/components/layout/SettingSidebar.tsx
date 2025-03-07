@@ -64,9 +64,21 @@ const SettingSidebar : React.FC = () => {
           </Link>
         </li>
         <li className="nav-item">
-          <Link href={`/settings/income-category`}
-            className={`nav-link ${activeLink === `/settings/income-category` ? 'active' : ''}`}>
-            <i className="fi fi-rs-category-alt"></i> {t('SETTING.SIDE_MENU.INCOME_CATEGORY')}
+          <Link href={`/settings/income-tag`}
+            className={`nav-link ${activeLink === `/settings/income-tag` ? 'active' : ''}`}>
+            <i className="fi fi-rs-category-alt"></i> {t('SETTING.SIDE_MENU.INCOME_TAG')}
+          </Link>
+        </li>
+        <li className="nav-item">
+          <Link href={`/settings/payment-type`}
+            className={`nav-link ${activeLink === `/settings/payment-type` ? 'active' : ''}`}>
+            <i className="fi fi-rr-wallet-arrow"></i> {t('SETTING.SIDE_MENU.PAYMENT_TYPE')}
+          </Link>
+        </li>
+        <li className="nav-item">
+          <Link href={`/settings/payment-gateway`}
+            className={`nav-link ${activeLink === `/settings/payment-gateway` ? 'active' : ''}`}>
+            <i className="fi fi-brands-stripe"></i> {t('SETTING.SIDE_MENU.PAYMENT_GATEWAY')}
           </Link>
         </li>
         <li className="nav-item">
@@ -81,7 +93,6 @@ const SettingSidebar : React.FC = () => {
             <i className="fi fi-rr-rules-alt"></i> {t('SETTING.SIDE_MENU.RULE')}
           </Link>
         </li>
-        <hr />
         <li className="nav-item">
           <Link href={`/settings/speciality`}
             className={`nav-link ${activeLink === `/settings/speciality` ? 'active' : ''}`}>
@@ -110,6 +121,12 @@ const SettingSidebar : React.FC = () => {
           <Link href={`/settings/user`}
             className={`nav-link ${activeLink === `/settings/user` ? 'active' : ''}`}>
             <i className="fi fi-rr-users"></i> {t('SETTING.SIDE_MENU.USER')}
+          </Link>
+        </li>
+        <li className="nav-item d-none">
+          <Link href={`/settings/print-template`}
+            className={`nav-link ${activeLink === `/settings/print-template` ? 'active' : ''}`}>
+            <i className="fi fi-rr-users"></i> Print
           </Link>
         </li>
       </ul>

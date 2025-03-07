@@ -2,10 +2,9 @@
 
 .loginContainer {
     width: 300px;
-    margin: 10% 0 auto 30%;
+    margin: 24% auto 0;
     /* width: 100%; */
     max-width: 300px;
-    background: rgba(255, 255, 255, 0.75);
   }
   .header {
     border-bottom: 1px solid #e9ecef;
@@ -38,7 +37,7 @@
   .button {
     padding: 0.5rem;
     border: none;
-    background-color: #004eff;
+    background-color: #66d100;
     color: white;
     font-size: 16px;
     cursor: pointer;
@@ -46,6 +45,14 @@
   }
   
   .button:hover {
-    background-color: #004d9a;
+    background-color: #5cb804;
   }
-  
+  .login-right {
+    width: 50%;
+    display: flex;
+    position: absolute;
+    right: 0;
+    top: 0;
+    background: #ffffff;
+    height: 100%;
+  }

@@ -215,7 +215,7 @@ const Surgery: React.FC = () => {
     try {
       let editID = 0;
       if(type == 'edit') editID = selectedSurgery;
-      let passData: string = JSON.stringify({ id: editID });
+      let passData: string = JSON.stringify({ id: editID, patient_id: patientId });
       const response = await execute_axios_post(ENDPOINTS.POST_SURGERY_FORMDATA, passData);
       if(response.success) {        
         handleShow();
@@ -300,6 +300,7 @@ const Surgery: React.FC = () => {
     // Implement your save logic here
     if (dynamicFormRefSurg.current?.validateModelForm()) {
       try {
+        console.log('formData',formData);
           // Update patient ID
         if (formData.patients[0].value) {
           formData.patient_id = formData.patients[0].value
@@ -344,7 +345,7 @@ const Surgery: React.FC = () => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>, index?: number) => {
     setFormReset(false); // block form reset
     const { name, value } = e.target;
-
+    console.log()
     if (index !== undefined) {
       const updateProcedure = [...formData.surgery_details];
       updateProcedure[index] = {

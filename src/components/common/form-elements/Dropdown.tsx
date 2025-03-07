@@ -3,6 +3,7 @@ import React from 'react';
 interface DropdownOption {
   label: string;
   value: string;
+  customAttr?: string;
 }
 
 interface DropdownProps {
@@ -39,10 +40,11 @@ const Dropdown: React.FC<DropdownProps> = ({ label, name, options, required, val
         >
           {!multiple && <option value="">Select...</option>}
           {options.map((option, index) => (
-            <option key={index} value={option.value}>
+            <option key={index} value={option.value} data-custom={option.customAttr}>
               {option.label}
             </option>
           ))}
+          
         </select>
         {error && <div className="text-danger">{error}</div>}
       </div>

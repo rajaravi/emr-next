@@ -1,18 +1,35 @@
+interface ConditionalParameter {
+    name: string;
+    value: string;
+}
+interface RuleParameter {
+    name: string;
+    value: number;
+    conditional_parameters: ConditionalParameter[];
+}
 interface RuleAction {
     id: number | null;
-    rule_action_id: string;
-    is_user_input_required: boolean;
+    name: string;
+    identifier: string;
+    category: string;
+    value: string;
+    recipients: string;
+    is_user_interaction_required: boolean;
+    is_skippable: boolean;
+    parameters: RuleParameter[]
 }
 
 interface RuleCondition {
-    id: number | null;
-    global_condition_id: string;
-    rule_actions: RuleAction[];
+    id: number | null;    
+    field: string;
+    condition: string;
+    field_value: number;
 }
 
 export interface RuleModel {
     id?: number | null;
     name: string;
-    module_id: number;
+    module: string;
     rule_conditions: RuleCondition[];
+    rule_actions: RuleAction[];    
 }
