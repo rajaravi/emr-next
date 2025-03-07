@@ -3,6 +3,7 @@ import Link from 'next/link';
 // import { faUser, faCalendarAlt, faWallet, faInbox, faEllipsisH } from '@fortawesome/free-solid-svg-icons';
 import styles from './Header.module.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { InputGroup, Form, Button } from 'react-bootstrap';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
@@ -21,10 +22,18 @@ const Header: React.FC = () => {
   return (
     <nav className={`navbar navbar-expand-lg ${styles.navbar} fixed-top`}>
       <div className="container-fluid">
-        <a className={`navbar-brand ${styles.navbarBrand}`} href="#"><img src='https://acumensoftwares.com/img/emr-logo.png' alt="EMR" height="65" /></a>
+        <a className={`navbar-brand ${styles.navbarBrand}`} href="#"><img src='https://acumensoftwares.com/img/vard-logo.png' alt="Vard" height="65" /></a>
         <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
           <span className="navbar-toggler-icon"></span>
-        </button>        
+        </button>     
+        <div className='common-search'>
+          <InputGroup className="mb-0">
+            <Form.Control
+              placeholder="Global Search"
+            />
+            <Button className="btn rounded-0"><i className="fi fi-bs-search"></i></Button>
+          </InputGroup>
+        </div>   
         <div className="collapse navbar-collapse" id="navbarNav">
           <ul className="navbar-nav ms-auto mb-2 mb-lg-0">
             <li className="nav-item">

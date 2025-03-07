@@ -1,4 +1,4 @@
-const BASE_API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://140.245.29.170/backend/public/api';
+const BASE_API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost/emr-backend-l11/public/api';
 
 const ENDPOINTS = {
     // GET METHODS
@@ -12,10 +12,9 @@ const ENDPOINTS = {
     GET_PURCHASER_LIST: `${BASE_API_URL}/purchaser/get-list`,
     GET_DOCTOR_LIST: `${BASE_API_URL}/doctor/get-list`,
     GET_PURCHASER_TYPE_LIST: `${BASE_API_URL}/purchaser-type/get-list`,
-    GET_ENCOUNTER_LIST: `${BASE_API_URL}/encounter/get-list`,
-    GET_PROCEDURE_LIST: `${BASE_API_URL}/procedure/get-list`,    
 
-    // POST METHODS
+    // POST METHODS    
+    POST_DROPDOWN: `${BASE_API_URL}/dropdown`,
     POST_CREATE_PATIENT: `${BASE_API_URL}/store`,
     POST_DOCTOR_LIST: `${BASE_API_URL}/doctor/index`,
     POST_DOCTOR_FORMDATA: `${BASE_API_URL}/doctor/form-data`,
@@ -26,6 +25,7 @@ const ENDPOINTS = {
     POST_PATIENT_CATEGORY_ARCHIVE: `${BASE_API_URL}/patient-type/archive`,
     POST_PATIENT_CATEGORY_STORE: `${BASE_API_URL}/patient-type/store`,
     POST_PROCEDURE_LIST: `${BASE_API_URL}/procedure/index`,
+    POST_PROCEDURE_GETLIST: `${BASE_API_URL}/procedure/get-list`,
     POST_PROCEDURE_FORMDATA: `${BASE_API_URL}/procedure/form-data`,
     POST_PROCEDURE_ARCHIVE: `${BASE_API_URL}/procedure/archive`,
     POST_PROCEDURE_STORE: `${BASE_API_URL}/procedure/store`,
@@ -69,11 +69,11 @@ const ENDPOINTS = {
     POST_CONSULTANT_HOURS_FORMDATA: `${BASE_API_URL}/consultant-work-hour/form-data`,
     POST_CONSULTANT_HOURS_ARCHIVE: `${BASE_API_URL}/consultant-work-hour/archive`,
     POST_CONSULTANT_HOURS_STORE: `${BASE_API_URL}/consultant-work-hour/store`,
-    POST_INCOME_CATEGORY_LIST: `${BASE_API_URL}/category/index`,
-    POST_INCOME_CATEGORY_FORMDATA: `${BASE_API_URL}/category/form-data`,
-    POST_INCOME_CATEGORY_ARCHIVE: `${BASE_API_URL}/category/archive`,
-    POST_INCOME_CATEGORY_STORE: `${BASE_API_URL}/category/store`,
-    POST_INCOME_CATEGORY_DEFAULT: `${BASE_API_URL}/category/default`,
+    POST_CATEGORY_LIST: `${BASE_API_URL}/category/index`,
+    POST_CATEGORY_FORMDATA: `${BASE_API_URL}/category/form-data`,
+    POST_CATEGORY_ARCHIVE: `${BASE_API_URL}/category/archive`,
+    POST_CATEGORY_STORE: `${BASE_API_URL}/category/store`,
+    POST_CATEGORY_DEFAULT: `${BASE_API_URL}/category/default`,
     POST_TAX_LIST: `${BASE_API_URL}/tax/index`,
     POST_TAX_FORMDATA: `${BASE_API_URL}/tax/form-data`,
     POST_TAX_ARCHIVE: `${BASE_API_URL}/tax/archive`,
@@ -90,6 +90,21 @@ const ENDPOINTS = {
     POST_PATIENT_ARCHIVE: `${BASE_API_URL}/patient/archive`,
     POST_PATIENT_STORE: `${BASE_API_URL}/patient/store`,
     POST_PATIENT_GETLIST: `${BASE_API_URL}/patient/get-list`,
+    POST_ENCOUNTER_LIST: `${BASE_API_URL}/encounter/index`,
+    POST_ENCOUNTER_FORMDATA: `${BASE_API_URL}/encounter/form-data`,
+    POST_ENCOUNTER_STATUS: `${BASE_API_URL}/encounter/status`,
+    POST_ENCOUNTER_STORE: `${BASE_API_URL}/encounter/store`,
+    POST_ENCOUNTER_GETLIST: `${BASE_API_URL}/encounter/get-list`,
+    POST_LETTER_LIST: `${BASE_API_URL}/letter/index`,
+    POST_LETTER_FORMDATA: `${BASE_API_URL}/letter/form-data`,
+    POST_LETTER_STATUS: `${BASE_API_URL}/letter/status`,
+    POST_LETTER_STORE: `${BASE_API_URL}/letter/store`,
+    POST_LETTER_GETLIST: `${BASE_API_URL}/letter/get-list`,
+    POST_LETTER_GETCONTENT: `${BASE_API_URL}/letter/get-content`,
+    POST_SCAN_LIST: `${BASE_API_URL}/scan/index`,
+    POST_SCAN_FORMDATA: `${BASE_API_URL}/scan/form-data`,
+    POST_SCAN_STATUS: `${BASE_API_URL}/scan/status`,
+    POST_SCAN_STORE: `${BASE_API_URL}/scan/store`,
     
     POST_APPOINTMENT_LIST: `${BASE_API_URL}/appointment/index`,
     POST_APPOINTMENT_FORMDATA: `${BASE_API_URL}/appointment/form-data`,
@@ -106,9 +121,14 @@ const ENDPOINTS = {
     POST_SURGERY_STORE: `${BASE_API_URL}/surgery/store`,
 
     POST_INVOICE_LIST: `${BASE_API_URL}/invoice/index`,
+    POST_INVOICE_GETLIST: `${BASE_API_URL}/invoice/get-list`,
     POST_INVOICE_FORMDATA: `${BASE_API_URL}/invoice/form-data`,
     POST_INVOICE_ARCHIVE: `${BASE_API_URL}/invoice/archive`,
     POST_INVOICE_STORE: `${BASE_API_URL}/invoice/store`,
+    POST_RECEIPT_LIST: `${BASE_API_URL}/receipt/index`,
+    POST_RECEIPT_FORMDATA: `${BASE_API_URL}/receipt/form-data`,
+    POST_RECEIPT_ARCHIVE: `${BASE_API_URL}/receipt/archive`,
+    POST_RECEIPT_STORE: `${BASE_API_URL}/receipt/store`,
 
     
     // PATCH METHODS

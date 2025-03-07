@@ -28,12 +28,18 @@ const PatientSidebar: React.FC<PatientSidebarProps> = ({ patientId }) => {
           </Link>
         </li>
         <li className="nav-item">
+          <Link href={`/patient/${patientId}/encounter`}
+            className={`nav-link ${activeLink === `/patient/${patientId}/encounter` ? 'active' : ''}`}>
+            <i className="fi fi-br-layers"></i> {t('PATIENT.SIDE_MENU.ENCOUNTER')}            
+          </Link>
+        </li>
+        <li className="nav-item d-none">
           <Link href={`/patient/${patientId}/patient-history`}
             className={`nav-link ${activeLink === `/patient/${patientId}/patient-history` ? 'active' : ''}`}>
             <i className="fi fi-br-rectangle-vertical-history"></i> {t('PATIENT.SIDE_MENU.PATIENT_HISTORY')}            
           </Link>
         </li>
-        <li className="nav-item">
+        <li className="nav-item d-none">
           <Link href={`/patient/${patientId}/examination`}
             className={`nav-link ${activeLink === `/patient/${patientId}/examination` ? 'active' : ''}`}>
             <i className="fi fi-rr-mobile"></i> {t('PATIENT.SIDE_MENU.EXAMINATION')}
@@ -52,6 +58,19 @@ const PatientSidebar: React.FC<PatientSidebarProps> = ({ patientId }) => {
           </Link>
         </li>
         <li className="nav-item">
+          <Link href={`/patient/${patientId}/letter`}
+            className={`nav-link ${activeLink === `/patient/${patientId}/letter` ? 'active' : ''}`}>
+            <i className="fi fi-rr-envelope-open-text"></i> {t('PATIENT.SIDE_MENU.LETTERS')} <span>2</span>
+          </Link>
+        </li>
+
+        <li className="nav-item">
+          <Link href={`/patient/${patientId}/scan`}
+            className={`nav-link ${activeLink === `/patient/${patientId}/scan` ? 'active' : ''}`}>
+            <i className="fi fi-br-qr-scan"></i> {t('PATIENT.SIDE_MENU.SCAN_DOCS')} <span>1</span>
+          </Link>
+        </li>
+        <li className="nav-item">
           <Link href={`/patient/${patientId}/prescription`}
             className={`nav-link ${activeLink === `/patient/${patientId}/prescription` ? 'active' : ''}`}>
             <i className="fi fi-rr-file-prescription"></i> {t('PATIENT.SIDE_MENU.PRESCRIPTION')} <span>0</span>
@@ -63,13 +82,8 @@ const PatientSidebar: React.FC<PatientSidebarProps> = ({ patientId }) => {
             <i className="fi fi-rr-form"></i> {t('PATIENT.SIDE_MENU.FORMS')} <span>4</span>
           </Link>
         </li>
-        <li className="nav-item">
-          <Link href={`/patient/${patientId}/letter`}
-            className={`nav-link ${activeLink === `/patient/${patientId}/letter` ? 'active' : ''}`}>
-            <i className="fi fi-rr-envelope-open-text"></i> {t('PATIENT.SIDE_MENU.LETTERS')} <span>2</span>
-          </Link>
-        </li>
-        <li className="nav-item">
+        
+        <li className="nav-item d-none">
           <Link href={`/patient/${patientId}/scan`}
             className={`nav-link ${activeLink === `/patient/${patientId}/scan` ? 'active' : ''}`}>
             <i className="fi fi-rr-scanner-image"></i> {t('PATIENT.SIDE_MENU.SCAN_DOCS')} <span>1</span>

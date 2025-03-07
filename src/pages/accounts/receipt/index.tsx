@@ -17,7 +17,7 @@ const Receipt: React.FC = () => {
 
   return (
     <AccountLayout>
-      <h1><span className={styles.textColor}>{t('ACCOUNT.SIDE_MENU.RECEIPT')}</span></h1>
+      <h1 className="mb-3 module-title"><i className="fi fi-rr-receipt"></i> {t('ACCOUNT.SIDE_MENU.RECEIPT')}</h1>
       <p>This is the content for Receipt.</p>
     </AccountLayout>
   );

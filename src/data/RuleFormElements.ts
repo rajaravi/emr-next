@@ -10,15 +10,5 @@ export const RuleFormElements: FormField[] = [
     "validation": { "minLength": 2 },
     "colClass": "col-sm-6",
     "order": 1
-  },
-  {
-    "type": "dropdown",
-    "name": "module_id",
-    "label": "MODULE",
-    "options": [],
-    "required": true,
-    "multiple": false,
-    "colClass": "col-sm-6",
-    "order": 2
   }
 ];

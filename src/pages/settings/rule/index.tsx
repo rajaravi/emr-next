@@ -21,16 +21,39 @@ import { RuleModel } from '@/types/rule';
 let pageLimit: number = 8;
 let selectedID: number = 0;
 let archiveID: number = 0;
+let conditionArray: any = [];
+let resourceURL: any = [];
+let CommonType: any = [];
+let actionCategory: any = [];
+let ActionType: any = [];
+let actionURL: any = [];
+let targetOther: any = [];
 export const getStaticProps: GetStaticProps = getI18nStaticProps();
 
 const initialValue = {
   name: '',
-  module_id: 0,
+  module: '',  
   rule_conditions: [{
-    global_condition_id: '',
-    rule_actions: [{
-      rule_action_id: '',
-      is_user_input_required: false,
+    id: 0,
+    field: '',
+    condition: '',
+    field_value: 0,
+  }],    
+  rule_actions: [{
+    name: '',
+    identifier: '',
+    category: '',
+    value: '',
+    recipients: '',
+    is_user_interaction_required: false,
+    is_skippable: false,
+    parameters: [{
+      name: '',
+      value: 0,
+      conditional_parameters: [{
+        name: '',
+        value: ''
+      }]
     }]
   }]
 };
@@ -42,7 +65,7 @@ const Rule: React.FC = () => {
   const columns: { name: string; class: string; field: string; format: string; }[] = [
     { name: t('SETTING.RULE.SNO'), class: "col-sm-1", field: "sno", format: ""},
     { name: t('SETTING.RULE.NAME'), class: "col-sm-4", field: "name", format: ""},
-    { name: t('SETTING.RULE.MODULE'), class: "col-sm-4", field: "module.description", format: ""}
+    { name: t('SETTING.RULE.MODULE'), class: "col-sm-4", field: "module", format: ""}
   ];
   const filter: { name: string; field: string; }[] = [
     { name: t('SETTING.RULE.NAME'), field: 'name' }
@@ -57,9 +80,19 @@ const Rule: React.FC = () => {
   const [list, setList] = useState<any>([]);
   const [searchFilter, setsearchFilter] = useState<any>([]);
   const [initialValues, setInitialValues] = useState<any>(initialValue);
+  const [fieldList, setFieldList] = useState<any>([]);
   const [conditionList, setConditionList] = useState<any>([]);
+  const [resourceList, setResourceList] = useState<any>([]);
+  const [moduleList, setModuleList] = useState<any>([]);  
   const [actionList, setActionList] = useState<any>([]);
+  const [categoryList, setCategoryList] = useState<any>([]);
+  const [categoryValueList, setCategoryValueList] = useState<any>([]);
+  const [recipientsList, setRecipientsList] = useState<any>([]);  
+  const [identity, setIdentity] = useState<any>([]);
   const [translatedElements, setTranslatedElements] = useState<any>([]);
+  const [jsonData, setJsonData] = useState<any>([]);
+  const [ruleSchema, setRuleSchema] = useState<any>([]);
+
   const [error, setError] = useState<string | null>(null);
   const [errors, setErrors] = useState<string[]>([]);
   const [formReset, setFormReset] = useState(false);
@@ -70,14 +103,29 @@ const Rule: React.FC = () => {
   const initialFormData: RuleModel = {
     "id": null,
     "name": "",
-    "module_id": 0,
+    "module": "",  
     "rule_conditions": [{
-      "id": 0,
-      "global_condition_id": "",
-      "rule_actions": [{
-        "id": 0,
-        "rule_action_id": "",
-        "is_user_input_required": false,
+      "id": null,
+      "field": "",
+      "condition": "",
+      "field_value": 0,
+    }],    
+    "rule_actions": [{
+      "id": null,
+      "name": "",
+      "identifier": "",
+      "category": "",
+      "value": "",
+      "recipients": "",
+      "is_user_interaction_required": false,
+      "is_skippable": false,
+      "parameters": [{
+        "name": "",
+        "value": 0,
+        "conditional_parameters": [{
+          "name": "",
+          "value": ""
+        }]
       }]
     }]
   };
@@ -143,7 +191,6 @@ const Rule: React.FC = () => {
   const ruleDblClick = (event: any) => {
     let x = document.getElementsByClassName("selected");
     if(x.length > 0) { x[0].classList.remove("selected"); }
-
     if(event.target.parentNode.getAttribute('custom-id')) {
       selectedID = event.target.parentNode.getAttribute('custom-id');
       event.target.parentElement.setAttribute('class', 'row selected');
@@ -176,39 +223,65 @@ const Rule: React.FC = () => {
       return false;
     }
     getRuleById('edit');
-  }
+  }  
 
-  // Get module list
-  const fetchMoudleList = async (moduleID: string) => {
-    try {
-      let passData: string = JSON.stringify({ module_id: moduleID });
-      const response = await execute_axios_post(ENDPOINTS.POST_RULE_GET_RULES, passData);
-      setConditionList(response.data.conditions);
-      setActionList(response.data.actions);
-    } catch (err) {
-      setError('Failed to load purchaser data.');
-    }
-  }; 
-  
   // Function to handle form field changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>, index?: number) => {
-    setFormReset(false); // block form reset
+    setFormReset(false);
     const { name, value } = e.target;
-    if(name === 'module_id') {
-      fetchMoudleList(value);
+    if (name == 'module') {
+      let fields = new Array;
+      const selectedModule = ruleSchema.modules[value];
+      selectedModule.fields.map((rule: any, r: number) => {
+        fields.push({'label':rule.name, 'value': rule.field, 'res': rule.resource_uri});
+        conditionArray[rule.field] = rule.conditions;
+        resourceURL[rule.field] = rule.resource_uri;
+        CommonType[rule.field] = rule.common_data_reference;
+      })
+      setFieldList(fields);
+      let actions = new Array;
+      let params = new Array;
+      selectedModule.actions.map((act: any, a: number) => {
+        actions.push({'label':act.action, 'value': act.identifier });
+        act.parameters.map((param: any, p: number) => {          
+          actionCategory[act.action] = act.parameters;
+          params.push({'label': act.action, 'param': param.parameter_identifier, 'resource': param.resource_uri});
+        })        
+      })
+      const actionParams:any = [];
+        actions.forEach(item1 => {
+          const match = params.find(item2 => item2.label === item1.label);
+          actionParams.push({ ...item1, ...(match || {}) });
+      });      
+      setActionList(actionParams);
+      setCategoryList(actionCategory);
     }
-    if (index !== undefined) {
-      const updateCondition = [...formData.rule_conditions];
-      updateCondition[index] = {
-        ...updateCondition[index], [name]: value
-      };
-
-      const updatedFormData = { ...formData, rule_conditions: updateCondition };
-      setFormData(updatedFormData);
-    } else {
-      setFormData({ ...formData, [name]: value });
-    }
+    setFormData({ ...formData, [name]: value });
   };  
+
+  const getChildData = (obj: any) => {    
+    alert(obj.module);
+    let fields = new Array;
+    const selectedModule = ruleSchema.modules[obj.module];
+    selectedModule.fields.map((rule: any, r: number) => {
+      fields.push({'label':rule.name, 'value': rule.field, 'res': rule.resource_uri});
+      conditionArray[rule.field] = rule.conditions;
+      resourceURL[rule.field] = rule.resource_uri;
+      CommonType[rule.field] = rule.common_data_reference;
+    })
+    setFieldList(fields);
+    let actions = new Array;
+    selectedModule.actions.map((act: any, a: number) => {
+      actions.push({'label':act.action, 'value': act.identifier });
+      actionCategory[act.action] = act.parameters;
+      act.parameters.map((param: any, p: number) => {
+        actionURL[param.parameter_identifier] = param.resource_uri;
+        ActionType[param.parameter_identifier] = param.common_data_reference;
+      })        
+    })      
+    setActionList(actions);
+    // setCategoryValueList(actionCategory);
+  }
 
   // Get form data
   const getRuleById = async (type: string) => {
@@ -218,28 +291,28 @@ const Rule: React.FC = () => {
       let passData: string = JSON.stringify({ id: editID });
       const response = await execute_axios_post(ENDPOINTS.POST_RULE_FORMDATA, passData);
       if(response.success) {        
-        handleShow();
+        handleShow();        
+        setRuleSchema(response.data.rule_schema);
         if(response.data?.data?.id) {
           setMode(true);
-          fetchMoudleList(response.data.data.module_id);
+          // getChildData(response.data.data);
+          response.data.data.rule_actions.map((con: any, c: number) => {
+            setConditionList(conditionArray[con.field]);
+            let dropDownType = CommonType[con.field] ? CommonType[con.field] : '';
+            getResourceData(con.field, resourceURL[con.field], dropDownType);
+          })      
           setInitialValues(response.data.data);
           setFormData(response.data.data);
-          
         }
-        // Module options assign
-        let module = new Array;
-        if(response.data.rule_modules) {
-            response.data.rule_modules.map((rule: any, r: number) => {
-              module.push({'label':rule.description, 'value': rule.id});
+               
+        if(response.data.rule_schema) {
+          let getModules = Object.keys(response.data.rule_schema.modules);
+          let rule_module = new Array;
+          getModules.map((rule: any, r: number) => {
+            rule_module.push({'label':rule, 'value': rule});
           })
-        }
-        // Dynamic values options format
-        translatedElements.map((elements: any, k: number) => {
-          if(elements.name == 'module_id') {
-            elements.options = [];
-            elements.options = module;
-          }
-        })        
+          setModuleList(rule_module);
+        }    
       }
     } catch (error: any) {
         console.error('Error on fetching procedure details:', error);
@@ -254,23 +327,23 @@ const Rule: React.FC = () => {
       validationErrors.push("At least one rule condition is required.");
     }
 
-    formData.rule_conditions.forEach((condition, cIndex) => {
-      if (!condition.global_condition_id) {
-        validationErrors.push(`Condition ${cIndex + 1} must have a selected type.`);
-      }
+    // formData.rule_conditions.forEach((condition, cIndex) => {
+    //   if (!condition.global_condition_id) {
+    //     validationErrors.push(`Condition ${cIndex + 1} must have a selected type.`);
+    //   }
 
-      if (condition.rule_actions.length === 0) {
-        validationErrors.push(`Condition ${cIndex + 1} must have at least one action.`);
-      }
+    //   if (condition.rule_actions.length === 0) {
+    //     validationErrors.push(`Condition ${cIndex + 1} must have at least one action.`);
+    //   }
 
-      condition.rule_actions.forEach((action, aIndex) => {
-        if (!action.rule_action_id) {
-          validationErrors.push(
-            `Action ${aIndex + 1} in Condition ${cIndex + 1} must have a selected type.`
-          );
-        }
-      });
-    });
+    //   condition.rule_actions.forEach((action, aIndex) => {
+    //     if (!action.rule_action_id) {
+    //       validationErrors.push(
+    //         `Action ${aIndex + 1} in Condition ${cIndex + 1} must have a selected type.`
+    //       );
+    //     }
+    //   });
+    // });
 
     setErrors(validationErrors);
     return validationErrors.length === 0;
@@ -280,7 +353,6 @@ const Rule: React.FC = () => {
   const handleSave = async () => {
     showLoading();
     console.log('formData', formData);
-    // return;
     // Implement your save logic here
     if (dynamicFormRef.current?.validateModelForm() && validateForm()) {
       try {
@@ -350,10 +422,7 @@ const Rule: React.FC = () => {
   const addRuleCondition = () => {
     setFormData((prev) => ({
       ...prev,
-      rule_conditions: [
-        ...prev.rule_conditions,
-        { id: 0, global_condition_id: "", rule_actions: [] }, // Unique ID
-      ],
+      rule_conditions: [...prev.rule_conditions, { id: 0, field: "", conditions: "", field_value: "" }, ],
     }));
   };
 
@@ -365,90 +434,191 @@ const Rule: React.FC = () => {
     }));
   };
 
+  // Remove a rule condition row
+  const removeRuleAction = (actionIndex: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      rule_actions: prev.rule_actions.filter((_, index) => index !== actionIndex),
+    }));
+  }; 
+
   // Add a new rule action row inside a condition
-  const addRuleAction = (conditionIndex: number) => {
+  const addRuleAction = () => {
+    setFormData((prev) => ({
+      ...prev,
+      rule_actions: [...prev.rule_actions, { id: 0, name: '',
+        identifier: '',
+        category: '',
+        value: '',
+        recipients: '',
+        is_user_interaction_required: false,
+        is_skippable: false,
+        parameters: [{
+          name: '',
+          value: 0,
+          conditional_parameters: [{
+            name: '',
+            value: ''
+          }]
+        }]  }, ],
+    }));
+  };
+
+  const handleFieldChange = (cIndex: number, e: any) => {
+    setConditionList(conditionArray[e.target.value]);
+    let dropDownType = CommonType[e.target.value] ? CommonType[e.target.value] : '';
+    getResourceData(e.target.value, resourceURL[e.target.value], dropDownType);
     setFormData((prev) => ({
       ...prev,
       rule_conditions: prev.rule_conditions.map((condition, index) =>
-        index === conditionIndex
-          ? {
-              ...condition,
-              rule_actions: [
-                ...condition.rule_actions,
-                { id: 0, rule_action_id: "", is_user_input_required: false }, // Unique ID
-              ],
-            }
-          : condition
+        index === cIndex ? { ...condition, field: e.target.value, condition: "", field_value: 0 } : condition
       ),
     }));
   };
 
-  // Remove a rule action row
-  const removeRuleAction = (conditionIndex: number, actionIndex: number) => {
+  const handleConditionChange = (cIndex: number, e: any) => {
     setFormData((prev) => ({
       ...prev,
-      rule_conditions: prev.rule_conditions.map((condition, cIndex) =>
-        cIndex === conditionIndex
-          ? {
-              ...condition,
-              rule_actions: condition.rule_actions.filter((_, aIndex) => aIndex !== actionIndex),
-            }
-          : condition
+      rule_conditions: prev.rule_conditions.map((condition, index) =>
+        index === cIndex ? { ...condition, condition: e.target.value } : condition
       ),
+    }));  
+  };
+
+  const handleFieldValueChange = (cIndex: number, e: any) => {
+    setFormData((prev) => ({
+      ...prev,
+      rule_conditions: prev.rule_conditions.map((condition, index) =>
+        index === cIndex ? { ...condition, field_value: e.target.value } : condition
+      ),
+    }));  
+  };
+    
+
+  // Get doctor list
+  const getResourceData = async (moduleType: string, url: string, ddtype: string) => {
+    try {
+      let passData = '';
+      if(ddtype) {
+        passData = JSON.stringify({type: [ddtype]})
+      }
+      const response = await execute_axios_post(process.env.NEXT_PUBLIC_API_URL+'/'+url, passData);
+      if(ddtype == 'APPOINTMENT_STATUS') {
+        let appStatus = new Array;
+        response.data.appointment_statuses.map((app: any, a: number) => {
+          appStatus.push({'id': app.id, 'name': app.description });          
+        })
+        let resource = resourceList;
+        resource[moduleType] = appStatus;
+        setResourceList(resource);
+      }
+      else {
+        let resource = resourceList;
+        resource[moduleType] = response.data;
+        setResourceList(resource); 
+      }
+    } catch (err) {
+      setError('Failed to load rule data.');
+    } finally {
+      hideLoading();
+    }
+  }; 
+
+  const handleActionChange = async(cIndex: number, e: any) => {
+    var selectedIndex = e.nativeEvent.target.selectedIndex;
+    var selectedText = e.nativeEvent.target[selectedIndex].text
+    const selectedOption = e.target.selectedOptions[0];
+    const identity = selectedOption.getAttribute("data-identity");
+    const parameterIdentity = selectedOption.getAttribute("data-param");
+    setFormData((prev) => ({
+      ...prev,
+      rule_actions: prev.rule_actions.map((action, index) =>
+        index === cIndex ? { ...action, name: e.target.value, identifier: identity, is_user_interaction_required: false, is_skippable: false,
+          parameters: [{ name: '', value: 0, conditional_parameters: [{ name: '', value: '' }] }] } : action ),
+    }));    
+    if(categoryList[selectedText] !== undefined) {
+      let currentModule = categoryList[selectedText][0];
+      let targetModule = categoryList[selectedText][1];
+      let passData = '';
+      if(currentModule.common_data_reference) {
+        passData = JSON.stringify({type: [currentModule.common_data_reference]})
+      }
+      const response = await execute_axios_post(process.env.NEXT_PUBLIC_API_URL+'/'+currentModule.resource_uri, passData);
+      let action = categoryValueList;
+      let identity = [];
+      action[selectedText] = response.data;
+      identity[selectedText] = parameterIdentity;
+      setCategoryValueList(action);
+      setIdentity(identity);
+
+      if(selectedText == "Send Email") {
+        let passData = '';
+        if(targetModule.common_data_reference) {
+          passData = JSON.stringify({type: [targetModule.common_data_reference]})
+        }
+        const response = await execute_axios_post(process.env.NEXT_PUBLIC_API_URL+'/'+targetModule.resource_uri, passData);
+        let emailTarget = new Array;
+        response.data.email_target_audiences.map((email: any, e: number) => {
+          emailTarget.push({'id': email.id, 'name': email.description });
+        })
+        let action = recipientsList;
+        action[selectedText] = emailTarget;
+        setRecipientsList(action);
+      }
+    }
+  };
+
+  const handleValueChange = (cIndex: number, e: any) => {
+    const selectedOption = e.target.selectedOptions[0]; // Get selected <option>
+    const paramIdentity = selectedOption.getAttribute("data-identity");
+    setFormData((prev) => ({
+      ...prev,
+      rule_actions: prev.rule_actions.map((action, index) =>
+        index === cIndex ? { ...action, value: e.target.value, is_user_interaction_required: false, is_skippable: false,
+          parameters: [{ identity:'', name: paramIdentity, value: e.target.value, conditional_parameters: [{ name: '', value: '' }] }] } : action ),
     }));
   };
 
+  const handleRecipientsChange = (cIndex: number, e: any) => {
+    alert(e.target.value);
+    var selectedIndex = e.nativeEvent.target.selectedIndex;
+    var selectedText = e.nativeEvent.target[selectedIndex].text
+    setFormData((prev) => ({
+      ...prev,
+      rule_actions: prev.rule_actions.map((action, index) =>
+        index === cIndex ? { ...action, category: e.target.value } : action ),
+    }));
+    
+  };
+
+  const handleTargetOtherChange = (cIndex: number, e: any) => {
+    alert(e.target.value);
+    targetOther[formData.rule_actions[cIndex].name] = e.target.value;    
+  };
+  
   // Toggle user input required for rule actions
-  const toggleUserInput = (conditionIndex: number, actionIndex: number) => {
+  const toggleUserInput = (aIndex: number) => {
     setFormData((prev) => ({
       ...prev,
-      rule_conditions: prev.rule_conditions.map((condition, cIndex) =>
-        cIndex === conditionIndex
-          ? {
-              ...condition,
-              rule_actions: condition.rule_actions.map((action, aIndex) =>
-                aIndex === actionIndex
-                  ? { ...action, is_user_input_required: !action.is_user_input_required }
-                  : action
-              ),
-            }
-          : condition
-      ),
+      rule_actions: prev.rule_actions.map((action, index) =>
+        index === aIndex ? { ...action, is_user_interaction_required: !action.is_user_interaction_required } : action ),
     }));
   };
 
-  // Update Selected Condition in Dropdown
-  const updateCondition = (conditionIndex: number, value: string) => {
+   // Toggle user input required for rule actions
+   const toggleUserSkip = (aIndex: number) => {
     setFormData((prev) => ({
       ...prev,
-      rule_conditions: prev.rule_conditions.map((condition, index) =>
-        index === conditionIndex ? { ...condition, global_condition_id: value } : condition
-      ),
-    }));
-  };
-
-  // Update action dropdown value
-  const updateActionType = (conditionIndex: number, actionIndex: number, value: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      rule_conditions: prev.rule_conditions.map((condition, cIndex) =>
-        cIndex === conditionIndex
-          ? {
-              ...condition,
-              rule_actions: condition.rule_actions.map((action, aIndex) =>
-                aIndex === actionIndex ? { ...action, rule_action_id: value } : action
-              ),
-            }
-          : condition
-      ),
+      rule_actions: prev.rule_actions.map((action, index) =>
+        index === aIndex ? { ...action, is_skippable: !action.is_skippable } : action ),
     }));
   };
   
   return (
     <SettingLayout>
       <div className="d-flex justify-content-between align-items-center">
-        <h1 className={`${styles.title} mb-3`}>{t('SETTING.SIDE_MENU.RULE')}</h1>
-      </div>
+        <h1 className={`${styles.title} mb-3 module-title`}><i className="fi fi-rr-rules-alt"></i> {t('SETTING.SIDE_MENU.RULE')}</h1>
+      </div>      
       <Row className="white-bg p-1 m-0 top-bottom-shadow">
         <Col xs={7} className="mt-3 action">
           <Button variant='primary' className='btn rounded-0' onClick={createRule}><i className="fi fi-ss-add"></i> {t('ACTIONS.ADDNEW')}</Button>
@@ -489,7 +659,7 @@ const Rule: React.FC = () => {
         title={ (mode) ? t('SETTING.RULE.EDIT_TITLE') : t('SETTING.RULE.CREATE_TITLE') }
         handleClose={handleClose}
         onSave={handleSave}
-        size="75%">
+        size="85%">
 
         <DynamicForm ref={dynamicFormRef}
           formData={translatedElements}
@@ -500,62 +670,151 @@ const Rule: React.FC = () => {
           modelFormInputs={handleInputChange}/>
 
         <Row>
-          <Col>
-            <Button className='btn btn-sm btn-primary col mb-2 rounded-0 float-end' onClick={addRuleCondition}><i className="fi fi-bs-plus"></i> Add Condition</Button>
+          <Col xs={6}>
+            <Form.Label>Module</Form.Label>
+            <Form.Select
+              name="module"
+              id={`module`}
+              className="rounded-0"                      
+              value={formData.module}
+              onChange={(e) => handleInputChange(e, 1)}>
+                <option value="">Select...</option>
+                {moduleList?.map((option: any, cIndex: number) => (
+                  <option key={cIndex} value={option.value}>{option.label}</option>
+                ))}
+            </Form.Select>
           </Col>          
         </Row>        
-        <Container style={{background:'#e2e7ed', marginBottom: '5px' }} >
+        <Container style={{ marginBottom: '5px', padding: '0' }} >          
+          <Row className='mt-3'>
+            <Col xs={6}><h5 className='my-2'>Condition(s)</h5></Col>
+            <Col xs={6}><Button className='btn btn-sm btn-primary col mb-2 rounded-0 float-end' onClick={addRuleCondition}><i className="fi fi-bs-plus"></i> Add Condition</Button></Col>
+          </Row>
+          <Row>
+            <Col xs={3}><Form.Label className='fw-bold mb-0'>Field</Form.Label></Col>
+            <Col xs={3}><Form.Label className='fw-bold mb-0'>Condition</Form.Label></Col>
+            <Col xs={3}><Form.Label className='fw-bold mb-0'>Value</Form.Label></Col>            
+          </Row>
           {formData.rule_conditions.map((condition, conditionIndex) => (
-            <Row key={condition.global_condition_id} style={{border:'1px solid #b2becb', background:'#e9eff6', }}>
-              <Col>
-                <Row className='py-2'>
-                  <Col xs={3}>
-                    <h5 className='my-2'> Condition {conditionIndex + 1}</h5>
-                  </Col>
-                  <Col xs={4}>
-                    <Form.Select
-                      name="global_condition_id"
-                      id={`global_condition_id-${conditionIndex}`}
-                      className="rounded-0"                      
-                      value={condition.global_condition_id}
-                      onChange={(e) => updateCondition(conditionIndex, e.target.value)}>
-                        <option value="">Select...</option>
-                        {conditionList?.map((option: any, cIndex: number) => (
-                          <option key={cIndex} value={option.id}>{option.description}</option>
-                        ))}
-                    </Form.Select>
-                  </Col>
-                  <Col xs={5}>
-                    <Button className='btn btn-sm btn-light text-danger border-danger rounded-0 float-end mt-1' onClick={() => removeRuleCondition(conditionIndex)}><i className="fi fi-br-trash"></i> Remove Condition</Button>
-                    <Button className='btn btn-sm btn-light text-success border-success rounded-0 float-end me-1 mt-1' onClick={() => addRuleAction(conditionIndex)}><i className="fi fi-bs-plus"></i> Add Action</Button>
-                  </Col>
-                </Row>
-                {condition.rule_actions.map((action, actionIndex) => (
-                <>
-                  <Row key={conditionIndex+''+action.rule_action_id} className='py-1 border-bottom-secondary' style={{border:'1px solid #b2becb', background:'#fff', }}>
-                    <Col xs={3}><label className='pt-2'>Actions {actionIndex + 1}</label></Col>
-                    <Col xs={4}>
-                      <Form.Select
-                        name="rule_action_id"
-                        id={`rule_action_id-${actionIndex}`}
-                        className="rounded-0"
-                        value={action.rule_action_id}
-                        onChange={(e) => updateActionType(conditionIndex, actionIndex, e.target.value)}>
-                          <option value="">Select...</option>
-                          {actionList?.map((option: any, aIndex: number) => (
-                            <option key={aIndex} value={option.id}>{option.description}</option>
-                          ))}
-                      </Form.Select>
-                    </Col>
-                    <Col xs={3} className='pt-2'>
-                      <label><input type="checkbox" checked={action.is_user_input_required} onChange={() => toggleUserInput(conditionIndex, actionIndex)} /> User Input Required</label>                      
-                    </Col>
-                    <Col xs={2}>
-                      <Button className='btn btn-sm btn-light text-danger rounded-0 float-end me-1 mt-1' onClick={() => removeRuleAction(conditionIndex, actionIndex)}><i className="fi fi-br-trash"></i> Remove Action</Button>
-                    </Col>
-                  </Row>
-                </>
-                ))}
+            <Row key={conditionIndex} style={{border:'1px solid transparent' }}>              
+              <Col xs={3}>       
+                <Form.Select
+                  name="field"
+                  id={`field-${conditionIndex}`}
+                  className="rounded-0"                      
+                  value={condition.field}
+                  onChange={(e) => handleFieldChange(conditionIndex, e)}>
+                    <option value="">Select...</option>
+                    {fieldList?.map((option: any, cIndex: number) => (
+                      <option key={cIndex} value={option.value}>{option.label}</option>
+                    ))}
+                </Form.Select>
+              </Col>
+              <Col xs={3}>                
+                <Form.Select
+                  name="condition"
+                  id={`condition-${conditionIndex}`}
+                  className="rounded-0"                      
+                  value={condition.condition}
+                  onChange={(e) => handleConditionChange(conditionIndex, e)}>
+                    <option value="">Select...</option>
+                    {conditionList?.map((option: any, cIndex: number) => (
+                      <option key={cIndex} value={option}>{option}</option>
+                    ))}
+                </Form.Select>
+              </Col>
+              <Col xs={3}>                
+                <Form.Select
+                  name="field_value"
+                  id={`field_value-${conditionIndex}`}
+                  className="rounded-0"                      
+                  value={condition.field_value}
+                  onChange={(e) => handleFieldValueChange(conditionIndex, e)}>
+                    <option value="">Select...</option>
+                    {resourceList[condition.field]?.map((option: any, cIndex: number) => (
+                      <option key={cIndex} value={option.id}>{option.name}</option>
+                    ))}
+                </Form.Select>
+              </Col>
+              <Col xs={3}>
+                <Form.Control type='hidden' name="id" id={`id-${conditionIndex}`} value={condition.id ? condition.id : 0} readOnly style={{width:'100px', float: 'left'}} />
+                <Button className='btn btn-sm btn-light text-danger rounded-0 float-end mt-1' onClick={() => removeRuleCondition(conditionIndex)}><i className="fi fi-br-trash"></i></Button>                
+              </Col>
+            </Row>
+          ))}
+          <Row className='mt-3'>
+            <Col xs={6}><h5 className='my-2'>Action(s)</h5></Col>
+            <Col xs={6}> <Button className='btn btn-sm btn-primary col mb-2 rounded-0 float-end' onClick={addRuleAction}><i className="fi fi-bs-plus"></i> Add Action</Button></Col>
+          </Row>
+          <Row>
+            <Col xs={2}><Form.Label className='fw-bold mb-0'>Name</Form.Label></Col>
+            <Col xs={2}><Form.Label className='fw-bold mb-0'>Value</Form.Label></Col>
+            <Col xs={2}><Form.Label className='fw-bold mb-0'>Target</Form.Label></Col>
+            <Col xs={2}><Form.Label className='fw-bold mb-0'>Recipients</Form.Label></Col>
+            <Col xs={2}><Form.Label className='fw-bold mb-0'>User Input Required</Form.Label></Col>
+            <Col xs={2}><Form.Label className='fw-bold mb-0'>User Can Skip</Form.Label></Col>
+          </Row>
+          {formData.rule_actions.map((action, actionIndex) => (
+            <Row key={actionIndex} style={{border:'1px solid transparent' }}>              
+              <Col xs={2}>       
+                <Form.Select
+                  name="name"
+                  id={`name-${actionIndex}`}
+                  className="rounded-0"                      
+                  value={action.name}
+                  onChange={(e) => handleActionChange(actionIndex, e)}>
+                    <option value="">Select...</option>
+                    {actionList?.map((option: any, cIndex: number) => (
+                      <option key={cIndex} value={option.label} data-param={option.param} data-resource={option.resource} data-identity={option.value}>{option.label}</option>
+                    ))}
+                </Form.Select>
+                <Form.Control type='hidden' name="identifier" id={`identifier-${actionIndex}`} value={action.identifier} readOnly />                
+              </Col>            
+              <Col xs={2}>
+                <Form.Select
+                  name="value"
+                  id={`value-${actionIndex}`}
+                  className="rounded-0"
+                  value={action.value}
+                  onChange={(e) => handleValueChange(actionIndex, e)}             
+                  disabled={categoryValueList[action.name] ? false : true}>
+                  <option value="">Select...</option>
+                  {categoryValueList[action.name]?.map((option: any, cIndex: number) => (
+                    <option key={cIndex} value={option.id} data-identity={identity[action.name]}>{option.name}</option>
+                  ))}                  
+                </Form.Select>
+              </Col>
+              <Col xs={2}>
+                <Form.Select
+                  name="category"
+                  id={`category-${actionIndex}`}
+                  className={recipientsList[action.name] ? 'rounded-0': 'd-none'}                      
+                  value={action.category}
+                  onChange={(e) => handleRecipientsChange(actionIndex, e)}
+                  disabled={recipientsList[action.name] ? false : true}
+                  >
+                  <option value="">Select...</option>
+                  {recipientsList[action.name]?.map((option: any, cIndex: number) => (
+                    <option key={cIndex} value={option.id}>{option.name}</option>
+                  ))}                  
+                </Form.Select>
+              </Col>
+              <Col xs={2}>
+                <Form.Control
+                  type='text'
+                  name="recipients"
+                  id={`recipients-${actionIndex}`}
+                  className={targetOther[action.name] ? 'rounded-0' : 'd-none'}                      
+                  value={action.recipients}
+                  onChange={(e) => handleTargetOtherChange(actionIndex, e)} />
+              </Col>
+              <Col xs={2} className='pt-2'>
+                <Form.Label><input type="checkbox" checked={action.is_user_interaction_required} onChange={() => toggleUserInput(actionIndex)} /></Form.Label>
+                <Form.Control className='col-sm-4' type='hidden' name="id" id={`id-${actionIndex}`} value={action.id ? action.id : 0} readOnly style={{width:'50px', float: 'left'}} />
+              </Col>
+              <Col xs={2} className='pt-2'>
+                <Form.Label><input type="checkbox" checked={action.is_skippable} onChange={() => toggleUserSkip(actionIndex)} /></Form.Label>
+                <Button className='btn btn-sm btn-light text-danger rounded-0 float-end' onClick={() => removeRuleAction(actionIndex)}><i className="fi fi-br-trash"></i></Button>   
               </Col>
             </Row>
           ))}

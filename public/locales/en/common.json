@@ -28,7 +28,8 @@
       "SCAN_DOCS": "Scan Doc's",
       "LETTERS": "Letters",
       "NOTES": "Notes",
-      "FORMS": "Forms"
+      "FORMS": "Forms",
+      "ENCOUNTER": "Encounter"
     },
     "DETAILS": {
       "SNO": "S.No",
@@ -71,7 +72,7 @@
       "EDIT_TITLE": "Edit Appointment",
       "SNO": "S.No",
       "PATIENT": "Patient",
-      "EPISODE": "Episode",
+      "EPISODE": "Encounter",
       "DOCTOR": "Doctor",
       "LOCATION": "Location",
       "APPOINTMENT_TYPE": "Type",
@@ -93,7 +94,7 @@
       "EDIT_TITLE": "Edit Surgery",
       "SNO": "S.No",
       "PATIENT": "Patient",
-      "EPISODE": "Episode",
+      "EPISODE": "Encounter",
       "DOCTOR": "Doctor",
       "LOCATION": "Location",
       "APPOINTMENT_TYPE": "Type",
@@ -109,6 +110,43 @@
       "MESSAGES": {
         "SAVE_SUCCESS": "Surgery saved successfully!"
       }    
+    },
+    "ENCOUNTER":{
+      "CREATE_TITLE": "Create Encounter",
+      "EDIT_TITLE": "Edit Encounter",
+      "SNO": "S.No",
+      "NAME": "Name",
+      "START_DATE": "Start Date",      
+      "STATUS": "Status",
+      "MESSAGES": {
+        "SAVE_SUCCESS": "Encounter saved successfully!"
+      }    
+    },
+    "LETTER":{
+      "CREATE_TITLE": "Create Letter",
+      "EDIT_TITLE": "Edit Letter",
+      "SNO": "S.No",
+      "DATE": "Date",
+      "DOCTOR": "Doctor",
+      "ENCOUNTER": "Encounter",
+      "CATEGORY": "Category",
+      "TEMPLATE": "Template",
+      "DESCRIPTION": "Description",
+      "MESSAGES": {
+        "SAVE_SUCCESS": "Letter saved successfully!"
+      }    
+    },
+    "SCAN":{
+      "CREATE_TITLE": "Create Scan",
+      "EDIT_TITLE": "Edit Scan",
+      "SNO": "S.No",
+      "DATE": "Date",
+      "DOCTOR": "Doctor",
+      "CATEGORY": "Category",
+      "DESCRIPTION": "Description",
+      "MESSAGES": {
+        "SAVE_SUCCESS": "Letter saved successfully!"
+      }    
     }
   },
   "ACCOUNT": {
@@ -122,12 +160,18 @@
       "DOCUMENTS": "CK Editor"
     },
     "INVOICE": {
+      "CREATE_TITLE": "Create Invoice",
+      "EDIT_TITLE": "Edit Invoice",
       "SNO": "S.No",
       "PATIENT": "Patient Name",
       "DATE": "Date",
       "DOCTOR": "Doctor",
+      "LOCATION": "Location",
       "INCOME_CATEGORY": "Income Category",
-      "BILL_TO": "Bill To",
+      "PAYEE": "Payee",
+      "THRID_PARTY": "Thrid Party",
+      "CONTACT": "Contact",
+      "TAG": "Tag",
       "TAX": "Tax",
       "PURCHASER": "Purchaser",
       "PURCHASER_PLAN": "Purchaser Plan",
@@ -144,7 +188,35 @@
       "PROCEDURE_NAME": "Procedure Name",
       "QUANTITY": "Quantity",
       "AMOUNT": "Amount",
-      "TOTAL": "Total"
+      "TOTAL": "Total",
+      "MESSAGES": {
+        "SAVE_SUCCESS": "Invoice saved successfully!"
+      }
+    },
+    "RECEIPT":{
+      "CREATE_TITLE": "Create Receipt",
+      "EDIT_TITLE": "Edit Receipt",
+      "SNO": "S.No",
+      "PATIENT": "Patient Name",
+      "DATE": "Date",
+      "DOCTOR": "Doctor",
+      "PAYEE": "Payee",
+      "TAG": "Tag",
+      "PAYMENT_TYPE":"Payment Type",
+      "CONTACT": "Contact",
+      "THRID_PARTY":"Thrid Party",
+      "TAX": "Tax",
+      "PURCHASER": "Purchaser",
+      "PURCHASER_PLAN": "Purchaser Plan",
+      "DISCOUNT": "Discount",
+      "NET_TOTAL": "Net Total",
+      "GRAND_TOTAL": "Grand Total",
+      "BALANCE": "Balance",
+      "WAIVED_RATE": "Wavied Rate",
+      "NOTES": "Notes",
+      "MESSAGES": {
+        "SAVE_SUCCESS": "Receipt saved successfully!"
+      }
     }
   },
   "SETTING": {
@@ -165,9 +237,11 @@
       "APPOINTMENT_SERVICE": "Appointment Service",
       "TEMPLATE": "Template",
       "CONSULTANT_HOURS": "Consultant Hours",
-      "INCOME_CATEGORY": "Income Category",
+      "INCOME_TAG": "Income Tag",
       "TAX": "Tax",
-      "RULE": "Rule"
+      "RULE": "Rule",
+      "PAYMENT_TYPE": "Payment Type",
+      "PAYMENT_GATEWAY": "Payment Gateway"
     },
     "DOCTOR": {
       "CREATE_TITLE": "Create Doctor",
@@ -364,15 +438,26 @@
         "SAVE_SUCCESS": "Consultant Hours saved successfully!"
       }
     },    
-    "INCOME_CATEGORY": {
-      "CREATE_TITLE": "Create Income category",
-      "EDIT_TITLE": "Edit Income category",
+    "INCOME_TAG": {
+      "CREATE_TITLE": "Create Income tag",
+      "EDIT_TITLE": "Edit Income tag",
       "SNO": "S.No",
       "NAME": "Name",
       "ARCHIVE": "Archive",
       "DEFAULT": "Default",
       "MESSAGES": {
-        "SAVE_SUCCESS": "Income category saved successfully!"
+        "SAVE_SUCCESS": "Income tag saved successfully!"
+      }
+    },
+    "PAYMENT_TYPE": {
+      "CREATE_TITLE": "Create Payment type",
+      "EDIT_TITLE": "Edit Payment type",
+      "SNO": "S.No",
+      "NAME": "Name",
+      "ARCHIVE": "Archive",
+      "DEFAULT": "Default",
+      "MESSAGES": {
+        "SAVE_SUCCESS": "Payment type saved successfully!"
       }
     },
     "TAX": {
@@ -413,6 +498,9 @@
   "ACTIONS": {
     "ADDNEW": "Add New",
     "EDIT": "Edit",
+    "SEND_EMAIL": "Send Email",
+    "PRINT_LETTER": "Print Letter",
+    "PRINT": "Print",
     "ADDROW": "Add Row",
     "ACTIONS": "Actions",
     "ADDAPPOINTMENT": "Add Appointment",

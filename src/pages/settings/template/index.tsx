@@ -58,7 +58,6 @@ const Template: React.FC = () => {
   const [list, setList] = useState<any>([]);
   const [searchFilter, setsearchFilter] = useState<any>([]);
   const [placeholders, setPlaceholders] = useState<any>([]);
-  const [doctors, setDoctors] = useState<any>([]);
   const [initialValues, setInitialValues] = useState<any>(initialValue);
   const [translatedElements, setTranslatedElements] = useState<any>([]);
   const [error, setError] = useState<string | null>(null);
@@ -207,20 +206,16 @@ const Template: React.FC = () => {
           setMode(true);
           setInitialValues(response.data.data);
           setFormData(response.data.data);   
-          // console.log('yes', response.data.data.data);          
         }
-        setSavedData(response.data.data.data);
-        setDoctors(response.data.doctors);
         setPlaceholders(response.data.placeholders);
-
         // Designations options assign
         let doctor = new Array;
+        console.log('sdaasd',response.data.doctors);
         if(response.data.doctors) {
           response.data.doctors.map((doc: any, s: number) => {
             doctor.push({'label':doc.name, 'value': doc.id});
           })
         }
-
         // Dynamic values options format
         translatedElements.map((elements: any, k: number) => {
           if(elements.name == 'doctor_id') {
@@ -228,6 +223,9 @@ const Template: React.FC = () => {
             elements.options = doctor;
           }
         })
+        if(response.data.data.data) {
+          setSavedData(response.data.data.data);
+        }
       }
     } catch (error: any) {
         console.error('Error on fetching template details:', error);
@@ -322,7 +320,7 @@ const Template: React.FC = () => {
   return (
     <SettingLayout>
       <div className="d-flex justify-content-between align-items-center">
-        <h1 className={`${styles.title} mb-3`}>{t('SETTING.SIDE_MENU.TEMPLATE')}</h1>
+        <h1 className={`${styles.title} mb-3 module-title`}><i className="fi fi-rr-file-word"></i> {t('SETTING.SIDE_MENU.TEMPLATE')}</h1>
       </div>
       <Row className="white-bg p-1 m-0 top-bottom-shadow">
         <Col xs={7} className="mt-3 action">

@@ -949,7 +949,10 @@ const Calendar = () => {
   return (
     <div className='container-fluid pt-60'>
       <div className='row mt-1'>
-        <div className={`${viewType} col-3 mt-2 text-start tabType`}>
+        <div className='col-4'>
+          <h1 className='my-3 mb-0 module-title'><i className="fi fi-rr-calendar-day"></i> Calendar</h1>
+        </div>
+        <div className={`${viewType} mt-3 tabType`}>
           <Button className={`${(moduleType === 1) ? `active` : ''} me-1 rounded-0`} onClick={showAppointment}>Appointment</Button>
           <Button className={`${(moduleType === 2) ? `active` : ''} rounded-0`} onClick={showSurgery}>Surgery</Button>         
         </div>        
@@ -957,7 +960,7 @@ const Calendar = () => {
           <div className={(moduleType === 1) ? '' : 'd-none'}>
             <Button variant='primary' className='btn rounded-0' onClick={() => handleFormOpen('Appointment')}><i className="fi fi-ss-add"></i> {t('ACTIONS.ADDAPPOINTMENT')}</Button>
             <Dropdown >
-              <Dropdown.Toggle variant="secondary" id="dropdown-basic"  className="btn rounded-0 ms-2">
+              <Dropdown.Toggle variant="secondary" id="dropdown-basic"  className="btn rounded-0 ms-2 me-3">
                 {t('ACTIONS.ACTIONS')}
               </Dropdown.Toggle>
               <Dropdown.Menu>
@@ -968,7 +971,7 @@ const Calendar = () => {
           <div className={(moduleType === 2) ? '' : 'd-none'}>
             <Button variant='primary' className='btn rounded-0' onClick={() => handleFormOpen('Surgery')}><i className="fi fi-ss-add"></i> {t('ACTIONS.ADDSURGERY')}</Button>
             <Dropdown >
-              <Dropdown.Toggle variant="secondary" id="dropdown-basic"  className="btn rounded-0 ms-2">
+              <Dropdown.Toggle variant="secondary" id="dropdown-basic"  className="btn rounded-0 ms-2 me-3">
                 {t('ACTIONS.ACTIONS')}
               </Dropdown.Toggle>
               <Dropdown.Menu>
@@ -978,7 +981,7 @@ const Calendar = () => {
           </div>          
         </div>
       </div> 
-      <div className={(moduleType === 1) ? '' : 'd-none'}>
+      <div className={(moduleType === 1) ? 'mt-3' : 'd-none'}>
         <MyFullCalendar 
           viewType={viewType}
           resources={resources}
@@ -989,7 +992,7 @@ const Calendar = () => {
       </div>      
       <div className={(moduleType === 2) ? 'mt-3' : 'd-none'}>
         <Row className="white-bg p-1 m-0 top-bottom-shadow ">        
-          <Col xs={3}>
+          <Col xs={3} className='offset-sm-2'>
             <Row className='m-0'>
               <button className='btn btn-light rounded-0 col-sm-2 float-start mt-3' onClick={prevDay}><i className="fi fi-ss-angle-circle-left"></i> </button>
               <input 
@@ -1003,8 +1006,7 @@ const Calendar = () => {
               <button className='btn btn-light rounded-0 col-sm-2 float-start mt-3' onClick={nextDay}>&nbsp;<i className="fi fi-ss-angle-circle-right"></i></button>
             </Row>          
           </Col>
-          <Col xs={4}></Col>
-          <Col xs={5} className="float-end">
+          <Col xs={4} className="float-end">
             <SearchFilter 
               filterColumns={filter}
               handleSearch={handleSearch}

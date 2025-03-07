@@ -20,7 +20,7 @@ body {
   font-size: 14px;
   font-weight: 500;
   font-style: normal;
-  background-color: #F4F7FA;
+  background-color: #f4f5f7;
   color: #000;
 }
 h1 {
@@ -42,11 +42,20 @@ h5 {
 h6 {
   font-size: 1rem;
 }
+.navbar-expand-lg .navbar-collapse {
+  height: 60px;
+}
 .navbar .nav-link {
   color: #000;
   font-size: 16px;
   margin: 0 5px;
   font-weight: 600;
+  height: 60px;
+  line-height: 60px;
+  padding: 0;
+  float: left;
+  width: 120px;
+  text-align: center;
 }
 .navbar .nav-link i {
   position: relative;
@@ -54,22 +63,22 @@ h6 {
   right: 2px;
 }
 .navbar .nav-link.active {
-  color: #004eff !important; /* Highlight active menu text */
-  position: relative; /* For positioning the underline */
+  color: #004eff !important;
+  position: relative;
+  background-color: #c2ebff;
 }
 .navbar .nav-link.active::before {
   content: '';
   height: 2px;
   width: 100%;
-  background-color: #004EFF;
+  background-color: #004eff;
   position: absolute;
-  bottom: -10px;
+  bottom: 0px;
   left: 0;
 }
 .navbar-brand {
   width: 230px;
-  margin-left: -10px;
-  text-align: center;
+  margin-left: -5px;
 }
 .sidebar {
   background-color: #fff;
@@ -89,21 +98,34 @@ h6 {
 .sidebar::-webkit-scrollbar-thumb:hover {
   background: #555; 
 }
-.sidebar .nav-item > .nav-link.active{
-  background-color: #4ec100;
+.sidebar .nav-item > .nav-link.active {
+  background-color: #c2ebff;
 }
 .sidebar .nav-link {
-  color: #333;
+  color: #132945;
   font-size: .92rem;
   font-weight: 600;
-  /* border-bottom: 1px dotted #bbc9de; */
+  border-bottom: 1px dotted #bbc9de;
   border-radius: 0;
-  padding: 12px 10px;
+  padding: 0 10px;
+  height: 46px;
+  line-height: 46px;
 }
 .sidebar .nav-link i {
   position: relative;
-  top: 2px;
-  right: 2px;
+  top: 0px;
+  right: 5px;
+  width: 40px;
+  float: left;
+  text-align: center;
+  border-right: 1px solid #ddd;
+  height: 46px;
+  padding-top: 3px;
+  color: #004eff;
+  font-size: 1rem;
+}
+.sidebar .nav-item > .nav-link.active i {
+  color: #004eff;
 }
 .sidebar .nav-link span {
   float: right;
@@ -167,13 +189,13 @@ h6 {
   padding: 0;
 }
 .nav-pills .nav-link.active, .nav-pills .show>.nav-link {  
-  color: #fff;
+  color: #004eff;
 }
 html, body, #__next {
     height: 100%;
 }
 #page-content-wrapper {
-  padding: 20px;
+  padding: 20px 15px 15px 20px;
 }
 .custom-modal-width {
   max-width: 98%;
@@ -211,6 +233,8 @@ input[type=text].form-control, select.form-control  {
   height: 46px;
   line-height: 46px;
   border-bottom: 1px dashed #BAC6D6;
+  border-left: 1px solid #dddddd;
+  border-right: 1px solid #dddddd;
   text-transform: uppercase;
   color: #5C6672;
   box-shadow: inset 0 7px 9px -7px #97a9c485;
@@ -496,8 +520,7 @@ a.fc-event, a.fc-event:hover {
   opacity: 0.75; /* Make it semi-transparent */
 }
 .fc-scroller table thead tr th:nth-child(2).fc-resource {
-  background-color: #e6f4ff;
-  color: #1776c1;
+  color: #fff;
 }
 .fc-scroller table thead tr th:nth-child(3).fc-resource {
   background-color: #ffecf2;
@@ -548,7 +571,7 @@ ul.timeSlots li {
   border: 1px solid #6bd933;
   padding: 5px;
   border-radius: 3px;
-  width: 30%;
+  width: 23%;
   text-align: center;
   float: left;
   font-size: .75rem;
@@ -566,26 +589,78 @@ ul.timeSlots li {
 .fc-v-event .fc-event-main {
   content: '';
 }
-/* .fc-header-toolbar .fc-toolbar-chunk {
-  position: absolute;
-  left: 15px;
-  top: 125px;
+.fc-header-toolbar .fc-toolbar-chunk {
+  right: 475px;
+  top: 152px;
 }
 .fc-header-toolbar .fc-toolbar-chunk:nth-child(2) {
-  left: 350px;
+  right: 190px;
+  width: 285px;
+  text-align: center;
+  padding-top: 3px;
 }
 .fc-header-toolbar .fc-toolbar-chunk:nth-child(3) {
-  left: 170px;
+  right: 30px;
 }
-.fc .fc-view-harness-active > .fc-view {
-  top: 20px;
-} */
+.fc-resourceTimeGridDay-view {
+  top: 70px !important;
+}
+.fc .fc-toolbar.fc-header-toolbar {
+  width: 40%;
+  position: absolute;
+  top: 80px;
+  right: 15px;
+}
+.fc-theme-standard .fc-timeGridWeek-view th, .fc-theme-standard .fc-dayGridMonth-view th {
+  background-color: #2c3e50;
+}
+.fc-theme-standard .fc-resourceTimeGridDay-view .fc-col-header th, .fc-theme-standard .fc-resourceTimeGridDay-view .fc-col-header td {
+  background-color: #2c3e50;
+  height: 30px;
+}
+.fc-theme-standard th a {
+  color: #fff;
+  text-decoration: none;
+  height: 36px;
+  line-height: 32px;
+  text-transform: uppercase;
+}
+.fc .fc-button-primary.fc-today-button {
+  background-color: #fad000;
+  border: 1px solid #caa800;
+  color: #333;
+}
+.fc .fc-button-primary.fc-today-button:focus {
+  background-color: #caa800;
+  border: 1px solid #caa800;
+}
+.fc .fc-view-harness {
+  background-color: #fff;
+}
+.fc-header-toolbar .fc-toolbar-chunk .fc-button-group button {
+  background-color: #0d6efd;
+  border-color: #0144a7;
+}
+.fc-header-toolbar .fc-toolbar-chunk .fc-button-group button:focus {
+  background-color: #5cb804;
+  border-color: #5cb804;
+}
+.fc-header-toolbar .fc-toolbar-chunk:nth-child(3) .fc-button-group button {
+  background-color: #0d6efd;
+  border-color: #014fc2;
+}
+.fc-header-toolbar .fc-toolbar-chunk:nth-child(3) .fc-button-group button:focus {
+  background-color: #014fc2;
+  border-color: #014fc2;
+}
+
 .cal-actions {
   width: auto;
   position: absolute;
   right: 0;
   display: flex;
-  top: 75px;
+  top: 155px;
+  z-index: 1;
 }
 .cal-actions div:first-child {
   width: auto;
@@ -596,15 +671,34 @@ ul.timeSlots li {
 .cal-actions .dropdown {
   float: left;
 }
+.tabType {
+  position: absolute;
+  left: 15px;
+  top: 135px;
+  width: 250px;
+  z-index: 9;
+}
 .tabType button {
-  background-color: #fff;
+  background-color: #f7f7f7;
   border: 0px solid #ddd;
-  border-bottom: 2px solid #0046e9;
-  color: #0046e9;
+  border-bottom: 2px solid #5cb804;
+  color: #5cb804;
+}
+.tabType button.active {
+  background-color: #66d100;
+  border-bottom: 2px solid #5cb804;
+  color: #fff;
+}
+.tabType button:hover {
+  background-color: #66d100;
+  border-bottom: 2px solid #5cb804;
+  color: #fff;
 }
 .patient-info-header {  
-  background: repeating-linear-gradient(45deg, #e4edff, #dde8ff 3px, #d0deff 3px, #d8e4ff 6px);
-  border: 1px solid #c0d3ff;  
+  /* background: repeating-linear-gradient(45deg, #e4edff, #dde8ff 3px, #d0deff 3px, #d8e4ff 6px);
+  border: 1px solid #c0d3ff;   */
+  background: repeating-linear-gradient(45deg, #fff493, #ffe600 3px, #ffecad 3px, #ffdd6b 6px);
+  border: 1px solid #ffca1c;
 }
 .patient-info-header p.card-text {
   text-transform: uppercase;
@@ -616,9 +710,9 @@ ul.timeSlots li {
 }
 .login-bg {
   background-image: url(../../public/emr-login-bg.jpg);
-  background-position: center;
+  background-position: right;
   background-repeat: no-repeat;
-  background-size: cover;
+  background-size: contain;
 }
 .fc-toolbar-chunk [type=button] {
   text-transform: capitalize;
@@ -645,9 +739,9 @@ ul.timeSlots li {
   overflow-x: hidden;
 }
 .formActions {
-  position: absolute;
+  /* position: absolute;
   right: 5px;
-  top: 10px;
+  top: 10px; */
 }
 #patients {
   padding: 0;
@@ -656,4 +750,87 @@ ul.timeSlots li {
 .disabled {
   pointer-events: none;
   background-color: #555;
+}
+.module-title {
+  color: #132945;
+}
+.module-title i {
+  font-size: 1rem;
+  background-color: #ffffff;
+  color: #132945;
+  width: 32px;
+  height: 32px;
+  float: left;
+  margin: 4px;
+  text-align: center;
+  padding: 6px;
+  border-radius: 50%;
+  border: 1px solid;
+}
+.common-search {
+  margin-top: 0;
+  margin-left: 48px;
+  width: 320px;
+  border: 1px solid #fafcff;
+  background: #f4f5f7;
+}
+.common-search input {
+  background-color: transparent;
+}
+.common-search button {
+  background: #dee3eb;
+  border: 1px solid #bbbbbb;
+  color: #132945;
+}
+.invoice-table {
+  border: 1px solid #bbb !important;
+} 
+.invoice-table thead tr th {
+  background-color: #5C6672;
+  color: #fff;
+}
+.invoice-table tbody tr td {
+  border: 1px solid #bbb !important;
+  padding: 0;
+}
+.invoice-table tbody tr:last-child td {
+  border-bottom: 1px solid #bbb !important;
+}
+.invoice-table tbody tr td input, .invoice-table tfoot tr td input[readonly] {
+  border: 0;
+  padding: 5px;
+  width: 100%;
+  border-radius: 0;
+  background: transparent;
+}
+.invoice-table tbody tr td input:focus {
+  border: none;
+}
+.receipt-table thead tr th {
+  background-color: #5C6672;
+  color: #fff;
+}
+.receipt-table tbody tr td input[type=text], .receipt-table tfoot tr td input[readonly] {
+  border: 0;
+  padding: 5px;
+  width: 100%;
+  border-radius: 0;
+  background: transparent;
+}
+
+.nav-tabs-custom .nav-item {
+  flex: 1; /* Makes all tabs take equal width */
+  text-align: center; /* Centers text */
+}
+
+.nav-tabs-custom .nav-link {
+  width: 100%; /* Ensure full width of flex container */
+  text-align: center;
+  font-weight: bold;
+  border-radius: 0; /* Optional: Removes rounded corners */
+  background-color: #ceecfb;
+}
+.nav-tabs-custom .nav-link.active {
+  background-color: #0046e9;
+  color: #fff;
 }

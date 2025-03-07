@@ -37,6 +37,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 let pageLimit: number = 6;
 let selectedID: number = 0;
 let archiveID: number = 0;
+const todayDate = new Date().toISOString().split('T')[0];
 
 const initialValue = {
   patient_id: 0,
@@ -45,7 +46,7 @@ const initialValue = {
   doctor_id: 0,
   location_id: 0,
   appointment_type_id: 0,
-  date: '',
+  date: todayDate,
   from_time: '',
   to_time: '',
   notes:'',
@@ -77,6 +78,7 @@ const Appointment: React.FC = () => {
   const [page, setPage] = useState<number>(1);  
   const [total, setTotal] = useState<number>(0);  
   const [mode, setMode] = useState<boolean>(false);
+  const [workFlowShow, setWorkflowShow] = useState<boolean>(false);
   const [clear, setClear] = useState<boolean>(false);  
   const [list, setList] = useState<any>([]);
   const [slotsList, setSlotsList] = useState<any>([]);
@@ -107,7 +109,7 @@ const Appointment: React.FC = () => {
     "doctor_id": 0,
     "location_id": 0,
     "appointment_type_id": 0,
-    "date": "",
+    "date": todayDate,
     "from_time": "",
     "to_time": "",
     "notes": "",
@@ -118,7 +120,7 @@ const Appointment: React.FC = () => {
   // Onload function
   useEffect(() => {
     // Language apply for form label
-    const filteredElements = AppointmentFormElements.filter((element) => element.name !== "patients");
+    const filteredElements = AppointmentFormElements.filter((element) => (element.name !== "patients"));
     const translatedFormElements = filteredElements.map((element) => {
       return {
         ...element,
@@ -261,7 +263,7 @@ const Appointment: React.FC = () => {
     try {
       let editID = 0;
       if(type == 'edit') editID = selectedAppointment;
-      let passData: string = JSON.stringify({ id: editID });      
+      let passData: string = JSON.stringify({ id: editID, patient_id: patientId });      
       showLoading();
       const response = await execute_axios_post(ENDPOINTS.POST_APPOINTMENT_FORMDATA, passData);
       if(response.success) {
@@ -368,7 +370,8 @@ const Appointment: React.FC = () => {
   }
 
   // Save button handler
-  const handleSave = async () => {    
+  const handleSave = async () => {
+    console.log(formData);
     if(activeIndex === -1 && formData.id === null) {
       handleShowToast(t('PATIENT.APPOINTMENT.MESSAGES.CHOOSE_SLOT'), 'danger');
       return false;
@@ -384,6 +387,7 @@ const Appointment: React.FC = () => {
         if(response.success) {
           handleShowToast(t('PATIENT.APPOINTMENT.MESSAGES.SAVE_SUCCESS'), 'success');
           handleClose();
+          setWorkflowShow(true);
         }
       } catch (error) {
         console.error('Error creating an appointment:', error);
@@ -531,6 +535,34 @@ const Appointment: React.FC = () => {
     return `${hours}:${minutes}`; // Format as HH:mm
   };
 
+  const [step, setStep] = useState(1);
+  const totalSteps = 3; // Change this based on your steps
+
+  // Handle next step
+  const nextStep = (type: number) => {
+    if(type == 1) {
+      handleShowToast(t('Saved Successfully!'), 'success');
+      if (step < totalSteps) setStep(step + 1);
+    }
+    if(type == 2) {
+      if (step < totalSteps) setStep(step + 1);
+    }
+    if(type == 3) {
+      handleShowToast(t('Saved Successfully!'), 'success');
+      setStep(1);
+      setWorkflowShow(false);
+    }
+    if(type == 4) {
+      setStep(1);
+      setWorkflowShow(false);
+    }
+  };
+
+  // Handle previous step
+  const prevStep = () => {
+    if (step > 1) setStep(step - 1);
+  };
+
   return (
     <PatientLayout patientId={id as string}>
       <div className="d-flex justify-content-between align-items-center">
@@ -545,6 +577,7 @@ const Appointment: React.FC = () => {
             </Dropdown.Toggle>
             <Dropdown.Menu>
               <Dropdown.Item onClick={handleEdit}><i className="fi fi-sr-pencil"></i> {t('ACTIONS.EDIT')}</Dropdown.Item>
+              <Dropdown.Item><i className="fi fi-rr-print"></i> {t('ACTIONS.PRINT_LETTER')}</Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>
         </Col>
@@ -590,6 +623,11 @@ const Appointment: React.FC = () => {
         activeIndex={activeIndex}
         fromSource={'Patients'}
         booked_slot_time={slotBookedTime}
+        workFlowShow={workFlowShow}
+        nextStep={nextStep}
+        step={step}
+        totalSteps={totalSteps}
+        setStep={setStep}
       />
       <ToastNotification
         show={showToast}

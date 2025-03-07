@@ -5,10 +5,11 @@ export const InvoiceFormElements: FormField[] = [
     "type": "date",
     "name": "date",
     "label": "DATE",
-    "required": true,
-    "defaultValue": "",
+    "required": false,
     "disablePrevDate": true,
-    "colClass": "col-sm-4",
+    "disableFutureDate": false,
+    "dateSelection": true, 
+    "colClass": "col-sm-3",
     "order": 1
   },
   {
@@ -17,7 +18,7 @@ export const InvoiceFormElements: FormField[] = [
     "label": 'PATIENT',
     "options": [],
     "required": true,
-    "colClass": "col-sm-4",
+    "colClass": "col-sm-3",
     "order": 2
   },
   {
@@ -27,7 +28,7 @@ export const InvoiceFormElements: FormField[] = [
     "options": [],
     "required": true,
     "multiple": false,
-    "colClass": "col-sm-4",
+    "colClass": "col-sm-3",
     "order": 3
   },
   {
@@ -37,16 +38,16 @@ export const InvoiceFormElements: FormField[] = [
     "options": [],
     "required": true,
     "multiple": false,
-    "colClass": "col-sm-4",
+    "colClass": "col-sm-3",
     "order": 4
   },
   {
     "type": "dropdown",
     "name": "tags",
-    "label": "TAGS",
+    "label": "TAG",
     "options": [],
-    "required": true,
-    "colClass": "col-sm-4",
+    "required": false,
+    "colClass": "col-sm-3",
     "multiple": false,
     "order": 5
   },
@@ -56,7 +57,7 @@ export const InvoiceFormElements: FormField[] = [
     "label": "PAYEE",
     "options": [],
     "required": true,
-    "colClass": "col-sm-4",
+    "colClass": "col-sm-3",
     "multiple": false,
     "order": 6
   },
@@ -66,18 +67,28 @@ export const InvoiceFormElements: FormField[] = [
     "label": "TAX",
     "options": [],
     "required": true,
-    "colClass": "col-sm-4",
+    "colClass": "col-sm-3",
     "multiple": false,
     "order": 7
   },
   {
     "type": "dropdown",
     "name": "contact_id",
+    "label": "CONTACT",
+    "options": [],
+    "required": false,
+    "colClass": "col-sm-3",
+    "multiple": false,
+    "order": 8
+  },
+  {
+    "type": "dropdown",
+    "name": "purchaser_id",
     "label": "THRID_PARTY",
     "options": [],
     "required": false,
-    "colClass": "col-sm-4",
+    "colClass": "col-sm-3",
     "multiple": false,
-    "order": 8
+    "order": 9
   }  
 ];

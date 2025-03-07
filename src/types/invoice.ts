@@ -28,7 +28,7 @@ export interface InvoiceModel {
     tax_rate: number;
     waived_rate: string;
     grand_total: string;
-    net_total: string;
+    net_total: number;
     balance: string;
     notes: string;
     invoice_details: InvoiceDetails[]

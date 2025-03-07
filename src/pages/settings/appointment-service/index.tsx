@@ -315,7 +315,7 @@ const AppointmentService: React.FC = () => {
   return (
     <SettingLayout>
       <div className="d-flex justify-content-between align-items-center">
-        <h1 className={`${styles.title} mb-3`}>{t('SETTING.SIDE_MENU.APPOINTMENT_SERVICE')}</h1>
+        <h1 className={`${styles.title} mb- module-title`}><i className="fi fi-rr-calendar-minus"></i> {t('SETTING.SIDE_MENU.APPOINTMENT_SERVICE')}</h1>
       </div>
       <Row className="white-bg p-1 m-0 top-bottom-shadow">
         <Col xs={7} className="mt-3 action">

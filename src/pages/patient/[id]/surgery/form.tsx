@@ -36,7 +36,7 @@ interface SurgeryProps {
   createPurchaser: (event: any) => void;
   deleteProcedure: (event: any) => void;
   handleTypeaheadInputChange: (name: string, selected: any, label: string) => void;
-  handleInputChange: (event: any) => void;
+  handleInputChange: (event: any, e:number) => void;
   handleClose: () => void;
   handleSave: () => void;  
   formReset: boolean;
@@ -86,7 +86,7 @@ const SurgeryForm = forwardRef<DynamicFormHandle, SurgeryProps>(({formLabels, in
                       id={`procedure_id-${index}`}
                       className="rounded-0"
                       value={surgery.procedure_id}
-                      onChange={(e) => handleInputChange(e)}>
+                      onChange={(e) => handleInputChange(e, index)}>
                         <option value="">Select...</option>
                         {procedureList?.map((option: any, index: number) => (
                           <option key={index} value={option.id}>{option.name}</option>
