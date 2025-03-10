@@ -12,6 +12,7 @@ import { PatientFormElements } from '@/data/PatientFormElements';
 const initialValue = {
   id: 0,
   designation_id: 0,
+  designation_id_dd: [],
   first_name: '',
   surname: '',
   full_name: '',
@@ -55,32 +56,8 @@ const PatientDetails: React.FC<PatientDetailsProps> = ({ patientId }) => {
   const [translatedElements, setTranslatedElements] = useState<any>([]);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');  
+  const [getDesignation, setDesignation] = useState<any>([]);
   const [toastColor, setToastColor] = useState<'primary' | 'success' | 'danger' | 'warning' | 'info' | 'light' | 'dark'>('primary');
-
-  // const initialFormData: Patient = {
-  //   "id": 0,
-  //   "designation_id": 0,
-  //   "first_name": "",
-  //   "surname": "",
-  //   "full_name": "",
-  //   "address1": "",
-  //   "address2": "",
-  //   "address3": "",
-  //   "county": "",
-  //   "country": "",
-  //   "eircode": "",
-  //   "mrn_no": "",
-  //   "doctor_id": 0,
-  //   "shared_doctor_ids": "",
-  //   "patient_type_id": 0,
-  //   "dob": "",
-  //   "gender_id": 0,
-  //   "home_phone_no": "",
-  //   "work_phone_no": "",
-  //   "mobile_no": "",
-  //   "email": "",
-  //   "is_archive": false 
-  // };
 
   useEffect(() => {
     if (!patientId) return;
@@ -95,6 +72,7 @@ const PatientDetails: React.FC<PatientDetailsProps> = ({ patientId }) => {
         let passData: any = { id: uuidToId(patientId) };
         const response = await execute_axios_post(ENDPOINTS.POST_PATIENT_FORMDATA, passData);
         if(response.success) {
+          response.data.data = Object.assign({}, response.data.data, {'designation_id_dd': []}) // for testing select2 purpose
           setInitialValues(response.data.data);
         }
         // Designations options assign
@@ -103,6 +81,7 @@ const PatientDetails: React.FC<PatientDetailsProps> = ({ patientId }) => {
             response.data.designations.map((design: any, s: number) => {
             designation.push({'label':design.description, 'value': design.id});
           })
+          setDesignation(designation);
         }
   
         // Doctors options assign
@@ -123,6 +102,10 @@ const PatientDetails: React.FC<PatientDetailsProps> = ({ patientId }) => {
         // Dynamic values options format
         translatedFormElements.map((elements: any, k: number) => {
           if(elements.name == 'designation_id') {
+            elements.options = [];
+            elements.options = designation;
+          }
+          if(elements.name == 'designation_id_dd') {
             elements.options = [];
             elements.options = designation;
           }

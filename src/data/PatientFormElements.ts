@@ -2,6 +2,16 @@ import { FormField } from "@/types/form";
 
 export const PatientFormElements: FormField[] = [
   {
+    "type": "select2dropdown",
+    "name": "designation_id_dd",
+    "label": "DESIGNATION",
+    "options": [],
+    "required": false,
+    "multiple": false, 
+    "colClass": "col-sm-3",
+    "order": 1
+  },
+  {
     "type": "dropdown",
     "name": "designation_id",
     "label": "DESIGNATION",

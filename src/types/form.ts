@@ -11,7 +11,7 @@ export interface Option {
 
 export interface FormField {
     type: 'text' | 'dropdown' | 'date' | 'radio' | 'checkbox' | 'typeahead' | 'typeaheadDynamic' | 'submit' 
-        | 'textarea' | 'switch' | 'color' | 'email' | 'time';
+        | 'textarea' | 'switch' | 'color' | 'email' | 'time' | 'select2dropdown';
     name: string;
     label?: string;
     placeholder?: string;

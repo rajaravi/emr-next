@@ -63,47 +63,53 @@ const CreatePatient = () => {
        const fetchInitialValues = async () => {
          try {
            let passData: any = { id: null };
-           const response = await execute_axios_post(ENDPOINTS.POST_PATIENT_FORMDATA, passData);
+           let response = await execute_axios_post(ENDPOINTS.POST_PATIENT_FORMDATA, passData);
            if(response.success) {            
+              // for testing select2 purpose
+              response.data = Object.assign({}, response.data, {'designation_id_dd': []}) 
                // Designations options assign
-               let designation = new Array;
-               if(response.data.designations) {
-                   response.data.designations.map((design: any, s: number) => {
-                   designation.push({'label':design.description, 'value': design.id});
-                 })
-               }
-         
-               // Doctors options assign
-               let doctor = new Array;
-               if(response.data.doctors) {
-                 response.data.doctors.map((spec: any, s: number) => {
-                   doctor.push({'label':spec.name, 'value': spec.id});
-                 })
-               }
-         
-               // Patient types options assign
-               let patientType = new Array;
-               if(response.data.patient_types) {
-                 response.data.patient_types.map((ptype: any, s: number) => {
-                   patientType.push({'label':ptype.name, 'value': ptype.id});
-                 })
-               }
-               // Dynamic values options format
-               translatedFormElements.map((elements: any, k: number) => {
-                 if(elements.name == 'designation_id') {
-                   elements.options = [];
-                   elements.options = designation;
-                 }
-                 if(elements.name == 'doctor_id') {
-                   elements.options = [];
-                   elements.options = doctor;
-                 }
-                 if(elements.name == 'patient_type_id') {
-                   elements.options = [];
-                   elements.options = patientType;
-                 }        
-               })
-               setTranslatedElements(translatedFormElements);
+              let designation = new Array;
+              if(response.data.designations) {
+                  response.data.designations.map((design: any, s: number) => {
+                  designation.push({'label':design.description, 'value': design.id});
+                })
+              }
+        
+              // Doctors options assign
+              let doctor = new Array;
+              if(response.data.doctors) {
+                response.data.doctors.map((spec: any, s: number) => {
+                  doctor.push({'label':spec.name, 'value': spec.id});
+                })
+              }
+        
+              // Patient types options assign
+              let patientType = new Array;
+              if(response.data.patient_types) {
+                response.data.patient_types.map((ptype: any, s: number) => {
+                  patientType.push({'label':ptype.name, 'value': ptype.id});
+                })
+              }
+              // Dynamic values options format
+              translatedFormElements.map((elements: any, k: number) => {
+                if(elements.name == 'designation_id') {
+                  elements.options = [];
+                  elements.options = designation;
+                }
+                if(elements.name == 'designation_id_dd') {
+                  elements.options = [];
+                  elements.options = designation;
+                }
+                if(elements.name == 'doctor_id') {
+                  elements.options = [];
+                  elements.options = doctor;
+                }
+                if(elements.name == 'patient_type_id') {
+                  elements.options = [];
+                  elements.options = patientType;
+                }        
+              })
+              setTranslatedElements(translatedFormElements);
            }
          } catch (err) {
            setError('Failed to load form data.');
@@ -119,6 +125,7 @@ const CreatePatient = () => {
      
     const handleCreate = async (formData: any) => {
         try {
+            delete formData.designation_id_dd
             const response = await execute_axios_post(ENDPOINTS.POST_PATIENT_STORE, formData);
             if(response.success) {
               handleShowToast(t('PATIENT.DETAILS.MESSAGES.SAVE_SUCCESS'), 'success');

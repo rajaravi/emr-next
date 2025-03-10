@@ -3,6 +3,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import TextInput from '@/components/common/form-elements/TextInput';
 // import TextInput from './formElements/TextInput';
 import Dropdown from '@/components/common/form-elements/Dropdown';
+import Select2Dropdown from '@/components/common/form-elements/Select2Dropdown';
 import DatePicker from '@/components/common/form-elements/DatePicker';
 import RadioButton from '@/components/common/form-elements/RadioButton';
 import Checkbox from '@/components/common/form-elements/Checkbox';
@@ -101,7 +102,13 @@ const DynamicForm = forwardRef<DynamicFormHandle, DynamicFormProps> (({
       }
     }
   };
-  
+
+  const handleSelect2Change = (selected: string[], name: string) => {
+    setFormValues((prevData) => ({
+      ...prevData,
+      [name]: selected
+    }));
+  };
   
   const validateModelForm = () => {
     return validate();
@@ -178,6 +185,9 @@ const DynamicForm = forwardRef<DynamicFormHandle, DynamicFormProps> (({
             case 'dropdown':
               return <Dropdown key={index} {...commonProps} options={field.options!}
                 onChange={handleChange} colClassName={field.colClass} />;
+            case 'select2dropdown':
+              return <Select2Dropdown key={index} {...commonProps} options={field.options!}
+                onChange={handleSelect2Change} colClassName={field.colClass} />;
             case 'date':
               return <DatePicker key={index} {...commonProps} disablePrevDate={field.disablePrevDate}
                 disableFutureDate={field.disableFutureDate} dateSelection={field.dateSelection}
