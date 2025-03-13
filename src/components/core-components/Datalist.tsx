@@ -61,26 +61,26 @@ const Datalist: FC<DatalistProps> = ({columns, list, page, total, pageLimit, onR
                                         data[f] = pageNo;
                                     }
                                     if(f === 'is_archive') {
-                                        if(data[f] === true) {
+                                        if(data[f] === true || data[f] === 1) {
                                             data[f] = <Form.Check cur-id={data?.id} type="switch" name={'archive'+data?.id} id={'archive'+data?.id} onChange={archiveRecord} checked = {true} className='pt-12' role="button"/>;
                                         }
-                                        if(data[f] === false) {
+                                        if(data[f] === false || data[f] === 0) {
                                             data[f] = <Form.Check cur-id={data?.id} type="switch" name={'unarchive'+data?.id} id={'unarchive'+data?.id} onChange={archiveRecord} checked = {false} className='pt-12' role="button"/>;
                                         }                    
                                     }
                                     if(f === 'is_active') {
-                                        if(data[f] === true) {
+                                        if(data[f] === true || data[f] === 1) {
                                             data[f] = <Form.Check cur-id={data?.id} type="switch" name={'active'+data?.id} id={'archive'+data?.id} onChange={archiveRecord} checked = {true} className='pt-12' role="button"/>;
                                         }
-                                        if(data[f] === false) {
+                                        if(data[f] === false || data[f] === 0) {
                                             data[f] = <Form.Check cur-id={data?.id} type="switch" name={'inactive'+data?.id} id={'unarchive'+data?.id} onChange={archiveRecord} checked = {false} className='pt-12' role="button"/>;
                                         }                    
                                     }
                                     if(f === 'is_default') {
-                                        if(data[f] === true) {
+                                        if(data[f] === true || data[f] === 1) {
                                             data[f] = <Form.Check cur-id={data?.id} type="switch" name={'default'+data?.id} id={'default'+data?.id} onChange={defaultRecord} checked = {true} className='pt-12' role="button"/>;
                                         }
-                                        if(data[f] === false) {
+                                        if(data[f] === false || data[f] === 0) {
                                             data[f] = <Form.Check cur-id={data?.id} type="switch" name={'undefault'+data?.id} id={'undefault'+data?.id} onChange={defaultRecord} checked = {false} className='pt-12' role="button"/>;
                                         }                    
                                     }

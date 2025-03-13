@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { useRouter } from 'next/router';
-import { execute_axios_post } from '@/utils/services/httpService';
+import { execute_axios_post, execute_axios_get } from '@/utils/services/httpService';
 import { Button, Row, Col, Dropdown, Container } from 'react-bootstrap';
 // Translation logic - start
 import { GetServerSideProps } from 'next';
@@ -44,6 +44,7 @@ let selectedID: number = 0;
 let archiveID: number = 0;
 let savedData: string = '';
 const todayDate = new Date().toISOString().split('T')[0];
+let heidiToken: string = '';
 
 const initialValue = {
   patient_id: 0,
@@ -78,6 +79,7 @@ const Letter: React.FC = () => {
     { name: t('PATIENT.LETTER.DATE'), field: 'date' }
   ];
 
+  const [token, setToken] = useState<string>('');
   const [show, setShow] = useState(false);
   const dynamicFormRef = useRef<DynamicFormHandle>(null);
   const [page, setPage] = useState<number>(1);  
@@ -117,8 +119,10 @@ const Letter: React.FC = () => {
 
   // Load the document into the editor once everything is ready
   const loadEditorData = useCallback(() => {
+    console.log('in savedData',savedData);
     if (editorContainerRef.current && savedData) {
-      editorContainerRef.current.documentEditor.open(savedData);
+      console.log('cond savedData',savedData);
+      editorContainerRef?.current.documentEditor.open(savedData);
       console.log('Document loaded successfully after form rendering.');
     }
   }, [savedData]);
@@ -128,9 +132,11 @@ const Letter: React.FC = () => {
       editorContainerRef.current.documentEditor.print();      
     }
   }
+ 
 
   // Onload function
-  useEffect(() => {   
+  useEffect(() => {
+    
     if (isEditorReady && savedData) {
       loadEditorData();
     } 
@@ -144,7 +150,55 @@ const Letter: React.FC = () => {
     });
     setTranslatedElements(translatedFormElements);
     fetchLetterList(page);
+
+    
+    // HeidiHealth Wizard code 
+    getHeidiToken();
+
   }, []);
+
+  const getHeidiToken = async() => {
+    try {
+      let passData = {"headers": {'Heidi-Api-Key': 'UtYBmtHHIalLporO5dIgSQw8oJK7JALh' }};
+      execute_axios_get('https://registrar.api.heidihealth.com/api/v2/ml-scribe/open-api/jwt?email='+(Math.random() + 1).toString(36).substring(7)+'@mail.ie&third_party_internal_id='+(Math.random() + 1).toString(36).substring(7), passData)
+        .then(response => {
+            console.log('response?==', response);
+            setToken(response.token);
+            heidiToken = response.token;
+          }
+        )
+        .catch(error => {
+          console.error("Error:", error);
+          throw error; // ✅ Re-throw for handling
+        }
+      );      
+    } catch (err) {
+      // setError('Failed to load doctor data.');
+    } 
+  }; 
+  const templateData = {
+    content: '...',
+    responses: [
+      {
+        questionId: '...',
+        question: '...',
+        answerType: '...',
+        answerOptions: ['...', '...'],
+      },
+    ],
+  };
+  
+  function openHeidiWithTemplate() {
+    Heidi.open({ template: templateData });
+  }
+  
+  function openHeidi() {    
+    Heidi.open();
+  }
+  
+  function closeHeidi() {
+    Heidi.close();
+  }
 
   // Get doctor list
   const fetchLetterList = async (page: number, sFilter?: { field: string; text: string }) => {
@@ -229,11 +283,11 @@ const Letter: React.FC = () => {
     const { name, value } = e.target;
     if(name == 'doctor_id') {    
       setDoctor(value);
-      getLetterContent(value, template);
+      getLetterContent(value, template, '');
     }
     if(name == 'template_id') {
       setTemplate(value);
-      getLetterContent(doctor, value);      
+      getLetterContent(doctor, value, '');      
     }    
     setFormData({ ...formData, [name]: value });    
   };
@@ -275,17 +329,19 @@ const Letter: React.FC = () => {
       if(response.success) {
         handleShow();
         if(response.data?.data?.id) {          
+          setMode(true);
           const formData = response.data?.data;
           if(response.data.data.content) {            
-            savedData = response.data.data.content;
-            loadEditorData();
+            savedData = JSON.parse(response.data.data.content);
+            // console.log('savedData',savedData);
+            // loadEditorData();            
             setDoctor(response.data.data.doctor_id);
             setTemplate(response.data.data.template_id);
-            getLetterContent(response.data.data.doctor_id, response.data.data.template_id);
+            getLetterContent(response.data.data.doctor_id, response.data.data.template_id, 'edit');            
           }          
           setInitialValues(formData);
           setFormData(formData);          
-          setMode(true);
+          
         } else {          
           setFormData(initialFormData);
         }
@@ -343,11 +399,62 @@ const Letter: React.FC = () => {
           }
         })
       }
+      // getHeidiToken();
+      startHeidi();
       hideLoading();
     } catch (error: any) {
         console.error('Error on fetching doctor details:', error);
         hideLoading();
     }    
+  }
+
+  const startHeidi = () => {
+    const heidiOptions = {
+      token: token,
+      target: '#heidi',
+      language: "en",
+      onInit: () => {
+        // Display the UI that will trigger Heidi
+        document
+          .querySelectorAll('.heidi-button')
+          .forEach((button) => (button.style.display = 'block'));
+      },
+      onReady: () => {
+        Heidi.onPushData((data: any) => {
+          // data.notesData will contain data generated by Heidi
+          // if a template was used, it will contain the result
+          // using the Template structure above
+          console.log(data);
+          const editorInstance = editorContainerRef.current?.documentEditor;
+          if (editorInstance) {
+            editorInstance.editor.insertText(data.noteData);
+          }          
+        });
+  
+        Heidi.onSessionStarted((sessionId: any) => {
+          // sessionId is the ID of the current Heidi Session.
+        });
+      },
+    };
+    
+    if (typeof window !== "undefined") { // Ensure it runs only in the browser
+      const script = document.createElement("script");
+      script.async = true;
+      script.src = "https://registrar.widget.heidihealth.com/staging/widget/heidi.js";
+      
+      script.onload = () => {
+        if (window.Heidi) {
+          new window.Heidi(heidiOptions); // Initialize Heidi widget with options
+        }
+      };
+
+      document.head.appendChild(script);
+
+      // Cleanup: Remove script when component unmounts (optional)
+      return () => {
+        document.head.removeChild(script);
+      };
+    }
   }
   const handleShow = () => {
     setShow(true);   
@@ -359,7 +466,7 @@ const Letter: React.FC = () => {
 
   // Save button handler
   const handleSave = async () => {
-    console.log(formData);
+    // console.log(formData);
     showLoading();
     // Implement your save logic here
     if (dynamicFormRef.current?.validateModelForm()) {
@@ -387,18 +494,27 @@ const Letter: React.FC = () => {
     }
   };
 
-  const getLetterContent = async (doctor: string, template: string) => {   
-    if (doctor && template) {      
+  const getLetterContent = async (doctor: string, template: string, mode: string) => {   
+    if (doctor && template) {
       try {
         let passData: string = JSON.stringify({ template_id: template, patient_id: patientId, doctor_id: doctor  });
         const result = await execute_axios_post(ENDPOINTS.POST_LETTER_GETCONTENT, passData);
-        savedData = result.data;
-        loadEditorData();
+        if(mode == 'edit') {
+          loadEditorContent()
+        }
+        else {
+          savedData = result.data;   
+          loadEditorData()
+        }
       } catch (error) {
         console.error("Error fetching records:", error);
       }
     } 
   }; 
+  const loadEditorContent = () => {    
+    loadEditorData();    
+  }; 
+  
 
   const handleEditorCreated = () => {
     setIsEditorReady(true);
@@ -475,8 +591,12 @@ const Letter: React.FC = () => {
               <i className="fi fi-rr-print"></i> Print
             </Button> : ''
           }
+          { <Button onClick={openHeidi} className="btn btn-info rounded-0 float-end me-2" style={{ position: 'absolute', bottom: '16px', right: '100px' }}>
+          <i className="fi fi-ss-circle-microphone"></i> Open Heidi
+            </Button>
+          }          
         </OffcanvasComponent>
-      
+        <div id="heidi-widget" style={{ width: "100%", height: "600px" }}></div> 
       <ToastNotification
         show={showToast}
         message={toastMessage}

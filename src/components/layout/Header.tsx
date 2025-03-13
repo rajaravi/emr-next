@@ -51,9 +51,9 @@ const Header: React.FC = () => {
                 <i className="fi fi-rs-calculator-money"></i> {t('MENU.MENU_ACCOUNT')}
               </Link>
             </li>
-            <li className="nav-item d-none">
-              <Link href="/tray" className={`nav-link ${isActive('/tray') ? 'active' : ''} `}>
-                <i className="fi fi-rr-drawer-empty"></i> {t('MENU.MENU_TRAY')}
+            <li className="nav-item">
+              <Link href="/task" className={`nav-link`}>
+                <i className="fi fi-rr-drawer-empty"></i> {t('MENU.MENU_TASK')}                
               </Link>
             </li>
             <li className="nav-item">

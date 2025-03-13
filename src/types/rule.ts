@@ -5,13 +5,13 @@ interface ConditionalParameter {
 interface RuleParameter {
     name: string;
     value: number;
-    conditional_parameters: ConditionalParameter[];
+    conditional_parameters: [];
 }
 interface RuleAction {
     id: number | null;
     name: string;
     identifier: string;
-    category: string;
+    recipient: string;
     value: string;
     recipients: string;
     is_user_interaction_required: boolean;

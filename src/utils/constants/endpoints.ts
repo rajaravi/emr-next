@@ -84,6 +84,16 @@ const ENDPOINTS = {
     POST_RULE_DELETE: `${BASE_API_URL}/rule/delete`,
     POST_RULE_STORE: `${BASE_API_URL}/rule/store`,
     POST_RULE_GET_RULES: `${BASE_API_URL}/rule/get-rule-details`,
+    POST_DRUG_PATHWAY_LIST: `${BASE_API_URL}/drug-pathway/index`,
+    POST_DRUG_PATHWAY_FORMDATA: `${BASE_API_URL}/drug-pathway/form-data`,
+    POST_DRUG_PATHWAY_ARCHIVE: `${BASE_API_URL}/drug-pathway/archive`,
+    POST_DRUG_PATHWAY_STORE: `${BASE_API_URL}/drug-pathway/store`,
+    POST_DRUG_PATHWAY_DEFAULT: `${BASE_API_URL}/drug-pathway/default`,
+    POST_DRUG_LIST: `${BASE_API_URL}/drug/index`,
+    POST_DRUG_FORMDATA: `${BASE_API_URL}/drug/form-data`,
+    POST_DRUG_DELETE: `${BASE_API_URL}/drug/delete`,
+    POST_DRUG_STORE: `${BASE_API_URL}/drug/store`,
+
 
     POST_PATIENT_LIST: `${BASE_API_URL}/patient/index`,
     POST_PATIENT_FORMDATA: `${BASE_API_URL}/patient/form-data`,
@@ -105,6 +115,15 @@ const ENDPOINTS = {
     POST_SCAN_FORMDATA: `${BASE_API_URL}/scan/form-data`,
     POST_SCAN_STATUS: `${BASE_API_URL}/scan/status`,
     POST_SCAN_STORE: `${BASE_API_URL}/scan/store`,
+    POST_NOTE_LIST: `${BASE_API_URL}/patient-note/index`,
+    POST_NOTE_FORMDATA: `${BASE_API_URL}/patient-note/form-data`,
+    POST_NOTE_DELETE: `${BASE_API_URL}/patient-note/delete`,
+    POST_NOTE_STORE: `${BASE_API_URL}/patient-note/store`,
+    POST_SOAP_NOTE_LIST: `${BASE_API_URL}/soap-note/index`,
+    POST_SOAP_NOTE_FORMDATA: `${BASE_API_URL}/soap-note/form-data`,
+    POST_SOAP_NOTE_DELETE: `${BASE_API_URL}/soap-note/delete`,
+    POST_SOAP_NOTE_STORE: `${BASE_API_URL}/soap-note/store`,
+
     
     POST_APPOINTMENT_LIST: `${BASE_API_URL}/appointment/index`,
     POST_APPOINTMENT_FORMDATA: `${BASE_API_URL}/appointment/form-data`,

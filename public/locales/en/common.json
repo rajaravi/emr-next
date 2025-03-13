@@ -10,6 +10,7 @@
     "MENU_SETTING": "Settings",
     "MENU_REPORT": "Reports",
     "MENU_PROFILE": "Profile",
+    "MENU_TASK": "Task",
     "MENU_LOGOUT": "Logout"
   },
   "PATIENT": {
@@ -29,7 +30,8 @@
       "LETTERS": "Letters",
       "NOTES": "Notes",
       "FORMS": "Forms",
-      "ENCOUNTER": "Encounter"
+      "ENCOUNTER": "Encounter",
+      "SOAP_NOTES": "SOAP Notes"
     },
     "DETAILS": {
       "SNO": "S.No",
@@ -147,6 +149,40 @@
       "MESSAGES": {
         "SAVE_SUCCESS": "Letter saved successfully!"
       }    
+    },
+    "FORM": {
+      "CREATE_TITLE": "Create Form",
+      "EDIT_TITLE": "Edit Form",
+      "SNO": "S.No",
+      "DATE": "Date",
+      "TYPE": "Type",
+      "NAME": "Name",
+      "MESSAGES": {
+        "SAVE_SUCCESS": "Form saved successfully!"
+      }
+    },
+    "NOTE": {
+      "CREATE_TITLE": "Create Note",
+      "EDIT_TITLE": "Edit Note",
+      "SNO": "S.No",
+      "DATE": "Date",
+      "NOTES": "Notes",
+      "STATUS": "Status",
+      "MESSAGES": {
+        "SAVE_SUCCESS": "Notes saved successfully!"
+      }
+    },
+    "SOAP_NOTE": {
+      "CREATE_TITLE": "Create SOAP Note",
+      "EDIT_TITLE": "Edit SOAP Note",
+      "SNO": "S.No",
+      "SUBJECTIVE": "Subjective",
+      "OBJECTIVE": "Objetive",
+      "ASSESSMENT": "Assessment",
+      "PLAN": "Plan",
+      "MESSAGES": {
+        "SAVE_SUCCESS": "SOAP Notes saved successfully!"
+      }
     }
   },
   "ACCOUNT": {
@@ -241,7 +277,9 @@
       "TAX": "Tax",
       "RULE": "Rule",
       "PAYMENT_TYPE": "Payment Type",
-      "PAYMENT_GATEWAY": "Payment Gateway"
+      "PAYMENT_GATEWAY": "Payment Gateway",
+      "DRUG_PATHWAY": "Drug Pathway",
+      "DRUG": "Drug"
     },
     "DOCTOR": {
       "CREATE_TITLE": "Create Doctor",
@@ -485,6 +523,31 @@
         "SAVE_SUCCESS": "Rule saved successfully!"
       }
     },
+    "DRUG_PATHWAY": {
+      "CREATE_TITLE": "Create Drug Pathway",
+      "EDIT_TITLE": "Edit Drug Pathway",
+      "SNO": "S.No",
+      "NAME": "Name",
+      "CODE": "Code",
+      "ARCHIVE": "Archive",
+      "DEFAULT": "Default",
+      "ACTIONS": "Actions",
+      "MESSAGES": {
+        "SAVE_SUCCESS": "Drug Pathway saved successfully!"
+      }
+    }, 
+    "DRUG": {
+      "CREATE_TITLE": "Create Drug",
+      "EDIT_TITLE": "Edit Drug",
+      "SNO": "S.No",
+      "TRADE_NAME": "Trade Name",
+      "CODE": "Code",
+      "GENERIC_NAME": "Generic Name",
+      "MANUFACTURER": "Manufacturer",
+      "MESSAGES": {
+        "SAVE_SUCCESS": "Drug saved successfully!"
+      }
+    },    
     "MESSAGES": {
       "SELECT_RECORD": "Select a record!",
       "ARCHIVE": "Archived successfully!",
@@ -492,12 +555,14 @@
       "ACTIVE": "Active successfully!",
       "INACTIVE": "Inactive successfully!",
       "SET_DEFAULT": "Record set as default successfully!",
-      "REMOVE_DEFAULT": "Record removed as default successfully!"
+      "REMOVE_DEFAULT": "Record removed as default successfully!",
+      "DELETE": "Deleted successfully!"
     }
   },
   "ACTIONS": {
     "ADDNEW": "Add New",
     "EDIT": "Edit",
+    "DELETE": "Delete",
     "SEND_EMAIL": "Send Email",
     "PRINT_LETTER": "Print Letter",
     "PRINT": "Print",

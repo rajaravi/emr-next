@@ -15,39 +15,85 @@ import { useLoading } from '@/context/LoadingContext';
 import OffcanvasComponent from '@/components/core-components/OffcanvasComponent';
 import DynamicForm, { DynamicFormHandle } from '@/components/core-components/DynamicForm';
 import ToastNotification from '@/components/core-components/ToastNotification';
-import { IncomeCategoryFormElements } from '@/data/IncomeCategoryFormElements';
-import { IncomeCategoryModel } from '@/types/income-category';
+import { DrugFormElements } from '@/data/DrugFormElements';
+import { DrugModel } from '@/types/drug';
 
 let pageLimit: number = 8;
 let selectedID: number = 0;
-let archiveID: number = 0;
+let deleteID: number = 0;
 export const getStaticProps: GetStaticProps = getI18nStaticProps();
 
 const initialValue = {
-  name: '',
-  type_id: 1,
-  is_archive: 0,
-  is_default: 0
+  category_id: 0,
+  code: '',
+  bar_code: '',
+  gms_number: '',
+  trade_name: '',
+  pack_size : '',
+  pack_size_number: '',
+  pack_size_units : '',
+  manufacturer: '',
+  agent: '',
+  ingredient_cost : '',
+  retail_price: '',
+  vat: '',
+  vat_change: '',
+  coschange : '',
+  poison_classification: '',
+  product_authorisation: '',
+  EHBLTINO: '',
+  generic_name: '',
+  drug_date : '',
+  warning_code: '',
+  ingred1: '',
+  ingred2: '',
+  ATC1 : '',
+  ATC2 : '',
+  dentist: '',
+  counsel_code: '',
+  strength: '',
+  drug_from : '',
+  ingredient1: '',
+  ingredient2: '',
+  ingredient3: '',
+  ingredient4: '',
+  ingredient5: '',
+  ingredient6: '',
+  ingredient7: '',
+  ingredient8: '',
+  ingredient9: '',
+  ingredient10: '',
+  IATC1: '',
+  IATC2: '',
+  IATC3: '',
+  IATC4: '',
+  IATC5: '',
+  IATC6: '',
+  IATC7: '',
+  IATC8: '',
+  IATC9: '',
+  IATC10: '',
 };
 
-const IncomeCategory: React.FC = () => {
+const Drug: React.FC = () => {
   const { showLoading, hideLoading } = useLoading();
   const [show, setShow] = useState(false);
   const { t } = useTranslation('common');
   const columns: { name: string; class: string; field: string; }[] = [
-    { name: t('SETTING.INCOME_CATEGORY.SNO'), class: "col-sm-1", field: "sno"},
-    { name: t('SETTING.INCOME_CATEGORY.NAME'), class: "col-sm-5", field: "name"},
-    { name: t('SETTING.INCOME_CATEGORY.DEFAULT'), class: "col-sm-3", field: "is_default"},
-    { name: t('SETTING.INCOME_CATEGORY.ARCHIVE'), class: "col-sm-3", field: "is_archive"}
+    { name: t('SETTING.DRUG.SNO'), class: "col-sm-1", field: "sno"},
+    { name: t('SETTING.DRUG.CODE'), class: "col-sm-2", field: "code"},
+    { name: t('SETTING.DRUG.TRADE_NAME'), class: "col-sm-3", field: "trade_name"},
+    { name: t('SETTING.DRUG.GENERIC_NAME'), class: "col-sm-3", field: "generic_name"},
+    { name: t('SETTING.DRUG.MANUFACTURER'), class: "col-sm-3", field: "manufacturer"}
   ];
   const filter: { name: string; field: string; }[] = [
-    { name: t('SETTING.INCOME_CATEGORY.NAME'), field: 'name' }
+    { name: t('SETTING.DRUG.NAME'), field: 'name' }
   ];
 
   const dynamicFormRef = useRef<DynamicFormHandle>(null);
   const [page, setPage] = useState<number>(1);
   const [total, setTotal] = useState<number>(0);
-  const [selectedIncomeCategory, setSelectedIncomeCategory] = useState<number>(0);
+  const [selectedIncomeCategory, setSelectedDrug] = useState<number>(0);
   const [mode, setMode] = useState<boolean>(false);
   const [clear, setClear] = useState<boolean>(false);
   const [list, setList] = useState<any>([]);
@@ -60,14 +106,59 @@ const IncomeCategory: React.FC = () => {
   const [toastMessage, setToastMessage] = useState('');  
   const [toastColor, setToastColor] = useState<'primary' | 'success' | 'danger' | 'warning' | 'info' | 'light' | 'dark'>('primary');
 
-  const initialFormData: IncomeCategoryModel = {
+  const initialFormData: DrugModel = {
     "id": null,
-    "type_id": 1,
-    "name": "",
-    "is_archive": false,
-    "is_default": 0
+    "category_id": 0,
+    "code": "",
+    "bar_code": "",
+    "gms_number": "",
+    "trade_name": "",
+    "pack_size": "",
+    "pack_size_number": "",
+    "pack_size_units": "",
+    "manufacturer": "",
+    "agent": "",
+    "ingredient_cost": "",
+    "retail_price": "",
+    "vat": "",
+    "vat_change": "",
+    "coschange": "",
+    "poison_classification": "",
+    "product_authorisation": "",
+    "EHBLTINO": "",
+    "generic_name": "",
+    "drug_date": "",
+    "warning_code": "",
+    "ingred1": "",
+    "ingred2": "",
+    "ATC1": "",
+    "ATC2": "",
+    "dentist": "",
+    "counsel_code": "",
+    "strength": "",
+    "drug_from": "",
+    "ingredient1": "",
+    "ingredient2": "",
+    "ingredient3": "",
+    "ingredient4": "",
+    "ingredient5": "",
+    "ingredient6": "",
+    "ingredient7": "",
+    "ingredient8": "",
+    "ingredient9": "",
+    "ingredient10": "",
+    "IATC1": "",
+    "IATC2": "",
+    "IATC3": "",
+    "IATC4": "",
+    "IATC5": "",
+    "IATC6": "",
+    "IATC7": "",
+    "IATC8": "",
+    "IATC9": "",
+    "IATC10": "",
   };
-  const [formData, setFormData] = useState<IncomeCategoryModel>(initialFormData);
+  const [formData, setFormData] = useState<DrugModel>(initialFormData);
   const handleShow = () => {
     setShow(true);
     setFormData(initialFormData);
@@ -79,20 +170,20 @@ const IncomeCategory: React.FC = () => {
 
   useEffect(() => {    
     // Language apply for form label
-    const translatedFormElements = IncomeCategoryFormElements.map((element) => ({
+    const translatedFormElements = DrugFormElements.map((element) => ({
       ...element,
-      label: t('SETTING.INCOME_CATEGORY.'+element.label)
+      label: t('SETTING.DRUG.'+element.label)
     }));
     setTranslatedElements(translatedFormElements);
-    fetchIncomeCategoryList(page);
+    fetchDrugList(page);
   }, []);
 
   // Get doctor list
-  const fetchIncomeCategoryList = async (page: number, sFilter?: { field: string; text: string }) => {
+  const fetchDrugList = async (page: number, sFilter?: { field: string; text: string }) => {
     showLoading();
     try {
       let passData: string = JSON.stringify({ page: page, limit: pageLimit, sort: null, search: sFilter });
-      const response = await execute_axios_post(ENDPOINTS.POST_INCOME_CATEGORY_LIST, passData);
+      const response = await execute_axios_post(ENDPOINTS.POST_DRUG_LIST, passData);
       setList(response.data.list);
       setTotal(response.data.total);
     } catch (err) {
@@ -112,7 +203,7 @@ const IncomeCategory: React.FC = () => {
         }
         setPage(1);
         setsearchFilter(sFilter);
-        fetchIncomeCategoryList(1,sFilter);
+        fetchDrugList(1,sFilter);
         setClear(true);
     }
   }
@@ -121,25 +212,25 @@ const IncomeCategory: React.FC = () => {
   const clearSearch = () => {
     (document.getElementById('searchText') as HTMLInputElement).value = '';
     setsearchFilter([]);
-    fetchIncomeCategoryList(1);
+    fetchDrugList(1);
     setClear(false);
   }
 
   // List double click
-  const incomeCategoryDblClick = (event: any) => {
+  const drugPathwayDblClick = (event: any) => {
     let x = document.getElementsByClassName("selected");
     if(x.length > 0) { x[0].classList.remove("selected"); }
 
     if(event.target.parentNode.getAttribute('custom-id')) {
       selectedID = event.target.parentNode.getAttribute('custom-id');
       event.target.parentElement.setAttribute('class', 'row selected');
-      setSelectedIncomeCategory(selectedID);
+      setSelectedDrug(selectedID);
     }
-    getIncomeCategoryById('edit');
+    getDrugById('edit');
   }
 
   // List single click
-  const incomeCategoryClick = (event: any) => {
+  const drugPathwayClick = (event: any) => {
     let x = document.getElementsByClassName("selected");
     if(x.length > 0) { x[0].classList.remove("selected"); }
 
@@ -147,12 +238,12 @@ const IncomeCategory: React.FC = () => {
       selectedID = event.target.parentNode.getAttribute('custom-id');
       event.target.parentElement.setAttribute('class', 'row selected');
     }
-    setSelectedIncomeCategory(selectedID);
+    setSelectedDrug(selectedID);
   }
 
   // Edit action call
-  const createSpeciality = () => {
-    getIncomeCategoryById('add');
+  const createDrug = () => {
+    getDrugById('add');
   }
   
   // Edit action call
@@ -161,7 +252,7 @@ const IncomeCategory: React.FC = () => {
       handleShowToast(t('SETTING.MESSAGES.SELECT_RECORD'), 'danger');
       return false;
     }
-    getIncomeCategoryById('edit');
+    getDrugById('edit');
   } 
   
   // Function to handle form field changes
@@ -172,12 +263,12 @@ const IncomeCategory: React.FC = () => {
   };  
 
   // Get form data
-  const getIncomeCategoryById = async (type: string) => {
+  const getDrugById = async (type: string) => {
     try {
       let editID = 0;      
       if(type == 'edit') editID = selectedIncomeCategory;
       let passData: string = JSON.stringify({ id: editID });      
-      const response = await execute_axios_post(ENDPOINTS.POST_INCOME_CATEGORY_FORMDATA, passData);
+      const response = await execute_axios_post(ENDPOINTS.POST_DRUG_FORMDATA, passData);
       if(response.success) {        
         handleShow();
         if(response.data?.data?.id) {
@@ -197,9 +288,8 @@ const IncomeCategory: React.FC = () => {
     // Implement your save logic here
     if (dynamicFormRef.current?.validateModelForm()) {
       try {
-        formData.type_id = 1;
-        const response = await execute_axios_post(ENDPOINTS.POST_INCOME_CATEGORY_STORE, formData);
-        handleShowToast(t('SETTING.INCOME_CATEGORY.MESSAGES.SAVE_SUCCESS'), 'success');
+        const response = await execute_axios_post(ENDPOINTS.POST_DRUG_STORE, formData);
+        handleShowToast(t('SETTING.DRUG.MESSAGES.SAVE_SUCCESS'), 'success');
       } catch (error) {
         console.error('Error updating income category:', error);
       } finally {
@@ -215,19 +305,14 @@ const IncomeCategory: React.FC = () => {
   };
 
   // Archive action call
-  const handleArchive = async(event: any) => {
+  const handleDelete = async(event: any) => {
     showLoading();
     try {
-      archiveID = event.target.getAttribute('cur-id');
-      let passData: string = JSON.stringify({ id: archiveID, is_archive: event.target.checked });
-      const response = await execute_axios_post(ENDPOINTS.POST_INCOME_CATEGORY_ARCHIVE, passData);      
+      deleteID = event.target.getAttribute('cur-id');
+      let passData: string = JSON.stringify({ id: selectedID });
+      const response = await execute_axios_post(ENDPOINTS.POST_DRUG_DELETE, passData);      
       if(response.success) { 
-        if(event.target.checked === true) {
-          handleShowToast(t('SETTING.MESSAGES.UNARCHIVE'), 'dark');
-        }
-        if(event.target.checked === false) {
-          handleShowToast(t('SETTING.MESSAGES.ARCHIVE'), 'success');
-        }
+        handleShowToast(t('SETTING.MESSAGES.DELETE'), 'success');
         refreshData(page);
         hideLoading();
       }
@@ -236,31 +321,6 @@ const IncomeCategory: React.FC = () => {
         hideLoading();
     }
   }
-
-  // set Default action call
-  const handleDefault = async(event: any) => {
-    showLoading();
-    try {
-      archiveID = event.target.getAttribute('cur-id');
-      let passData: string = JSON.stringify({ id: archiveID, is_default: event.target.checked });
-      const response = await execute_axios_post(ENDPOINTS.POST_INCOME_CATEGORY_DEFAULT, passData);      
-      if(response.success) { 
-        if(event.target.checked === true) {
-          handleShowToast(t('SETTING.MESSAGES.REMOVED_DEFAULT'), 'dark');
-        }
-        if(event.target.checked === false) {
-          handleShowToast(t('SETTING.MESSAGES.SET_DEFAULT'), 'success');
-        }
-        refreshData(page);
-        hideLoading();
-      }
-    } catch (error: any) {
-        console.error('Error on fetching income category details:', error);
-        hideLoading();
-    }
-  }
-
-  
 
   // Callback function form save to list refresh
   const refreshForm = () => {
@@ -273,9 +333,9 @@ const IncomeCategory: React.FC = () => {
     listRows.forEach(function(row){
       row.classList.remove('selected');
     })
-    setSelectedIncomeCategory(0);
+    setSelectedDrug(0);
     setPage(currentPage);
-    fetchIncomeCategoryList(currentPage, searchFilter);
+    fetchDrugList(currentPage, searchFilter);
   }
 
   // Toast message call
@@ -288,17 +348,18 @@ const IncomeCategory: React.FC = () => {
   return (
     <SettingLayout>
       <div className="d-flex justify-content-between align-items-center">
-        <h1 className={`${styles.title} mb-3`}>{t('SETTING.SIDE_MENU.INCOME_CATEGORY')}</h1>
+        <h1 className={`${styles.title} mb-3 module-title`}><i className="fi fi-bs-pills"></i> {t('SETTING.SIDE_MENU.DRUG')}</h1>
       </div>
       <Row className="white-bg p-1 m-0 top-bottom-shadow">
         <Col xs={7} className="mt-3 action">
-          <Button variant='primary' className='btn rounded-0' onClick={createSpeciality}><i className="fi fi-ss-add"></i> {t('ACTIONS.ADDNEW')}</Button>
+          <Button variant='primary' className='btn rounded-0' onClick={createDrug}><i className="fi fi-ss-add"></i> {t('ACTIONS.ADDNEW')}</Button>
           <Dropdown >
             <Dropdown.Toggle variant="secondary" id="dropdown-basic"  className="btn rounded-0 ms-2">
               {t('ACTIONS.ACTIONS')}
             </Dropdown.Toggle>
             <Dropdown.Menu>
               <Dropdown.Item onClick={handleEdit}><i className="fi fi-sr-pencil"></i> {t('ACTIONS.EDIT')}</Dropdown.Item>
+              <Dropdown.Item onClick={handleDelete}><i className="fi fi-rr-trash"></i> {t('ACTIONS.DELETE')}</Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>
         </Col>
@@ -316,19 +377,18 @@ const IncomeCategory: React.FC = () => {
         <Datalist
           columns={columns}
           list={list}
-          onRowDblClick={incomeCategoryDblClick}
-          onRowClick={incomeCategoryClick}
+          onRowDblClick={drugPathwayDblClick}
+          onRowClick={drugPathwayClick}
           page={page}
           total={total}
           pageLimit={pageLimit}
           refreshData={refreshData}
           showPagination={true}
-          archiveRecord={handleArchive}
-          defaultRecord={handleDefault}/>
+          archiveRecord={handleDelete}/>
       </div>
       <OffcanvasComponent
         show={show}
-        title={ (mode) ? t('SETTING.INCOME_CATEGORY.EDIT_TITLE') : t('SETTING.INCOME_CATEGORY.CREATE_TITLE') }
+        title={ (mode) ? t('SETTING.DRUG.EDIT_TITLE') : t('SETTING.DRUG.CREATE_TITLE') }
         handleClose={handleClose}
         onSave={handleSave}
         size="30%">     
@@ -351,4 +411,4 @@ const IncomeCategory: React.FC = () => {
     </SettingLayout>
   );
 };
-export default IncomeCategory;
+export default Drug;

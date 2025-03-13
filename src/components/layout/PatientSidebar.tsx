@@ -46,6 +46,12 @@ const PatientSidebar: React.FC<PatientSidebarProps> = ({ patientId }) => {
           </Link>
         </li>
         <li className="nav-item">
+          <Link href={`/patient/${patientId}/soap-notes`}
+            className={`nav-link ${activeLink === `/patient/${patientId}/soap-notes` ? 'active' : ''}`}>
+            <i className="fi fi-rr-edit"></i> {t('PATIENT.SIDE_MENU.SOAP_NOTES')} <span>3</span>
+          </Link>
+        </li>
+        <li className="nav-item">
           <Link href={`/patient/${patientId}/appointment`}
             className={`nav-link ${activeLink === `/patient/${patientId}/appointment` ? 'active' : ''}`}>
             <i className="fi fi-rs-time-watch-calendar"></i> {t('PATIENT.SIDE_MENU.APPOINTMENT')} <span>1</span>
@@ -58,38 +64,6 @@ const PatientSidebar: React.FC<PatientSidebarProps> = ({ patientId }) => {
           </Link>
         </li>
         <li className="nav-item">
-          <Link href={`/patient/${patientId}/letter`}
-            className={`nav-link ${activeLink === `/patient/${patientId}/letter` ? 'active' : ''}`}>
-            <i className="fi fi-rr-envelope-open-text"></i> {t('PATIENT.SIDE_MENU.LETTERS')} <span>2</span>
-          </Link>
-        </li>
-
-        <li className="nav-item">
-          <Link href={`/patient/${patientId}/scan`}
-            className={`nav-link ${activeLink === `/patient/${patientId}/scan` ? 'active' : ''}`}>
-            <i className="fi fi-br-qr-scan"></i> {t('PATIENT.SIDE_MENU.SCAN_DOCS')} <span>1</span>
-          </Link>
-        </li>
-        <li className="nav-item">
-          <Link href={`/patient/${patientId}/prescription`}
-            className={`nav-link ${activeLink === `/patient/${patientId}/prescription` ? 'active' : ''}`}>
-            <i className="fi fi-rr-file-prescription"></i> {t('PATIENT.SIDE_MENU.PRESCRIPTION')} <span>0</span>
-          </Link>
-        </li>
-        <li className="nav-item">
-          <Link href={`/patient/${patientId}/forms`}
-            className={`nav-link ${activeLink === `/patient/${patientId}/forms` ? 'active' : ''}`}>
-            <i className="fi fi-rr-form"></i> {t('PATIENT.SIDE_MENU.FORMS')} <span>4</span>
-          </Link>
-        </li>
-        
-        <li className="nav-item d-none">
-          <Link href={`/patient/${patientId}/scan`}
-            className={`nav-link ${activeLink === `/patient/${patientId}/scan` ? 'active' : ''}`}>
-            <i className="fi fi-rr-scanner-image"></i> {t('PATIENT.SIDE_MENU.SCAN_DOCS')} <span>1</span>
-          </Link>
-        </li>        
-        <li className="nav-item">
           <Link href={`/patient/${patientId}/invoice`}
             className={`nav-link ${activeLink === `/patient/${patientId}/invoice` ? 'active' : ''}`}>
             <i className="fi fi-rr-file-invoice"></i> {t('PATIENT.SIDE_MENU.INVOICE')} <span>2</span>
@@ -101,6 +75,36 @@ const PatientSidebar: React.FC<PatientSidebarProps> = ({ patientId }) => {
             <i className="fi fi-rr-receipt"></i> {t('PATIENT.SIDE_MENU.RECEIPT')} <span>1</span>
           </Link>
         </li>
+        <li className="nav-item">
+          <Link href={`/patient/${patientId}/letter`}
+            className={`nav-link ${activeLink === `/patient/${patientId}/letter` ? 'active' : ''}`}>
+            <i className="fi fi-rr-envelope-open-text"></i> {t('PATIENT.SIDE_MENU.LETTERS')} <span>2</span>
+          </Link>
+        </li>
+        <li className="nav-item">
+          <Link href={`/patient/${patientId}/scan`}
+            className={`nav-link ${activeLink === `/patient/${patientId}/scan` ? 'active' : ''}`}>
+            <i className="fi fi-br-qr-scan"></i> {t('PATIENT.SIDE_MENU.SCAN_DOCS')} <span>1</span>
+          </Link>
+        </li>
+        <li className="nav-item d-none">
+          <Link href={`/patient/${patientId}/prescription`}
+            className={`nav-link ${activeLink === `/patient/${patientId}/prescription` ? 'active' : ''}`}>
+            <i className="fi fi-rr-file-prescription"></i> {t('PATIENT.SIDE_MENU.PRESCRIPTION')} <span>0</span>
+          </Link>
+        </li>
+        <li className="nav-item">
+          <Link href={`/patient/${patientId}/forms`}
+            className={`nav-link ${activeLink === `/patient/${patientId}/forms` ? 'active' : ''}`}>
+            <i className="fi fi-rr-form"></i> {t('PATIENT.SIDE_MENU.FORMS')} <span>4</span>
+          </Link>
+        </li>        
+        <li className="nav-item d-none">
+          <Link href={`/patient/${patientId}/scan`}
+            className={`nav-link ${activeLink === `/patient/${patientId}/scan` ? 'active' : ''}`}>
+            <i className="fi fi-rr-scanner-image"></i> {t('PATIENT.SIDE_MENU.SCAN_DOCS')} <span>1</span>
+          </Link>
+        </li>        
         <li className="nav-item">
           <Link href={`/patient/${patientId}/notes`}
             className={`nav-link ${activeLink === `/patient/${patientId}/notes` ? 'active' : ''}`}>

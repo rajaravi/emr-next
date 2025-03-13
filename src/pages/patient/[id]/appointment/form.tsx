@@ -1,11 +1,10 @@
-import React, { forwardRef, useRef, useImperativeHandle, useEffect, useState } from 'react';
+import React, { forwardRef, useRef, useImperativeHandle, useEffect, useState, useCallback } from 'react';
 import { Row, Col, Container, Button, Form, ProgressBar, Modal, Tabs, Tab } from 'react-bootstrap';
 import { GetServerSideProps } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useTranslation } from 'next-i18next';
 import DynamicForm, { DynamicFormHandle } from '@/components/core-components/DynamicForm';
 import OffcanvasComponent from '@/components/core-components/OffcanvasComponent';
-import ToastNotification from '@/components/core-components/ToastNotification';
 import { typeaheadColumnConfig } from '@/types/patient';
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
@@ -40,28 +39,22 @@ interface AppointmentProps {
   activeIndex: number;
   fromSource: string;
   booked_slot_time: string;
-  workFlowShow: boolean;
-  nextStep: (i: number) => void;
-  step: number;
-  totalSteps: number;
-  setStep: (i: number) => void;
 }
 
 const AppointmentForm = forwardRef<DynamicFormHandle, AppointmentProps>(({formLabels, initialValues, slotsList, editID, show, mode,
-  refreshForm, handleTypeaheadInputChange, handleInputChange, handleItemClick, formReset, activeIndex, handleSave, handleClose, fromSource, booked_slot_time, workFlowShow, nextStep, step, totalSteps, setStep}, ref) => {
+  refreshForm, handleTypeaheadInputChange, handleInputChange, handleItemClick, formReset, activeIndex, handleSave, handleClose, fromSource, booked_slot_time }, ref) => {
 
-  const { t } = useTranslation('common');
-  const [showToast, setShowToast] = useState(false);
-  const [toastMessage, setToastMessage] = useState('');
-  const [toastColor, setToastColor] = useState<'primary' | 'success' | 'danger' | 'warning' | 'info' | 'light' | 'dark'>('primary');
-
+  const { t } = useTranslation('common');  
+  
   const dynamicFormRefApp = useRef<DynamicFormHandle>(null);
   useImperativeHandle(ref, () => ({
     validateModelForm: () => dynamicFormRefApp.current?.validateModelForm(),
   }));
 
+  
+
   useEffect(() => {
-    console.log('formLabels',formLabels)
+    console.log('formLabels',formLabels);
       // Language apply for form label
       // const filteredElements = formLabels.filter((element) => element.name !== "status_id");
       // const translatedFormElements = filteredElements.map((element) => {
@@ -73,6 +66,8 @@ const AppointmentForm = forwardRef<DynamicFormHandle, AppointmentProps>(({formLa
 
 
     }, []);
+
+    
 
   return (
   <>
@@ -123,67 +118,7 @@ const AppointmentForm = forwardRef<DynamicFormHandle, AppointmentProps>(({formLa
         </Col>
       </Row>
     </OffcanvasComponent>
-    <Modal size='xl' show={workFlowShow}>
-      <Container className="my-4">
-        <h3 className='mb-3 border-bottom'>Appointment - Follow up actions</h3>
-        <Tabs className="mb-3 w-100 d-flex justify-content-between nav-tabs-custom" activeKey={step} >
-          <Tab eventKey={1} title="Step 1" disabled={step < 1} />
-          <Tab eventKey={2} title="Step 2" disabled={step < 2} />
-          <Tab eventKey={3} title="Step 3" disabled={step < 3} />
-        </Tabs>
-        {step === 1 && (
-          <Form>
-            <Form.Group controlId="step1">
-              <Form.Label>Step 1</Form.Label>
-              <Form.Control type="text" placeholder="Enter your name" />
-            </Form.Group>
-          </Form>
-        )}
-
-        {step === 2 && (
-          <Form>
-            <Form.Group controlId="step2">
-              <Form.Label>Step 2</Form.Label>
-              <Form.Control type="email" placeholder="Enter your email" />
-            </Form.Group>
-          </Form>
-        )}
-
-        {step === 3 && (
-          <Form>
-            <Form.Group controlId="step3">
-              <Form.Label>Step 3</Form.Label>
-              <p>Review your information and submit.</p>
-            </Form.Group>
-          </Form>
-        )}
-
-        <div className="d-flex float-end mt-3">
-          {/* <Button variant="secondary" onClick={prevStep} disabled={step === 1}>
-            Previous
-          </Button> */}
-          {step < totalSteps ? (
-            <>
-              <Button className='float-end rounded-0' variant="success" onClick={() => nextStep(1)}>
-                Save and Next
-              </Button>
-              <Button className='float-end rounded-0' variant="default" onClick={() => nextStep(2)}>
-                Skip
-              </Button>
-            </>
-          ) : (
-            <>
-              <Button variant="success" className='rounded-0' onClick={() => nextStep(3)}>
-                Submit and Close
-              </Button>
-              <Button className='float-end rounded-0' variant="default" onClick={() => nextStep(4)}>
-                Skip
-              </Button>
-            </>
-          )}
-        </div>
-      </Container>
-    </Modal>
+    
   </>
   )
 });
