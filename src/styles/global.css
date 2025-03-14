@@ -858,5 +858,5 @@ li.nav-item:hover ul.sub-menu {
   right: 8px !important;
 }
 
-next-route-announcer + div {display:none;}
+next-route-announcer + div, next-route-announcer + script + div {display:none;}
 .e-dropdown-popup.e-lib.e-popup + div, .heidi-iframe + div {display:none;}

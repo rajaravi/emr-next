@@ -148,10 +148,10 @@ const Calendar = () => {
   const columns: { name: string; class: string; field: string; format: string; }[] = [
     { name: t('PATIENT.SURGERY.SNO'), class: "col-sm-1", field: "sno", format:''},
     { name: t('PATIENT.SURGERY.DATE'), class: "col-sm-1", field: "date", format:'date'},
-    { name: t('PATIENT.SURGERY.PATIENT'), class: "col-sm-3", field: "patient.full_name", format:''},
-    { name: t('PATIENT.SURGERY.DOCTOR'), class: "col-sm-2", field: "doctor.name", format:''},
-    { name: t('PATIENT.SURGERY.LOCATION'), class: "col-sm-3", field: "location.name", format:''},
-    { name: t('PATIENT.SURGERY.STATUS'), class: "col-sm-2", field: "status.description", format:''},    
+    { name: t('PATIENT.SURGERY.PATIENT'), class: "col-sm-3", field: "patient?.full_name", format:''},
+    { name: t('PATIENT.SURGERY.DOCTOR'), class: "col-sm-2", field: "doctor?.name", format:''},
+    { name: t('PATIENT.SURGERY.LOCATION'), class: "col-sm-3", field: "location?.name", format:''},
+    { name: t('PATIENT.SURGERY.STATUS'), class: "col-sm-2", field: "status?.description", format:''},    
   ];
   const filter: { name: string; field: string; }[] = [
     { name: t('PATIENT.SURGERY.PATIENT'), field: 'patient_id' }
@@ -254,14 +254,14 @@ const Calendar = () => {
   const getEncounterList = async (moduleType:string) => {
     try {
         let passData: string = JSON.stringify({ patient_id: patientID });
-        const result = await execute_axios_post(ENDPOINTS.GET_ENCOUNTER_LIST, passData);
+        const result = await execute_axios_post(ENDPOINTS.POST_ENCOUNTER_GETLIST, passData);
         let encounter = new Array;
         if(result.data) {
           result.data.map((enc: any, e: number) => {
             encounter.push({'label':enc.name, 'value': enc.id});
           })
         }
-        if(moduleType === 'Apoointment') {
+        if(moduleType === 'Appointment') {
           translatedElementsApp.map((elements: any, k: number) => {
             if(elements.name == 'episode_id') {
               elements.options = [];

@@ -462,6 +462,7 @@ const Letter: React.FC = () => {
   const handleClose = () => {
       setShow(false);
       setMode(false);
+      // closeHeidiWidget();
   }
 
   // Save button handler
@@ -484,6 +485,7 @@ const Letter: React.FC = () => {
       } catch (error) {
         console.error('Error creating an appointment:', error);
       } finally {
+          // closeHeidiWidget();
           hideLoading();
           refreshForm();
       }
@@ -519,6 +521,20 @@ const Letter: React.FC = () => {
   const handleEditorCreated = () => {
     setIsEditorReady(true);
   };
+
+  function closeHeidiWidget() {
+    const heidiWidget = document.querySelector("#heidi-widget"); // Replace with the actual ID/class
+    if (heidiWidget) {
+      heidiWidget.style.display = "none"; // Hide the widget
+    }
+  
+    // Clear any input fields inside the widget
+    const inputs = heidiWidget.querySelectorAll("input, textarea, select");
+    inputs.forEach((input) => (input.value = ""));
+  
+    // Clear any stored state if applicable
+    localStorage.removeItem("heidiWidgetData"); // If data is stored in localStorage
+  }
   
   return (
     <PatientLayout patientId={id as string}>

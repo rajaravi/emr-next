@@ -51,11 +51,11 @@ const Datalist: FC<DatalistProps> = ({columns, list, page, total, pageLimit, onR
                                     let pageNo = ((page-1) * pageLimit) + (i + 1);
                                     lastNo = pageNo;
                                     if(f.includes(".")) { // Column name with different tables
-                                        data[f] = eval('data.'+f);
+                                        data[f] = eval('data?.'+f);
                                     }
                                     if(f.includes("-")) { // Two string shows in the single column
                                         let splitData = f.split('-');
-                                        data[f] = eval('data.'+splitData[0])+ ' - ' +eval('data.'+splitData[1]);
+                                        data[f] = eval('data?.'+splitData[0])+ ' - ' +eval('data?.'+splitData[1]);
                                     }
                                     if(f === 'sno') {
                                         data[f] = pageNo;
