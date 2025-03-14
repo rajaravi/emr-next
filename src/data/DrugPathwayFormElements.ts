@@ -1,6 +1,16 @@
 import { FormField } from "@/types/form";
 
-export const PaymentTypeFormElements: FormField[] = [
+export const DrugPathwayFormElements: FormField[] = [
+  {
+    "type": "text",
+    "name": "code",
+    "label": "CODE",
+    "placeholder": "",
+    "required": true,
+    "validation": { "minLength": 2 },
+    "colClass": "col-sm-12",
+    "order": 1
+  },
   {
     "type": "text",
     "name": "name",
@@ -9,7 +19,7 @@ export const PaymentTypeFormElements: FormField[] = [
     "required": true,
     "validation": { "minLength": 2 },
     "colClass": "col-sm-12",
-    "order": 1
+    "order": 2
   },
   {
     "type": "switch",
@@ -20,7 +30,7 @@ export const PaymentTypeFormElements: FormField[] = [
     ],
     "required": false,
     "colClass": "col-sm-12",
-    "order": 2
+    "order": 3
   },
   {
     "type": "switch",
@@ -31,6 +41,6 @@ export const PaymentTypeFormElements: FormField[] = [
     ],
     "required": false,
     "colClass": "col-sm-12",
-    "order": 3
+    "order": 4
   }
 ];

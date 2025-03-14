@@ -1,75 +1,54 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useRouter } from 'next/router';
 import { execute_axios_post } from '@/utils/services/httpService';
-import { Button, Row, Col, Dropdown } from 'react-bootstrap';
+import { Button, Row, Col, Dropdown, Form } from 'react-bootstrap';
 import ENDPOINTS from '@/utils/constants/endpoints';
 import styles from './_style.module.css';
 
 // Translation logic - start
-import { GetServerSideProps } from 'next';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useTranslation } from 'next-i18next';
-import PatientLayout from '@/components/layout/PatientLayout';
+import { GetStaticPaths, GetStaticProps } from 'next';
+import { getI18nStaticProps } from '@/utils/services/getI18nStaticProps';
+import SettingLayout from '@/components/layout/SettingLayout';
 import Datalist from '@/components/core-components/Datalist';
 import SearchFilter from '@/components/core-components/SearchFilter';
 import { useLoading } from '@/context/LoadingContext';
 import OffcanvasComponent from '@/components/core-components/OffcanvasComponent';
 import DynamicForm, { DynamicFormHandle } from '@/components/core-components/DynamicForm';
 import ToastNotification from '@/components/core-components/ToastNotification';
-import { uuidToId } from '@/utils/helpers/uuid';
-import { EncounterFormElements } from '@/data/EncounterFormElements';
-import { EncounterModel } from '@/types/encounter';
+import { DrugPathwayFormElements } from '@/data/DrugPathwayFormElements';
+import { DrugPathwayModel } from '@/types/drug-pathway';
 
-let pageLimit: number = 6;
+let pageLimit: number = 8;
 let selectedID: number = 0;
-let statusID: number = 0;
-const todayDate = new Date().toISOString().split('T')[0];
-
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  const { id } = context.params as { id: string };
-  if (!id) {
-    return {
-      notFound: true, // Show 404 if patient ID is invalid
-    };
-  }
-  return {
-    props: {
-      ...(await serverSideTranslations(context.locale || 'en', ['common'])), // Ensure 'common' namespace exists
-      id: id, // Pass a valid string
-    },
-  };
-};
+let archiveID: number = 0;
+export const getStaticProps: GetStaticProps = getI18nStaticProps();
 
 const initialValue = {
-  id: 0,
-  patient_id: 0,
   name: '',
-  start_date: '',
-  is_active: 0
+  code: '',
+  is_archive: 0,
+  is_default: 0,
 };
 
-const Encounter: React.FC = () => {
+const DrugPathway: React.FC = () => {
   const { showLoading, hideLoading } = useLoading();
   const [show, setShow] = useState(false);
   const { t } = useTranslation('common');
-  const router = useRouter();
-  const { id } = router.query;
-  const patientId = id ? uuidToId(id) : 0;
-
-  const columns: { name: string; class: string; field: string; format: string; }[] = [
-    { name: t('PATIENT.ENCOUNTER.SNO'), class: "col-sm-1", field: "sno", format: ""},
-    { name: t('PATIENT.ENCOUNTER.START_DATE'), class: "col-sm-3", field: "start_date", format: "date"},
-    { name: t('PATIENT.ENCOUNTER.NAME'), class: "col-sm-6", field: "name", format: ""},
-    { name: t('PATIENT.ENCOUNTER.STATUS'), class: "col-sm-2", field: "is_active", format: ""}
+  const columns: { name: string; class: string; field: string; }[] = [
+    { name: t('SETTING.DRUG_PATHWAY.SNO'), class: "col-sm-1", field: "sno"},
+    { name: t('SETTING.DRUG_PATHWAY.CODE'), class: "col-sm-2", field: "code"},
+    { name: t('SETTING.DRUG_PATHWAY.NAME'), class: "col-sm-5", field: "name"},
+    { name: t('SETTING.DRUG_PATHWAY.DEFAULT'), class: "col-sm-2", field: "is_default"},
+    { name: t('SETTING.DRUG_PATHWAY.ARCHIVE'), class: "col-sm-2", field: "is_archive"}
   ];
   const filter: { name: string; field: string; }[] = [
-    { name: t('PATIENT.ENCOUNTER.NAME'), field: 'name' }
+    { name: t('SETTING.DRUG_PATHWAY.NAME'), field: 'name' }
   ];
 
   const dynamicFormRef = useRef<DynamicFormHandle>(null);
   const [page, setPage] = useState<number>(1);
   const [total, setTotal] = useState<number>(0);
-  const [selectedencounter, setSelectedEncounter] = useState<number>(0);
+  const [selectedIncomeCategory, setSelectedDrugPathway] = useState<number>(0);
   const [mode, setMode] = useState<boolean>(false);
   const [clear, setClear] = useState<boolean>(false);
   const [list, setList] = useState<any>([]);
@@ -82,14 +61,14 @@ const Encounter: React.FC = () => {
   const [toastMessage, setToastMessage] = useState('');  
   const [toastColor, setToastColor] = useState<'primary' | 'success' | 'danger' | 'warning' | 'info' | 'light' | 'dark'>('primary');
 
-  const initialFormData: EncounterModel = {
+  const initialFormData: DrugPathwayModel = {
     "id": null,
-    "patient_id": 0,
     "name": "",
-    "start_date": todayDate,
-    "is_active": false
+    "code": "",
+    "is_archive": 0,
+    "is_default": 0,
   };
-  const [formData, setFormData] = useState<EncounterModel>(initialFormData);
+  const [formData, setFormData] = useState<DrugPathwayModel>(initialFormData);
   const handleShow = () => {
     setShow(true);
     setFormData(initialFormData);
@@ -101,24 +80,24 @@ const Encounter: React.FC = () => {
 
   useEffect(() => {    
     // Language apply for form label
-    const translatedFormElements = EncounterFormElements.map((element) => ({
+    const translatedFormElements = DrugPathwayFormElements.map((element) => ({
       ...element,
-      label: t('PATIENT.ENCOUNTER.'+element.label)
+      label: t('SETTING.DRUG_PATHWAY.'+element.label)
     }));
     setTranslatedElements(translatedFormElements);
-    fetchEncounterList(page);
+    fetchDrugPathwayList(page);
   }, []);
 
   // Get doctor list
-  const fetchEncounterList = async (page: number, sFilter?: { field: string; text: string }) => {
+  const fetchDrugPathwayList = async (page: number, sFilter?: { field: string; text: string }) => {
     showLoading();
     try {
-      let passData: string = JSON.stringify({ page: page, limit: pageLimit, sort: null, search: sFilter, patient_id: uuidToId(id) });
-      const response = await execute_axios_post(ENDPOINTS.POST_ENCOUNTER_LIST, passData);
+      let passData: string = JSON.stringify({ page: page, limit: pageLimit, sort: null, search: sFilter });
+      const response = await execute_axios_post(ENDPOINTS.POST_DRUG_PATHWAY_LIST, passData);
       setList(response.data.list);
       setTotal(response.data.total);
     } catch (err) {
-      setError('Failed to load encounter data.');
+      setError('Failed to load income category data.');
     } finally {
       hideLoading();
     }
@@ -134,7 +113,7 @@ const Encounter: React.FC = () => {
         }
         setPage(1);
         setsearchFilter(sFilter);
-        fetchEncounterList(1,sFilter);
+        fetchDrugPathwayList(1,sFilter);
         setClear(true);
     }
   }
@@ -143,25 +122,25 @@ const Encounter: React.FC = () => {
   const clearSearch = () => {
     (document.getElementById('searchText') as HTMLInputElement).value = '';
     setsearchFilter([]);
-    fetchEncounterList(1);
+    fetchDrugPathwayList(1);
     setClear(false);
   }
 
   // List double click
-  const encounterDblClick = (event: any) => {
+  const drugPathwayDblClick = (event: any) => {
     let x = document.getElementsByClassName("selected");
     if(x.length > 0) { x[0].classList.remove("selected"); }
 
     if(event.target.parentNode.getAttribute('custom-id')) {
       selectedID = event.target.parentNode.getAttribute('custom-id');
       event.target.parentElement.setAttribute('class', 'row selected');
-      setSelectedEncounter(selectedID);
+      setSelectedDrugPathway(selectedID);
     }
-    getEncounterById('edit');
+    getDrugPathwayById('edit');
   }
 
   // List single click
-  const encounterClick = (event: any) => {
+  const drugPathwayClick = (event: any) => {
     let x = document.getElementsByClassName("selected");
     if(x.length > 0) { x[0].classList.remove("selected"); }
 
@@ -169,21 +148,21 @@ const Encounter: React.FC = () => {
       selectedID = event.target.parentNode.getAttribute('custom-id');
       event.target.parentElement.setAttribute('class', 'row selected');
     }
-    setSelectedEncounter(selectedID);
+    setSelectedDrugPathway(selectedID);
   }
 
   // Edit action call
-  const createEncounter = () => {    
-    getEncounterById('add');
+  const createDrugPathway = () => {
+    getDrugPathwayById('add');
   }
   
   // Edit action call
   const handleEdit = () => {
-    if(selectedencounter === 0) {
+    if(selectedIncomeCategory === 0) {
       handleShowToast(t('SETTING.MESSAGES.SELECT_RECORD'), 'danger');
       return false;
     }
-    getEncounterById('edit');
+    getDrugPathwayById('edit');
   } 
   
   // Function to handle form field changes
@@ -194,12 +173,12 @@ const Encounter: React.FC = () => {
   };  
 
   // Get form data
-  const getEncounterById = async (type: string) => {
+  const getDrugPathwayById = async (type: string) => {
     try {
       let editID = 0;      
-      if(type == 'edit') editID = selectedencounter;
-      let passData: string = JSON.stringify({ id: editID });
-      const response = await execute_axios_post(ENDPOINTS.POST_ENCOUNTER_FORMDATA, passData);
+      if(type == 'edit') editID = selectedIncomeCategory;
+      let passData: string = JSON.stringify({ id: editID });      
+      const response = await execute_axios_post(ENDPOINTS.POST_DRUG_PATHWAY_FORMDATA, passData);
       if(response.success) {        
         handleShow();
         if(response.data?.data?.id) {
@@ -209,7 +188,7 @@ const Encounter: React.FC = () => {
         }
       }
     } catch (error: any) {
-        console.error('Error on fetching encounter details:', error);
+        console.error('Error on fetching income category details:', error);
     }
   }
 
@@ -219,11 +198,10 @@ const Encounter: React.FC = () => {
     // Implement your save logic here
     if (dynamicFormRef.current?.validateModelForm()) {
       try {
-        formData.patient_id = patientId;
-        const response = await execute_axios_post(ENDPOINTS.POST_ENCOUNTER_STORE, formData);
-        handleShowToast(t('PATIENT.ENCOUNTER.MESSAGES.SAVE_SUCCESS'), 'success');
+        const response = await execute_axios_post(ENDPOINTS.POST_DRUG_PATHWAY_STORE, formData);
+        handleShowToast(t('SETTING.DRUG_PATHWAY.MESSAGES.SAVE_SUCCESS'), 'success');
       } catch (error) {
-        console.error('Error updating notes:', error);
+        console.error('Error updating income category:', error);
       } finally {
           hideLoading();
           refreshForm();
@@ -240,24 +218,49 @@ const Encounter: React.FC = () => {
   const handleArchive = async(event: any) => {
     showLoading();
     try {
-      statusID = event.target.getAttribute('cur-id');
-      let passData: string = JSON.stringify({ id: statusID, is_active: event.target.checked });
-      const response = await execute_axios_post(ENDPOINTS.POST_ENCOUNTER_STATUS, passData);      
+      archiveID = event.target.getAttribute('cur-id');
+      let passData: string = JSON.stringify({ id: archiveID, is_archive: event.target.checked });
+      const response = await execute_axios_post(ENDPOINTS.POST_DRUG_PATHWAY_ARCHIVE, passData);      
       if(response.success) { 
         if(event.target.checked === true) {
-          handleShowToast(t('SETTING.MESSAGES.INACTIVE'), 'dark');
+          handleShowToast(t('SETTING.MESSAGES.UNARCHIVE'), 'dark');
         }
         if(event.target.checked === false) {
-          handleShowToast(t('SETTING.MESSAGES.ACTIVE'), 'success');
+          handleShowToast(t('SETTING.MESSAGES.ARCHIVE'), 'success');
         }
         refreshData(page);
         hideLoading();
       }
     } catch (error: any) {
-        console.error('Error on fetching encounter details:', error);
+        console.error('Error on fetching income category details:', error);
         hideLoading();
     }
   }
+
+  // set Default action call
+  const handleDefault = async(event: any) => {
+    showLoading();
+    try {
+      archiveID = event.target.getAttribute('cur-id');
+      let passData: string = JSON.stringify({ id: archiveID, is_default: event.target.checked });
+      const response = await execute_axios_post(ENDPOINTS.POST_DRUG_PATHWAY_DEFAULT, passData);      
+      if(response.success) { 
+        if(event.target.checked === true) {
+          handleShowToast(t('SETTING.MESSAGES.REMOVE_DEFAULT'), 'dark');
+        }
+        if(event.target.checked === false) {
+          handleShowToast(t('SETTING.MESSAGES.SET_DEFAULT'), 'success');
+        }
+        refreshData(page);
+        hideLoading();
+      }
+    } catch (error: any) {
+        console.error('Error on fetching income category details:', error);
+        hideLoading();
+    }
+  }
+
+  
 
   // Callback function form save to list refresh
   const refreshForm = () => {
@@ -270,9 +273,9 @@ const Encounter: React.FC = () => {
     listRows.forEach(function(row){
       row.classList.remove('selected');
     })
-    setSelectedEncounter(0);
+    setSelectedDrugPathway(0);
     setPage(currentPage);
-    fetchEncounterList(currentPage, searchFilter);
+    fetchDrugPathwayList(currentPage, searchFilter);
   }
 
   // Toast message call
@@ -283,13 +286,13 @@ const Encounter: React.FC = () => {
   };
   
   return (
-    <PatientLayout patientId={id as string}>
+    <SettingLayout>
       <div className="d-flex justify-content-between align-items-center">
-        <h1 className={`${styles.title} mb-3 module-title`}><i className="fi fi-br-layers"></i> {t('PATIENT.SIDE_MENU.ENCOUNTER')}</h1>
+        <h1 className={`${styles.title} mb-3 module-title`}><i className="fi fi-rr-wallet-arrow"></i> {t('SETTING.SIDE_MENU.DRUG_PATHWAY')}</h1>
       </div>
       <Row className="white-bg p-1 m-0 top-bottom-shadow">
         <Col xs={7} className="mt-3 action">
-          <Button variant='primary' className='btn rounded-0' onClick={createEncounter}><i className="fi fi-ss-add"></i> {t('ACTIONS.ADDNEW')}</Button>
+          <Button variant='primary' className='btn rounded-0' onClick={createDrugPathway}><i className="fi fi-ss-add"></i> {t('ACTIONS.ADDNEW')}</Button>
           <Dropdown >
             <Dropdown.Toggle variant="secondary" id="dropdown-basic"  className="btn rounded-0 ms-2">
               {t('ACTIONS.ACTIONS')}
@@ -313,22 +316,22 @@ const Encounter: React.FC = () => {
         <Datalist
           columns={columns}
           list={list}
-          onRowDblClick={encounterDblClick}
-          onRowClick={encounterClick}
+          onRowDblClick={drugPathwayDblClick}
+          onRowClick={drugPathwayClick}
           page={page}
           total={total}
           pageLimit={pageLimit}
           refreshData={refreshData}
           showPagination={true}
-          archiveRecord={handleArchive}/>
+          archiveRecord={handleArchive}
+          defaultRecord={handleDefault}/>
       </div>
       <OffcanvasComponent
         show={show}
-        title={ (mode) ? t('PATIENT.ENCOUNTER.EDIT_TITLE') : t('PATIENT.ENCOUNTER.CREATE_TITLE') }
+        title={ (mode) ? t('SETTING.DRUG_PATHWAY.EDIT_TITLE') : t('SETTING.DRUG_PATHWAY.CREATE_TITLE') }
         handleClose={handleClose}
         onSave={handleSave}
-        size="30%">
-
+        size="30%">     
         <DynamicForm ref={dynamicFormRef}
           formData={translatedElements}
           initialValues={initialValues}
@@ -345,7 +348,7 @@ const Encounter: React.FC = () => {
         color={toastColor}
         onClose={() => setShowToast(false)}
       />
-    </PatientLayout>
+    </SettingLayout>
   );
 };
-export default Encounter;
+export default DrugPathway;

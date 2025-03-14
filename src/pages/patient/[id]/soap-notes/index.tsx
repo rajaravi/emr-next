@@ -17,12 +17,12 @@ import OffcanvasComponent from '@/components/core-components/OffcanvasComponent'
 import DynamicForm, { DynamicFormHandle } from '@/components/core-components/DynamicForm';
 import ToastNotification from '@/components/core-components/ToastNotification';
 import { uuidToId } from '@/utils/helpers/uuid';
-import { EncounterFormElements } from '@/data/EncounterFormElements';
-import { EncounterModel } from '@/types/encounter';
+import { SOAPNoteFormElements } from '@/data/SOAPNoteFormElements';
+import { SOAPNoteModel } from '@/types/soap-note';
 
 let pageLimit: number = 6;
 let selectedID: number = 0;
-let statusID: number = 0;
+
 const todayDate = new Date().toISOString().split('T')[0];
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
@@ -43,12 +43,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 const initialValue = {
   id: 0,
   patient_id: 0,
-  name: '',
-  start_date: '',
-  is_active: 0
+  subjective: '',
+  objective: '',
+  assesment: '',
+  plan: '',
 };
 
-const Encounter: React.FC = () => {
+const SOAPNote: React.FC = () => {
   const { showLoading, hideLoading } = useLoading();
   const [show, setShow] = useState(false);
   const { t } = useTranslation('common');
@@ -57,19 +58,20 @@ const Encounter: React.FC = () => {
   const patientId = id ? uuidToId(id) : 0;
 
   const columns: { name: string; class: string; field: string; format: string; }[] = [
-    { name: t('PATIENT.ENCOUNTER.SNO'), class: "col-sm-1", field: "sno", format: ""},
-    { name: t('PATIENT.ENCOUNTER.START_DATE'), class: "col-sm-3", field: "start_date", format: "date"},
-    { name: t('PATIENT.ENCOUNTER.NAME'), class: "col-sm-6", field: "name", format: ""},
-    { name: t('PATIENT.ENCOUNTER.STATUS'), class: "col-sm-2", field: "is_active", format: ""}
+    { name: t('PATIENT.SOAP_NOTE.SNO'), class: "col-sm-1", field: "sno", format: ""},
+    { name: t('PATIENT.SOAP_NOTE.SUBJECTIVE'), class: "col-sm-3", field: "subjective", format: ""},
+    { name: t('PATIENT.SOAP_NOTE.OBJECTIVE'), class: "col-sm-3", field: "objective", format: ""},
+    { name: t('PATIENT.SOAP_NOTE.ASSESSMENT'), class: "col-sm-3", field: "assesment", format: ""},
+    { name: t('PATIENT.SOAP_NOTE.PLAN'), class: "col-sm-2", field: "plan", format: ""},
   ];
   const filter: { name: string; field: string; }[] = [
-    { name: t('PATIENT.ENCOUNTER.NAME'), field: 'name' }
+    { name: t('PATIENT.SOAP_NOTE.SUBJECTIVE'), field: 'subjective' }
   ];
 
   const dynamicFormRef = useRef<DynamicFormHandle>(null);
   const [page, setPage] = useState<number>(1);
   const [total, setTotal] = useState<number>(0);
-  const [selectedencounter, setSelectedEncounter] = useState<number>(0);
+  const [selectedSOAPNotes, setSelectedSOAPNotes] = useState<number>(0);
   const [mode, setMode] = useState<boolean>(false);
   const [clear, setClear] = useState<boolean>(false);
   const [list, setList] = useState<any>([]);
@@ -82,14 +84,15 @@ const Encounter: React.FC = () => {
   const [toastMessage, setToastMessage] = useState('');  
   const [toastColor, setToastColor] = useState<'primary' | 'success' | 'danger' | 'warning' | 'info' | 'light' | 'dark'>('primary');
 
-  const initialFormData: EncounterModel = {
+  const initialFormData: SOAPNoteModel = {
     "id": null,
     "patient_id": 0,
-    "name": "",
-    "start_date": todayDate,
-    "is_active": false
+    "subjective": "",
+    "objective": "",
+    "assesment": "",
+    "plan": "",
   };
-  const [formData, setFormData] = useState<EncounterModel>(initialFormData);
+  const [formData, setFormData] = useState<SOAPNoteModel>(initialFormData);
   const handleShow = () => {
     setShow(true);
     setFormData(initialFormData);
@@ -101,24 +104,24 @@ const Encounter: React.FC = () => {
 
   useEffect(() => {    
     // Language apply for form label
-    const translatedFormElements = EncounterFormElements.map((element) => ({
+    const translatedFormElements = SOAPNoteFormElements.map((element) => ({
       ...element,
-      label: t('PATIENT.ENCOUNTER.'+element.label)
+      label: t('PATIENT.SOAP_NOTE.'+element.label)
     }));
     setTranslatedElements(translatedFormElements);
-    fetchEncounterList(page);
+    fetchNotesList(page);
   }, []);
 
   // Get doctor list
-  const fetchEncounterList = async (page: number, sFilter?: { field: string; text: string }) => {
+  const fetchNotesList = async (page: number, sFilter?: { field: string; text: string }) => {
     showLoading();
     try {
       let passData: string = JSON.stringify({ page: page, limit: pageLimit, sort: null, search: sFilter, patient_id: uuidToId(id) });
-      const response = await execute_axios_post(ENDPOINTS.POST_ENCOUNTER_LIST, passData);
+      const response = await execute_axios_post(ENDPOINTS.POST_SOAP_NOTE_LIST, passData);
       setList(response.data.list);
       setTotal(response.data.total);
     } catch (err) {
-      setError('Failed to load encounter data.');
+      setError('Failed to load soap note data.');
     } finally {
       hideLoading();
     }
@@ -134,7 +137,7 @@ const Encounter: React.FC = () => {
         }
         setPage(1);
         setsearchFilter(sFilter);
-        fetchEncounterList(1,sFilter);
+        fetchNotesList(1,sFilter);
         setClear(true);
     }
   }
@@ -143,25 +146,25 @@ const Encounter: React.FC = () => {
   const clearSearch = () => {
     (document.getElementById('searchText') as HTMLInputElement).value = '';
     setsearchFilter([]);
-    fetchEncounterList(1);
+    fetchNotesList(1);
     setClear(false);
   }
 
   // List double click
-  const encounterDblClick = (event: any) => {
+  const soapnoteDblClick = (event: any) => {
     let x = document.getElementsByClassName("selected");
     if(x.length > 0) { x[0].classList.remove("selected"); }
 
     if(event.target.parentNode.getAttribute('custom-id')) {
       selectedID = event.target.parentNode.getAttribute('custom-id');
       event.target.parentElement.setAttribute('class', 'row selected');
-      setSelectedEncounter(selectedID);
+      setSelectedSOAPNotes(selectedID);
     }
-    getEncounterById('edit');
+    getSOAPNoteById('edit');
   }
 
   // List single click
-  const encounterClick = (event: any) => {
+  const soapnoteClick = (event: any) => {
     let x = document.getElementsByClassName("selected");
     if(x.length > 0) { x[0].classList.remove("selected"); }
 
@@ -169,21 +172,21 @@ const Encounter: React.FC = () => {
       selectedID = event.target.parentNode.getAttribute('custom-id');
       event.target.parentElement.setAttribute('class', 'row selected');
     }
-    setSelectedEncounter(selectedID);
+    setSelectedSOAPNotes(selectedID);
   }
 
   // Edit action call
-  const createEncounter = () => {    
-    getEncounterById('add');
+  const createSOAPNote = () => {    
+    getSOAPNoteById('add');
   }
   
   // Edit action call
   const handleEdit = () => {
-    if(selectedencounter === 0) {
+    if(selectedSOAPNotes === 0) {
       handleShowToast(t('SETTING.MESSAGES.SELECT_RECORD'), 'danger');
       return false;
     }
-    getEncounterById('edit');
+    getSOAPNoteById('edit');
   } 
   
   // Function to handle form field changes
@@ -194,12 +197,12 @@ const Encounter: React.FC = () => {
   };  
 
   // Get form data
-  const getEncounterById = async (type: string) => {
+  const getSOAPNoteById = async (type: string) => {
     try {
       let editID = 0;      
-      if(type == 'edit') editID = selectedencounter;
+      if(type == 'edit') editID = selectedSOAPNotes;
       let passData: string = JSON.stringify({ id: editID });
-      const response = await execute_axios_post(ENDPOINTS.POST_ENCOUNTER_FORMDATA, passData);
+      const response = await execute_axios_post(ENDPOINTS.POST_SOAP_NOTE_FORMDATA, passData);
       if(response.success) {        
         handleShow();
         if(response.data?.data?.id) {
@@ -207,9 +210,21 @@ const Encounter: React.FC = () => {
           setInitialValues(response.data.data);
           setFormData(response.data.data);
         }
+        let status = new Array;
+        if(response.data.statuses) {
+          response.data.statuses.map((stat: any, s: number) => {
+            status.push({'label': stat.description, 'value': stat.id});
+          })
+        }     
+        translatedElements.map((elements: any, k: number) => {
+          if(elements.name == 'status_id') {
+            elements.options = [];
+            elements.options = status;
+          }
+        })
       }
     } catch (error: any) {
-        console.error('Error on fetching encounter details:', error);
+        console.error('Error on fetching soap notes details:', error);
     }
   }
 
@@ -220,8 +235,8 @@ const Encounter: React.FC = () => {
     if (dynamicFormRef.current?.validateModelForm()) {
       try {
         formData.patient_id = patientId;
-        const response = await execute_axios_post(ENDPOINTS.POST_ENCOUNTER_STORE, formData);
-        handleShowToast(t('PATIENT.ENCOUNTER.MESSAGES.SAVE_SUCCESS'), 'success');
+        const response = await execute_axios_post(ENDPOINTS.POST_SOAP_NOTE_STORE, formData);
+        handleShowToast(t('PATIENT.SOAP_NOTE.MESSAGES.SAVE_SUCCESS'), 'success');
       } catch (error) {
         console.error('Error updating notes:', error);
       } finally {
@@ -236,25 +251,23 @@ const Encounter: React.FC = () => {
     }
   };
 
-  // Archive action call
-  const handleArchive = async(event: any) => {
+  // Delete action call
+  const handleDelete = async(event: any) => {
+    if(selectedSOAPNotes === 0) {
+      handleShowToast(t('SETTING.MESSAGES.SELECT_RECORD'), 'danger');
+      return false;
+    }
     showLoading();
     try {
-      statusID = event.target.getAttribute('cur-id');
-      let passData: string = JSON.stringify({ id: statusID, is_active: event.target.checked });
-      const response = await execute_axios_post(ENDPOINTS.POST_ENCOUNTER_STATUS, passData);      
+      let passData: string = JSON.stringify({ id: selectedID });
+      const response = await execute_axios_post(ENDPOINTS.POST_SOAP_NOTE_DELETE, passData);      
       if(response.success) { 
-        if(event.target.checked === true) {
-          handleShowToast(t('SETTING.MESSAGES.INACTIVE'), 'dark');
-        }
-        if(event.target.checked === false) {
-          handleShowToast(t('SETTING.MESSAGES.ACTIVE'), 'success');
-        }
+        handleShowToast(t('SETTING.MESSAGES.DELETE'), 'success');
         refreshData(page);
         hideLoading();
       }
     } catch (error: any) {
-        console.error('Error on fetching encounter details:', error);
+        console.error('Error on fetching soap note details:', error);
         hideLoading();
     }
   }
@@ -270,9 +283,9 @@ const Encounter: React.FC = () => {
     listRows.forEach(function(row){
       row.classList.remove('selected');
     })
-    setSelectedEncounter(0);
+    setSelectedSOAPNotes(0);
     setPage(currentPage);
-    fetchEncounterList(currentPage, searchFilter);
+    fetchNotesList(currentPage, searchFilter);
   }
 
   // Toast message call
@@ -285,17 +298,18 @@ const Encounter: React.FC = () => {
   return (
     <PatientLayout patientId={id as string}>
       <div className="d-flex justify-content-between align-items-center">
-        <h1 className={`${styles.title} mb-3 module-title`}><i className="fi fi-br-layers"></i> {t('PATIENT.SIDE_MENU.ENCOUNTER')}</h1>
+        <h1 className={`${styles.title} mb-3 module-title`}><i className="fi fi-rr-edit"></i> {t('PATIENT.SIDE_MENU.SOAP_NOTES')}</h1>
       </div>
       <Row className="white-bg p-1 m-0 top-bottom-shadow">
         <Col xs={7} className="mt-3 action">
-          <Button variant='primary' className='btn rounded-0' onClick={createEncounter}><i className="fi fi-ss-add"></i> {t('ACTIONS.ADDNEW')}</Button>
+          <Button variant='primary' className='btn rounded-0' onClick={createSOAPNote}><i className="fi fi-ss-add"></i> {t('ACTIONS.ADDNEW')}</Button>
           <Dropdown >
             <Dropdown.Toggle variant="secondary" id="dropdown-basic"  className="btn rounded-0 ms-2">
               {t('ACTIONS.ACTIONS')}
             </Dropdown.Toggle>
             <Dropdown.Menu>
               <Dropdown.Item onClick={handleEdit}><i className="fi fi-sr-pencil"></i> {t('ACTIONS.EDIT')}</Dropdown.Item>
+              <Dropdown.Item onClick={handleDelete}><i className="fi fi-rr-trash"></i> {t('ACTIONS.DELETE')}</Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>
         </Col>
@@ -313,21 +327,21 @@ const Encounter: React.FC = () => {
         <Datalist
           columns={columns}
           list={list}
-          onRowDblClick={encounterDblClick}
-          onRowClick={encounterClick}
+          onRowDblClick={soapnoteDblClick}
+          onRowClick={soapnoteClick}
           page={page}
           total={total}
           pageLimit={pageLimit}
           refreshData={refreshData}
           showPagination={true}
-          archiveRecord={handleArchive}/>
+          archiveRecord={handleDelete}/>
       </div>
       <OffcanvasComponent
         show={show}
-        title={ (mode) ? t('PATIENT.ENCOUNTER.EDIT_TITLE') : t('PATIENT.ENCOUNTER.CREATE_TITLE') }
+        title={ (mode) ? t('PATIENT.SOAP_NOTE.EDIT_TITLE') : t('PATIENT.SOAP_NOTE.CREATE_TITLE') }
         handleClose={handleClose}
         onSave={handleSave}
-        size="30%">
+        size="50%">
 
         <DynamicForm ref={dynamicFormRef}
           formData={translatedElements}
@@ -335,7 +349,7 @@ const Encounter: React.FC = () => {
           formReset={formReset}
           onSubmit={handleSave}
           isEditMode={mode}
-          modelFormInputs={handleInputChange}/>
+          modelFormInputs={handleInputChange}/>       
         
       </OffcanvasComponent>
       <ToastNotification
@@ -348,4 +362,4 @@ const Encounter: React.FC = () => {
     </PatientLayout>
   );
 };
-export default Encounter;
+export default SOAPNote;

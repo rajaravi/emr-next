@@ -529,11 +529,10 @@ const Rule: React.FC = () => {
   };
 
   const getActionsData = async(selectedText: string, parameterIdentity: string ) => {
-    // alert(parameterIdentity);
+    alert(parameterIdentity);
     // let currentModule = categoryList[selectedText][0] ? categoryList[selectedText][0] : actionCategory[selectedText][0];
     // let targetModule = categoryList[selectedText][1] ? categoryList[selectedText][1] : actionCategory[selectedText][1];
     params.forEach((param: any) => {
-      console.log('url',param.resource);
       let passData = '';
       if(param.label === selectedText) {
         if(param.common_data_reference) {

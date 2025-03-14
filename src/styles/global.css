@@ -259,6 +259,11 @@ input[type=text].form-control, select.form-control  {
 .listBody .row.selected {
   background-color: #e5ffff;
 }
+.listBody .row .col {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
 ul.pagination {
   float: right;
@@ -834,3 +839,24 @@ ul.timeSlots li {
   background-color: #0046e9;
   color: #fff;
 }
+.sub-menu {
+  background-color: #fff;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  display: none;
+}
+li.nav-item:hover ul.sub-menu {
+  display: block;
+}
+.sub-menu li a {
+  text-decoration: none;
+}
+
+.heidi-iframe {
+  bottom: 50px !important;
+  right: 8px !important;
+}
+
+next-route-announcer + div, next-route-announcer + script + div {display:none;}
+.e-dropdown-popup.e-lib.e-popup + div, .heidi-iframe + div {display:none;}

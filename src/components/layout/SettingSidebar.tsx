@@ -94,6 +94,18 @@ const SettingSidebar : React.FC = () => {
           </Link>
         </li>
         <li className="nav-item">
+          <Link href={`/settings/drug`}
+            className={`nav-link ${activeLink === `/settings/drug` ? 'active' : ''}`}>
+            <i className="fi fi-bs-pills"></i> {t('SETTING.SIDE_MENU.DRUG')}
+          </Link>
+        </li>
+        <li className="nav-item">
+          <Link href={`/settings/drug-pathway`}
+            className={`nav-link ${activeLink === `/settings/drug-pathway` ? 'active' : ''}`}>
+            <i className="fi fi-rr-capsules"></i> {t('SETTING.SIDE_MENU.DRUG_PATHWAY')}
+          </Link>
+        </li>
+        <li className="nav-item">
           <Link href={`/settings/speciality`}
             className={`nav-link ${activeLink === `/settings/speciality` ? 'active' : ''}`}>
             <i className="fi fi-rr-member-list"></i> {t('SETTING.SIDE_MENU.SPECIALITY')}
@@ -123,7 +135,7 @@ const SettingSidebar : React.FC = () => {
             <i className="fi fi-rr-users"></i> {t('SETTING.SIDE_MENU.USER')}
           </Link>
         </li>
-        <li className="nav-item d-none">
+        <li className="nav-item d-none1">
           <Link href={`/settings/print-template`}
             className={`nav-link ${activeLink === `/settings/print-template` ? 'active' : ''}`}>
             <i className="fi fi-rr-users"></i> Print

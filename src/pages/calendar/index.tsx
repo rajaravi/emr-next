@@ -1,6 +1,6 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { execute_axios_post } from '@/utils/services/httpService';
-import { Table, Button, Row, Col, Dropdown, Form, Container } from 'react-bootstrap';
+import { Table, Button, Row, Col, Dropdown, Form, Container, Modal, Tabs, Tab } from 'react-bootstrap';
 // import MyBigCalendar from '@/components/core-components/BigCalendar';
 import MyFullCalendar from '@/components/core-components/FullCalendarComponent';
 import ENDPOINTS from '@/utils/constants/endpoints';
@@ -11,6 +11,7 @@ import { getI18nStaticProps } from '@/utils/services/getI18nStaticProps';
 import Datalist from '@/components/core-components/Datalist';
 import SearchFilter from '@/components/core-components/SearchFilter';
 import { useLoading } from '@/context/LoadingContext';
+import { DocumentEditorContainerComponent, Toolbar } from '@syncfusion/ej2-react-documenteditor';
 import DynamicForm, { DynamicFormHandle } from '@/components/core-components/DynamicForm';
 import ToastNotification from '@/components/core-components/ToastNotification';
 import { AppointmentFormElements } from '@/data/AppointmentFormElements';
@@ -20,11 +21,14 @@ import { SurgeryFormElements } from '@/data/SurgeryFormElements';
 import { SurgeryModel } from '@/types/surgery';
 import SurgeryForm from '../patient/[id]/surgery/form';
 
+DocumentEditorContainerComponent.Inject(Toolbar);
+
 export const getStaticProps: GetStaticProps = getI18nStaticProps();
 
 let pageLimit: number = 8;
 let selectedID: number = 0;
 let clickCount: number = 0;
+let savedData: string = '';
 
 // Calendar block
 interface Event {
@@ -97,7 +101,8 @@ const Calendar = () => {
   const [moduleType, setModuleType] = useState<number>(1);  
 
   // Appointment block
-  const dynamicFormRefApp = useRef<DynamicFormHandle>(null);
+  const [isEditorReady, setIsEditorReady] = useState(false);
+  const dynamicFormRefApp = useRef<DynamicFormHandle>(null);  
   const [translatedElementsApp, setTranslatedElementsApp] = useState<any>([]);
   const [initialValuesApp, setInitialValuesApp] = useState<any>(initialValueAppointment);
   const [selectedAppointment, setSelectedAppointment] = useState<number>(0);
@@ -108,6 +113,7 @@ const Calendar = () => {
   const [apptype, setApptype] = useState<number>(0);
   const [appdate, setAppdate] = useState<string | null>(null);
   const [activeIndex, setActiveIndex] = useState<number>(-1);
+  const [workFlowShow, setWorkflowShow] = useState<boolean>(false);
   const initialFormDataApp: AppointmentModel = { 
     "id": null,
     "patient_id": 0,
@@ -126,7 +132,7 @@ const Calendar = () => {
     "status_id": 0
   };
   const [formDataApp, setFormDataApp] = useState<AppointmentModel>(initialFormDataApp);
-
+  const editorContainerRef = useRef<DocumentEditorContainerComponent | null>(null);
   // Surgery block  
   const dynamicFormRefSurg = useRef<DynamicFormHandle>(null);
   const [translatedElementsSurg, setTranslatedElementsSurg] = useState<any>([]);
@@ -142,10 +148,10 @@ const Calendar = () => {
   const columns: { name: string; class: string; field: string; format: string; }[] = [
     { name: t('PATIENT.SURGERY.SNO'), class: "col-sm-1", field: "sno", format:''},
     { name: t('PATIENT.SURGERY.DATE'), class: "col-sm-1", field: "date", format:'date'},
-    { name: t('PATIENT.SURGERY.PATIENT'), class: "col-sm-3", field: "patient.full_name", format:''},
-    { name: t('PATIENT.SURGERY.DOCTOR'), class: "col-sm-2", field: "doctor.name", format:''},
-    { name: t('PATIENT.SURGERY.LOCATION'), class: "col-sm-3", field: "location.name", format:''},
-    { name: t('PATIENT.SURGERY.STATUS'), class: "col-sm-2", field: "status.description", format:''},    
+    { name: t('PATIENT.SURGERY.PATIENT'), class: "col-sm-3", field: "patient?.full_name", format:''},
+    { name: t('PATIENT.SURGERY.DOCTOR'), class: "col-sm-2", field: "doctor?.name", format:''},
+    { name: t('PATIENT.SURGERY.LOCATION'), class: "col-sm-3", field: "location?.name", format:''},
+    { name: t('PATIENT.SURGERY.STATUS'), class: "col-sm-2", field: "status?.description", format:''},    
   ];
   const filter: { name: string; field: string; }[] = [
     { name: t('PATIENT.SURGERY.PATIENT'), field: 'patient_id' }
@@ -248,14 +254,14 @@ const Calendar = () => {
   const getEncounterList = async (moduleType:string) => {
     try {
         let passData: string = JSON.stringify({ patient_id: patientID });
-        const result = await execute_axios_post(ENDPOINTS.GET_ENCOUNTER_LIST, passData);
+        const result = await execute_axios_post(ENDPOINTS.POST_ENCOUNTER_GETLIST, passData);
         let encounter = new Array;
         if(result.data) {
           result.data.map((enc: any, e: number) => {
             encounter.push({'label':enc.name, 'value': enc.id});
           })
         }
-        if(moduleType === 'Apoointment') {
+        if(moduleType === 'Appointment') {
           translatedElementsApp.map((elements: any, k: number) => {
             if(elements.name == 'episode_id') {
               elements.options = [];
@@ -572,6 +578,8 @@ const Calendar = () => {
             setEvents([...events, newEvent]);
           }
           handleClose();
+          getLetterId();
+          setWorkflowShow(true);
         }
       } catch (error) {
         console.error('Error creating an appointment:', error);
@@ -939,11 +947,94 @@ const Calendar = () => {
   // Get procedure list
   const fetchProcedureList = async () => {
     try {
-      const response = await execute_axios_post(ENDPOINTS.GET_PROCEDURE_LIST, []);
+      const response = await execute_axios_post(ENDPOINTS.POST_PROCEDURE_GETLIST, []);
       setProcedureList(response.data);
     } catch (err) {
       setError('Failed to load purchaser data.');
     }
+  };
+
+  const [step, setStep] = useState(1);
+  const totalSteps = 3; // Change this based on your steps
+
+  // Handle next step
+  const nextStep = (type: number) => {    
+    if(type == 1) {
+      // handleShowToast(t('Saved Successfully!'), 'success');
+      if(step == 1) {
+        savedData = '';
+        getTabData('SMS', 'sms-template/form-data');
+      }
+      if(step == 2) {
+        savedData = '';
+        getTabData('Email', 'mail-template/form-data');
+      }   
+      if (step < totalSteps) setStep(step + 1);       
+    }
+    if(type == 2) {
+      if (step < totalSteps) setStep(step + 1);      
+    }
+    if(type == 3) {
+      // handleShowToast(t('Saved Successfully!'), 'success');
+      setStep(1);
+      setWorkflowShow(false);
+    }
+    if(type == 4) {
+      setStep(1);
+      setWorkflowShow(false);
+    }
+  };
+
+  const getTabData = async (module: string, url: string) => {
+    try {
+      let passData: string = JSON.stringify({ id: 1 });      
+      showLoading();
+      const response = await execute_axios_post(process.env.NEXT_PUBLIC_API_URL+'/'+url, passData);
+      if(response.success) {
+        if(response.data?.data?.id) {          
+          const formData = response.data?.data;
+          if(response.data.data.content) {            
+            savedData = response.data.data.content;            
+          }        
+        }
+        hideLoading();       
+      }
+    } catch (error: any) {
+        console.error('Error on fetching doctor details:', error);
+        hideLoading();
+    }    
+  }
+
+  const getLetterId = async () => {
+    try {
+      let passData: string = JSON.stringify({ id: 1, patient_id: 1 });      
+      showLoading();
+      const response = await execute_axios_post(ENDPOINTS.POST_LETTER_FORMDATA, passData);
+      if(response.success) {
+        if(response.data?.data?.id) {          
+          const formData = response.data?.data;
+          if(response.data.data.content) {            
+            savedData = response.data.data.content;
+            loadEditorData();            
+          }        
+        }       
+      }
+    } catch (error: any) {
+        console.error('Error on fetching doctor details:', error);
+        hideLoading();
+    }    
+  }
+
+  // Load the document into the editor once everything is ready
+  const loadEditorData = useCallback(() => {
+    if (editorContainerRef.current && savedData) {
+      editorContainerRef.current.documentEditor.open(savedData);
+      console.log('Document loaded successfully after form rendering.');
+    }
+  }, [savedData]);
+
+  const handleEditorCreated = () => {
+    setIsEditorReady(true);
   };
 
   return (
@@ -1071,6 +1162,73 @@ const Calendar = () => {
         />
         )  
       }
+      <Modal size='xl' show={workFlowShow}>
+        <Container className="my-4">
+          <h3 className='mb-3'>Appointment - Follow up actions</h3>
+          <Tabs className="mb-3 w-100 d-flex justify-content-between nav-tabs-custom" activeKey={step} >
+            <Tab eventKey={1} title="Letter" disabled={step < 1} />
+            <Tab eventKey={2} title="SMS" disabled={step < 2} />
+            <Tab eventKey={3} title="Email" disabled={step < 3} />
+          </Tabs>
+          {step === 1 && (
+            <Form>
+              <Form.Group controlId="step1">
+                <DocumentEditorContainerComponent
+                  id="container"
+                  height="570px"
+                  width="100%"
+                  serviceUrl="https://ej2services.syncfusion.com/production/web-services/api/documenteditor/"
+                  enableToolbar={true} // Enable toolbar
+                  className="border"
+                  ref={editorContainerRef}
+                  created={handleEditorCreated}
+                />
+              </Form.Group>
+            </Form>
+          )}
+
+          {step === 2 && (
+            <Form>
+              <Form.Group controlId="step2">
+                <Form.Control as="textarea" rows={5} value={savedData} className='form-control' disabled />              
+              </Form.Group>
+            </Form>
+          )}
+
+          {step === 3 && (
+            <Form>
+              <Form.Group controlId="step3">
+                <iframe srcDoc={savedData} style={{width: '100%', height: '420px'}}></iframe>
+              </Form.Group>
+            </Form>
+          )}
+
+          <div className="d-flex float-end mt-3">
+            {/* <Button variant="secondary" onClick={prevStep} disabled={step === 1}>
+              Previous
+            </Button> */}
+            {step < totalSteps ? (
+              <>
+                <Button className='float-end rounded-0' variant="success" onClick={() => nextStep(1)}>
+                  Next
+                </Button>
+                <Button className='float-end rounded-0 d-none' variant="default" onClick={() => nextStep(2)}>
+                  Skip
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button variant="success" className='rounded-0' onClick={() => nextStep(3)}>
+                  Close
+                </Button>
+                <Button className='float-end rounded-0 d-none' variant="default" onClick={() => nextStep(4)}>
+                  Skip
+                </Button>
+              </>
+            )}
+          </div>
+        </Container>
+      </Modal>
       <ToastNotification
         show={showToast}
         message={toastMessage}

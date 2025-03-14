@@ -1,7 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import { execute_axios_post } from '@/utils/services/httpService';
-import { Button, Row, Col, Dropdown } from 'react-bootstrap';
+import { Button, Row, Col, Dropdown, Container, Form, Modal, Tabs, Tab } from 'react-bootstrap';
 // Translation logic - start
 import { GetServerSideProps } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
@@ -12,12 +12,15 @@ import PatientLayout from '@/components/layout/PatientLayout';
 import Datalist from '@/components/core-components/Datalist';
 import SearchFilter from '@/components/core-components/SearchFilter';
 import { useLoading } from '@/context/LoadingContext';
+import { DocumentEditorContainerComponent, Toolbar } from '@syncfusion/ej2-react-documenteditor';
 import { DynamicFormHandle } from '@/components/core-components/DynamicForm';
 import ToastNotification from '@/components/core-components/ToastNotification';
 import { uuidToId } from '@/utils/helpers/uuid';
 import AppointmentForm from './form';
 import { AppointmentFormElements } from '@/data/AppointmentFormElements';
 import { AppointmentModel } from '@/types/appointment';
+
+DocumentEditorContainerComponent.Inject(Toolbar);
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { id } = context.params as { id: string };
@@ -38,6 +41,7 @@ let pageLimit: number = 6;
 let selectedID: number = 0;
 let archiveID: number = 0;
 const todayDate = new Date().toISOString().split('T')[0];
+let savedData: string = '';
 
 const initialValue = {
   patient_id: 0,
@@ -72,7 +76,7 @@ const Appointment: React.FC = () => {
   const filter: { name: string; field: string; }[] = [
     { name: t('PATIENT.APPOINTMENT.DATE'), field: 'date' }
   ];
-
+  const [isEditorReady, setIsEditorReady] = useState(false);
   const [show, setShow] = useState(false);
   const dynamicFormRefApp = useRef<DynamicFormHandle>(null);
   const [page, setPage] = useState<number>(1);  
@@ -97,7 +101,7 @@ const Appointment: React.FC = () => {
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [toastColor, setToastColor] = useState<'primary' | 'success' | 'danger' | 'warning' | 'info' | 'light' | 'dark'>('primary');
-    
+  const editorContainerRef = useRef<DocumentEditorContainerComponent | null>(null);
   const initialFormData: AppointmentModel = { 
     "id": null,
     "patient_id": 0,
@@ -387,6 +391,7 @@ const Appointment: React.FC = () => {
         if(response.success) {
           handleShowToast(t('PATIENT.APPOINTMENT.MESSAGES.SAVE_SUCCESS'), 'success');
           handleClose();
+          getLetterId();
           setWorkflowShow(true);
         }
       } catch (error) {
@@ -539,16 +544,24 @@ const Appointment: React.FC = () => {
   const totalSteps = 3; // Change this based on your steps
 
   // Handle next step
-  const nextStep = (type: number) => {
+  const nextStep = (type: number) => {    
     if(type == 1) {
-      handleShowToast(t('Saved Successfully!'), 'success');
-      if (step < totalSteps) setStep(step + 1);
+      // handleShowToast(t('Saved Successfully!'), 'success');
+      if(step == 1) {
+        savedData = '';
+        getTabData('SMS', 'sms-template/form-data');
+      }
+      if(step == 2) {
+        savedData = '';
+        getTabData('Email', 'mail-template/form-data');
+      }   
+      if (step < totalSteps) setStep(step + 1);       
     }
     if(type == 2) {
-      if (step < totalSteps) setStep(step + 1);
+      if (step < totalSteps) setStep(step + 1);      
     }
     if(type == 3) {
-      handleShowToast(t('Saved Successfully!'), 'success');
+      // handleShowToast(t('Saved Successfully!'), 'success');
       setStep(1);
       setWorkflowShow(false);
     }
@@ -556,6 +569,58 @@ const Appointment: React.FC = () => {
       setStep(1);
       setWorkflowShow(false);
     }
+  };
+
+  const getTabData = async (module: string, url: string) => {
+    try {
+      let passData: string = JSON.stringify({ id: 1 });      
+      showLoading();
+      const response = await execute_axios_post(process.env.NEXT_PUBLIC_API_URL+'/'+url, passData);
+      if(response.success) {
+        if(response.data?.data?.id) {          
+          const formData = response.data?.data;
+          if(response.data.data.content) {            
+            savedData = response.data.data.content;            
+          }        
+        }
+        hideLoading();       
+      }
+    } catch (error: any) {
+        console.error('Error on fetching doctor details:', error);
+        hideLoading();
+    }    
+  }
+
+  const getLetterId = async () => {
+    try {
+      let passData: string = JSON.stringify({ id: 1, patient_id: 1 });      
+      showLoading();
+      const response = await execute_axios_post(ENDPOINTS.POST_LETTER_FORMDATA, passData);
+      if(response.success) {
+        if(response.data?.data?.id) {          
+          const formData = response.data?.data;
+          if(response.data.data.content) {            
+            savedData = response.data.data.content;
+            loadEditorData();            
+          }        
+        }       
+      }
+    } catch (error: any) {
+        console.error('Error on fetching doctor details:', error);
+        hideLoading();
+    }    
+  }
+
+  // Load the document into the editor once everything is ready
+  const loadEditorData = useCallback(() => {
+    if (editorContainerRef.current && savedData) {
+      editorContainerRef.current.documentEditor.open(savedData);
+      console.log('Document loaded successfully after form rendering.');
+    }
+  }, [savedData]);
+
+  const handleEditorCreated = () => {
+    setIsEditorReady(true);
   };
 
   // Handle previous step
@@ -623,12 +688,74 @@ const Appointment: React.FC = () => {
         activeIndex={activeIndex}
         fromSource={'Patients'}
         booked_slot_time={slotBookedTime}
-        workFlowShow={workFlowShow}
-        nextStep={nextStep}
-        step={step}
-        totalSteps={totalSteps}
-        setStep={setStep}
       />
+      <Modal size='xl' show={workFlowShow}>
+        <Container className="my-4">
+          <h3 className='mb-3'>Appointment - Follow up actions</h3>
+          <Tabs className="mb-3 w-100 d-flex justify-content-between nav-tabs-custom" activeKey={step} >
+            <Tab eventKey={1} title="Letter" disabled={step < 1} />
+            <Tab eventKey={2} title="SMS" disabled={step < 2} />
+            <Tab eventKey={3} title="Email" disabled={step < 3} />
+          </Tabs>
+          {step === 1 && (
+            <Form>
+              <Form.Group controlId="step1">
+                <DocumentEditorContainerComponent
+                  id="container"
+                  height="570px"
+                  width="100%"
+                  serviceUrl="https://ej2services.syncfusion.com/production/web-services/api/documenteditor/"
+                  enableToolbar={true} // Enable toolbar
+                  className="border"
+                  ref={editorContainerRef}
+                  created={handleEditorCreated}
+                />
+              </Form.Group>
+            </Form>
+          )}
+
+          {step === 2 && (
+            <Form>
+              <Form.Group controlId="step2">
+                <Form.Control as="textarea" rows={5} value={savedData} className='form-control' disabled />              
+              </Form.Group>
+            </Form>
+          )}
+
+          {step === 3 && (
+            <Form>
+              <Form.Group controlId="step3">
+                <iframe srcDoc={savedData} style={{width: '100%', height: '420px'}}></iframe>
+              </Form.Group>
+            </Form>
+          )}
+
+          <div className="d-flex float-end mt-3">
+            {/* <Button variant="secondary" onClick={prevStep} disabled={step === 1}>
+              Previous
+            </Button> */}
+            {step < totalSteps ? (
+              <>
+                <Button className='float-end rounded-0' variant="success" onClick={() => nextStep(1)}>
+                  Next
+                </Button>
+                <Button className='float-end rounded-0 d-none' variant="default" onClick={() => nextStep(2)}>
+                  Skip
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button variant="success" className='rounded-0' onClick={() => nextStep(3)}>
+                  Close
+                </Button>
+                <Button className='float-end rounded-0 d-none' variant="default" onClick={() => nextStep(4)}>
+                  Skip
+                </Button>
+              </>
+            )}
+          </div>
+        </Container>
+      </Modal>
       <ToastNotification
         show={showToast}
         message={toastMessage}

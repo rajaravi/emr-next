@@ -1,14 +1,21 @@
 import { FormField } from "@/types/form";
 
-export const NotesFormElements: FormField[] = [
+export const PreAdmissionFormElements: FormField[] = [
   {
-    "type": "date",
-    "name": "date",
-    "label": "Date",
-    "required": true,
-    "disablePrevDate": true,
-    "disableFutureDate": false,
+    "type": "text",
+    "name": "patient_name",
+    "label": "Patient Name",
+    "required": false,
+    "colClass": "col-sm-6",
     "order": 1
+  },
+  {
+    "type": "text",
+    "name": "doctor_name",
+    "label": "Doctor Name",
+    "required": false,
+    "colClass": "col-sm-6",    
+    "order": 2
   },
   {
     "type": "dropdown",

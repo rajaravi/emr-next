@@ -245,7 +245,7 @@ const Tax: React.FC = () => {
       const response = await execute_axios_post(ENDPOINTS.POST_TAX_DEFAULT, passData);      
       if(response.success) { 
         if(event.target.checked === true) {
-          handleShowToast(t('SETTING.MESSAGES.REMOVED_DEFAULT'), 'dark');
+          handleShowToast(t('SETTING.MESSAGES.REMOVE_DEFAULT'), 'dark');
         }
         if(event.target.checked === false) {
           handleShowToast(t('SETTING.MESSAGES.SET_DEFAULT'), 'success');
